@@ -123,7 +123,7 @@ is modified from [[https://stackoverflow.com/a/14760833/2731421][this answer on 
                  (substring (current-time-string) 11 13))))
       (if (member hour (number-sequence 8 17))
           (synchronize-theme-helper 'tango)
-        ((synchronize-theme-helper 'tango-dark))
+        (synchronize-theme-helper 'tango-dark)
         )
       ))
 
@@ -307,7 +307,8 @@ Rainbow mode by default.
 
 *** POSTPONED Page Break Lines
 
-Display ugly =^L= page breaks as tidy horizontal lines. It does not work fine on Windows systems and I haven't work it out.
+Display ugly =^L= page breaks as tidy horizontal lines. It does not work
+fine on Windows systems and I haven't work it out.
 
 #+begin_src emacs-lisp
   (global-page-break-lines-mode)
@@ -359,18 +360,18 @@ Jump to text using a char-based decision tree. It's really
 cool!
 
 #+begin_src emacs-lisp
-(global-set-key (kbd "C-;") 'avy-goto-char)
-(global-set-key (kbd "C-'") 'avy-goto-line)
-(global-set-key (kbd "M-g f") 'avy-goto-line)
-(global-set-key (kbd "M-g w") 'avy-goto-word-1)
-(global-set-key (kbd "M-g e") 'avy-goto-word-0)
+  (global-set-key (kbd "C-;") 'avy-goto-char)
+  (global-set-key (kbd "C-'") 'avy-goto-line)
+  (global-set-key (kbd "M-g f") 'avy-goto-line)
+  (global-set-key (kbd "M-g w") 'avy-goto-word-1)
+  (global-set-key (kbd "M-g e") 'avy-goto-word-0)
 #+end_src
 
 *** Ace Window
 Bind =M-o= to use ace-window.
 
 #+begin_src emacs-lisp
-(global-set-key (kbd "M-o") 'ace-window)
+  (global-set-key (kbd "M-o") 'ace-window)
 #+end_src
 
 *** Multiple Cursors
