@@ -1,0 +1,780 @@
+#+Title: Emacs Configuration
+
+* General
+
+This is the configuration file for my Emacs.
+
+Some Emacs settings might be system dependent, which are listed in
+Table [[conf-table]] so that they can be modified easily. Other
+configurations can also be modified by the emacs-lisp source code
+blocks in this file.
+
+#+CAPTION: General Configuration
+#+NAME: conf-table
+| Field              | Value   | Description                |
+|--------------------+---------+----------------------------|
+| font               | default |                            |
+| font-size          | default | font height in units of pt |
+| cjk-font           | default |                            |
+| cjk-font-size      | default | font height in units of pt |
+| python-interpreter | default | default for auto-detection |
+
+The following code loads the field names in Table [[conf-table]] into
+emacs with a prefix "collie-".
+
+#+begin_src emacs-lisp :exports code :var table=conf-table
+  (dolist (pair table) 
+  (set (intern (concat "collie-" (car pair))) (cadr pair))
+  )
+#+end_src
+
+* Preferences
+** Personal Info
+
+Set =user-full-name.=
+
+#+BEGIN_SRC emacs-lisp
+  (setq user-full-name "Zhen Ni")
+#+END_SRC
+
+** Package Management
+
+Add melpa to package management system.
+
+#+begin_src emacs-lisp
+  ;; Added by Package.el.  This must come before
+  ;; configurations of installed packages.  Don't delete this
+  ;; line.  If you don't want it, just comment it out by
+  ;; adding a semicolon to the start of the line.  You may
+  ;; delete these explanatory comments.
+  (require 'package)
+  (add-to-list'package-archives
+   '("melpa-stable" . "http://melpa.org/packages/") t)
+  (package-initialize)
+#+end_src
+
+** Startup Screen
+*** Disable Builtin Startup Screen
+Turn off the startup screen. Type =M-x display-about-screen= to
+open it manullay if you want.
+
+#+begin_src emacs-lisp
+  (setq inhibit-startup-screen t)
+#+end_src
+
+*** Use Dashboard
+
+#+begin_src emacs-lisp
+  (require 'dashboard)
+  (dashboard-setup-startup-hook)
+  (setq dashboard-banner-logo-title "Nice day!")
+  (setq dashboard-startup-banner 'official) ;; 也可以自定义图片
+  (setq dashboard-items '(
+                        ;;  (projects . 5)
+                          (bookmarks . 5)  ;; number of listed bookmarks
+                          (recents  . 5)  ;; number of listed recent files
+                          )
+        )
+#+end_src
+
+Provide a function =(dashboard)= to goto dashboard. See [[https://github.com/emacs-dashboard/emacs-dashboard/issues/236#issue-688633919][this link]]
+for more details.
+
+#+begin_src emacs-lisp
+  (defun dashboard nil
+    (interactive)
+    (if (get-buffer "*dashboard*")
+        (switch-to-buffer "*dashboard*")
+        (dashboard-refresh-buffer))
+    )
+#+end_src
+
+** Misc
+
+Turn off the annoying bell.
+
+#+begin_src emacs-lisp
+  (setq visible-bell t)
+#+end_src
+
+* Appearance
+** Color Theme
+
+Set color theme by time. The theme is set to =tango= from 8:00
+to 18:00, and set to =tango-dark= from 18:00 to 8:00. The code
+is modified from [[https://stackoverflow.com/a/14760833/2731421][this answer on Github]].
+ 
+#+begin_src emacs-lisp
+  ;; See https://stackoverflow.com/a/14760833/2731421 for more
+  ;; information.
+
+  (load-theme 'tango)
+  (setq current-theme 'tango)
+
+  (defun synchronize-theme-helper (new-theme)
+    "Set the current theme to new-theme."
+    (if (equal current-theme new-theme) ()
+      (progn (load-theme new-theme) (setq current-theme new-theme))
+      ))
+
+  (defun synchronize-theme ()
+    "Set theme by time."
+    (let ((hour (string-to-number 
+                 (substring (current-time-string) 11 13))))
+      (if (member hour (number-sequence 8 17))
+          (synchronize-theme-helper 'tango)
+        ((synchronize-theme-helper 'tango-dark))
+        )
+      ))
+
+  ;; Check every 10 minutes.
+  (run-with-timer 0 600 'synchronize-theme)
+#+end_src
+
+** Window Layouts
+   
+I'd like to turn off menu, tool and scroll bar.
+
+#+begin_src emacs-lisp
+  (menu-bar-mode 0)
+  (tool-bar-mode 0)
+  (scroll-bar-mode 0)
+#+end_src
+
++Show line numbers on the left of the window.+
+#+begin_src emacs-lisp
+  ;; (global-linum-mode t)
+#+end_src
+
+** Fonts
+
+The settings of the fonts are provided in Table [[conf-table]]. On Linux
+systems, The following code do nothing if font attribute are set to
+"default". On Windows systems, The default font is set to "Consolas"
+with size 110, and default cjk font is "微软雅黑" with size 22.
+
+#+begin_src emacs-lisp
+  (if (eq 'windows-nt system-type)
+      (progn
+        (if (equal collie-font "default")
+            (setq collie-font "Consolas"))
+        (if (equal collie-font-size "default")
+            (setq collie-font-size 11))
+        (if (equal collie-cjk-font "default")
+            (setq collie-cjk-font "微软雅黑"))
+        (if (equal collie-cjk-font-size "default")
+            (setq collie-cjk-font-size 22))
+        )
+    )
+
+  (if (not (equal collie-font "default"))
+      (progn (set-face-attribute 'default nil :font collie-font)
+             (set-face-attribute 'fixed-pitch nil :font collie-font))
+    )
+  (if (not (equal collie-font-size "default"))
+      (progn (set-face-attribute 'default nil
+                                 :height (* collie-font-size 10))
+             (set-face-attribute 'fixed-pitch nil
+                                 :height (* collie-font-size 10)))
+    )
+
+  (dolist (charset '(kana han cjk-misc bopomofo))
+    (set-fontset-font
+     (frame-parameter nil 'font)
+     charset
+     (font-spec
+      :family (if (equal collie-cjk-font "default")
+                  nil collie-cjk-font)
+      :size (if (equal collie-cjk-font-size "default")
+                    nil collie-cjk-font-size)
+      )
+     )
+    )
+#+end_src
+
+** Troubleshooting
+
+In X11 window, the default window size seems to be very small. This
+might be a BUG, but easy to fix.
+
+#+begin_src emacs-lisp
+  ;; Set window height and width only when run in WSL.
+  ;; Note that operating-system-release might be nil on windows, 
+  ;; which can not be argument of string-match-p.
+  (if operating-system-release
+      (if (string-match-p
+           "microsoft-standard-WSL"
+           operating-system-release)
+          (setq default-frame-alist
+                '((height . 32) (width . 80)))))
+#+end_src
+ 
+* Editor
+** Misc
+
+Smooth scrolling.
+
+#+bein_src emacs-lisp
+(setq mouse-wheel-progressive-speed nil)
+#+end_src
+
+** Default Modes
+*** Built-in
+
+Show column number on the bottom of the editor buffer.
+
+#+begin_src emacs-lisp
+  (column-number-mode 1)
+#+end_src
+
+Show matching parentheses.
+
+#+begin_src emacs-lisp
+  (show-paren-mode 1)
+#+end_src
+
+Automatically revert buffer if its content is changed
+somewhere else.
+
+#+begin_src emacs-lisp
+  (global-auto-revert-mode t)
+#+end_src
+
++Delete the selected region if text entered.+
+
+#+begin_src emacs-lisp
+  ;; (delete-selection-mode t)
+#+end_src
+
+*** Recent Files
+
+Exclude files in =~/.emacs.d/=.
+
+#+begin_src emacs-lisp
+  (setq recentf-exclude '("~/.emacs.d/"))
+#+end_src
+
+Enable recentf mode and save recent opened files every 5 minutes.
+#+begin_src emacs-lisp
+  (recentf-mode t)
+  (run-at-time (current-time) (* 5 60) 'recentf-save-list)
+#+end_src
+
+*** Auto Complete
+
+Use Company mode for auto-completion.
+
+#+begin_src emacs-lisp
+  (global-company-mode 1)
+#+end_src
+
+*** Ivy, Swiper and Counsel
+
+Do not enable the whole ivy mode as I just want to use a portion
+of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
+1)=)
+    
+#+begin_src emacs-lisp
+  ;; ivy virtual buffer
+  (setq ivy-use-virtual-buffers t)
+  ;; ivy mini buffer
+  (setq enable-recursive-minibuffers t)
+#+end_src
+    
+*** Marginalia
+
+Marginalia in the minibuffer. [[https://github.com/minad/marginalia][Marginalia Homepage]].
+
+#+begin_src emacs-lisp
+(marginalia-mode t)
+#+end_src
+
+*** Flycheck
+
+Enable Flycheck mode by default.
+
+#+begin_src emacs-lisp
+      (global-flycheck-mode)
+#+end_src
+
+*** Rainbow
+
+Rainbow mode by default.
+
+#+begin_src emacs-lisp
+  (add-hook 'prog-mode-hook 'rainbow-mode)
+#+end_src
+
+*** POSTPONED Page Break Lines
+
+Display ugly =^L= page breaks as tidy horizontal lines. It does not work fine on Windows systems and I haven't work it out.
+
+#+begin_src emacs-lisp
+  (global-page-break-lines-mode)
+  (set-fontset-font "fontset-default"
+                    (cons page-break-lines-char page-break-lines-char)
+                    (face-attribute 'default :family))
+#+end_src
+
+** Keybindings
+*** Default Functoins
+
+Upcase and downcase region.
+
+#+begin_src emacs-lisp
+  ;; C-x C-u
+  (put 'upcase-region 'disabled nil)
+  ;; C-x C-l
+  (put 'downcase-region 'disabled nil)
+#+end_src
+
+*** Ivy, Counsel and Swiper
+
+Key bindings for counsel. I just enable some of the key bindings
+here.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-s") 'swiper)
+  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-x b") 'counsel-switch-buffer)
+  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  ;;(define-key ivy-minibuffer-map (kbd "C-j") 'ivy-immediate-done)
+#+end_src
+
+*** Mwim
+
+Move to the beginning/end of line, code or comment in a
+better way.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-a") 'mwim-beginning-of-code-or-line)
+  (global-set-key (kbd "C-e") 'mwim-end-of-code-or-line)
+  (global-set-key (kbd "<home>") 'mwim-beginning-of-line-or-code)
+  (global-set-key (kbd "<end>") 'mwim-end-of-line-or-code)
+#+end_src
+
+*** Avy
+
+Jump to text using a char-based decision tree. It's really
+cool!
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-;") 'avy-goto-char)
+(global-set-key (kbd "C-'") 'avy-goto-line)
+(global-set-key (kbd "M-g f") 'avy-goto-line)
+(global-set-key (kbd "M-g w") 'avy-goto-word-1)
+(global-set-key (kbd "M-g e") 'avy-goto-word-0)
+#+end_src
+
+*** Ace Window
+Bind =M-o= to use ace-window.
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "M-o") 'ace-window)
+#+end_src
+
+*** Multiple Cursors
+
+[[https://github.com/magnars/multiple-cursors.el][Multiple cursors]] for Emacs.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-?") 'mc/mark-all-words-like-this)
+  (global-set-key (kbd "C-S-<mouse-1>") 'mc/toggle-cursor-on-click)
+#+end_src
+
+** Backup Setting
+
+Set the Backup directory. Different Directories are used for
+Linux and Windows.
+
+#+begin_src emacs-lisp
+  (if (eq 'gnu/linux system-type)
+      (setq backup-directory-alist '(("." . "~/.emacs_backups/")))
+    )
+  (if (eq 'windows-nt system-type)
+      (setq backup-directory-alist '(("." . "D:/App/Emacs/")))
+    )
+#+end_src
+
+** Troubleshooting
+
+In X11, <delete> works as backward delete, which should be forward
+delete. I don't know whether it is a bug. But it is easy to work
+around this issue.
+
+#+begin_src emacs-lisp
+     (if operating-system-release
+	 (if (string-match-p
+	      "microsoft-standard-WSL"
+	      operating-system-release)
+	     (global-set-key (kbd "<delete>") 'delete-forward-char)
+	   )
+       )
+#+end_src
+   
+* Major Modes
+** Org Mode
+*** Basic Setting
+
+Start org-mode with all headers collapsed. The default
+setting of Emacs minght be different on different
+machines. So we set it here.
+
+#+begin_src emacs-lisp
+  (setq org-startup-folded t)
+#+end_src
+
+Wrap long lines in Org mode.
+
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
+#+end_src
+
+Enable shift-select.
+
+#+begin_src emacs-lisp
+  (setq org-support-shift-select t)
+#+end_src
+
+Use Org-indent-mode.
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook 'org-indent-mode)
+#+end_src
+
+*** Constants
+    
+#+begin_src emacs-lisp
+  (setq org-table-formula-constants
+        '(("π" . "3.14159265359")
+          ("pi" . "3.14159265359")
+          ("e" . "2.718281828459")
+          ))
+#+end_src
+
+*** Apperance Setting
+
+Use utf-8 characters for display. Use "C-c C-x \" to toggle.
+#+begin_src emacs-lisp
+  (setq org-pretty-entities t)
+#+end_src
+
+Hide *, ~ and / in org text.
+
+#+begin_src emacs-lisp
+  (setq org-hide-emphasis-markers t)
+#+end_src
+
++Hide the verbose leading stars before headlines. This feature is
+automatically enabled by =org-indent-mode=.+
+
+#+begin_src emacs-lisp
+  ;; (setq org-hide-leading-stars t)
+#+end_src
+
+I'd like something fancy instead of the ellipsis (...) that org
+displays when there's staff under a header. The arrow symbol is
+found from [[https://unicode-table.com/en/sets/arrow-symbols/][Unicode Character Table]].  
+Due to the limitation of font set, this only works for the X11
+window.
+
+#+begin_src emacs-lisp
+  (if (eq (window-system) 'x)
+      (setq org-ellipsis "..⤸")
+    )
+#+end_src
+
+*** "TODO" List Setting
+
+Org mode keyword settings.
+
+#+begin_src emacs-lisp
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "DOING(i)"
+                    "|"
+                    "DONE(d)" "ABORT(a)" "POSTPONED(p)")))
+  (setq org-todo-keyword-faces '(
+    ("TODO" . "red")
+    ("DOING" . "orange")
+    ("DONE" . "dark cyan")
+    ("ABORT" ."dim grey")
+    ("POSTPONED" . "dark magenta")))
+#+end_src
+
+*** Source Code Block Setting
+    
+Use the current window for editing source blocks (Press C-c ' in
+source code block).
+
+#+begin_src emacs-lisp
+  (setq org-src-window-setup 'other-window)
+#+end_src
+
+Enable Python, C, C++ and D languages.
+
+#+begin_src emacs-lisp
+  ;; Enable Python.
+  (org-babel-do-load-languages 'org-babel-load-languages
+  '((python . t)))
+  ;; Enable C, C++ and D.
+  (org-babel-do-load-languages 'org-babel-load-languages 
+  '((C . t)))
+#+end_src
+
+#+RESULTS:
+
+Run these codes without prompting.
+
+#+begin_src emacs-lisp
+  (defun my-org-confirm-babel-evaluate (lang body)
+    (not (member lang '("C" "C++" "python" "emacs-lisp")))
+    )
+  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+#+end_src
+
+*** Troubleshooting
+
+The source code block should presrve the source code's
+indentation. That is, leave the whitespaces as it instead of
+converting them to tabs. However, after editing the source code
+block using =C-c '=, the source code block will be indented
+automatically, and converts spaces to tabs. To disable this
+behaviour, one solution is to disable the source code block from
+automatically indent the codes. The following code works by
+cancelling all indents of source code blocks: ~(setq
+org-src-preserve-indentation nil)~. However, this is not what we
+want as we need an organized structure which indents
+correctly. Another workaround is to disable the =indent-tab-mode= in
+=org-mode=, which forces =org-mode= to use spaces for indentation. The
+drawback of this solution is all leading tabs will become
+whitespaces. And to insert tab in =org-mode=, press =C-q tab=.
+
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook
+  (lambda () (setq indent-tabs-mode nil)))
+#+end_src
+
+Disable page-breaklines mode because it does not work with
+org-indent-mode.
+
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook (lambda () (page-break-lines-mode -1)))
+#+end_src
+
+On windows systems, ob-python doesn't work well with the default
+python interpreter when matplotlib is used to plot figures. Using
+Ipython solves the problem. As this is the same issue as that in
+python-mode, the solution is given in the troubleshooting section
+in python mode settings.
+
+** Lisp Mode
+
+Use rainbow-delimiters for lisp-like languages.
+
+#+begin_src emacs-lisp
+  (add-hook 'lisp-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'scheme-mode-hook 'rainbow-delimiters-mode)
+  ;; The effect of rainbow delimiters is as follows:
+  '(((((((((.)))))))))
+#+end_src
+
+** Python Mode
+*** Basic Settings
+
+Use melpa's python-mode.el to replace the built-in python-mode.
+#+begin_src emacs-lisp
+  (require 'python-mode)
+#+end_src
+
+Enable eply mode for Python.
+
+#+begin_src emacs-lisp
+  (elpy-enable)
+#+end_src
+
+Disable virtualenv
+
+#+begin_src emacs-lisp
+  (setq elpy-rpc-virtualenv-path 'current)
+#+end_src
+
+*** Minor Mode Settings
+
+The flymake mode is turned on by default in elpy. But we use
+flycheck mode in python. So, turn it off.
+
+#+begin_src emacs-lisp
+  (add-hook 'elpy-mode-hook (lambda () (flymake-mode -1)))
+#+end_src
+
+Specify flycheck checkers for python.
+
+#+begin_src emacs-lisp
+  (flycheck-add-next-checker 'python-flake8 'python-mypy)
+#+end_src
+
+Specify a cache directory for mypy. Different cache directories
+are used for Linux and windows systems.
+
+#+begin_src emacs-lisp
+  (if (eq 'gnu/linux system-type)
+      ;; For Linux system.
+      (setq flycheck-python-mypy-cache-dir "/home/collie/.emacs_backups/.mypy_cache/")
+    ;; For Windows system.
+    (setq flycheck-python-mypy-cache-dir "D:/App/Emacs/.mypy_cache/")
+    )
+#+end_src
+
+*** Key Bindings
+    
+Press <f9> to run the whole buffer or the selected region.
+
+#+begin_src emacs-lisp
+  (add-hook 'elpy-mode-hook
+            (lambda () 
+              (local-set-key [f9] "\C-u\C-c\C-c")))
+#+end_src
+
+Press C-<f9> to kill the current python buffer and run the whole
+buffer.
+
+#+begin_src emacs-lisp
+  (defun collie-python-rerun () (interactive)
+         "Kill python shell and run current buffer or selection."
+         (elpy-shell-kill) (elpy-shell-send-region-or-buffer '(4))
+         )
+  (add-hook 'elpy-mode-hook
+            (lambda () (local-set-key (kbd "C-<f9>")
+                                      'collie-python-rerun)))
+#+end_src
+
+Press <f5> to save all files, run the whole buffer or the selected
+region.
+
+#+begin_src emacs-lisp
+  (add-hook 'elpy-mode-hook (lambda () (local-set-key
+    [f5] (kbd "C-u C-x s C-u C-c C-c"))))
+#+end_src
+
+Press C-<f5> to save all files, kill the current python buffer and
+run the whole buffer or the selected region.
+    
+#+begin_src emacs-lisp
+  (defun collie-python-save-and-rerun () (interactive)
+         "Save all buffers, kill current python buffer and run
+  current buffer or selection."
+         (save-some-buffers '(4)) (elpy-shell-kill)
+         (elpy-shell-send-region-or-buffer '(4)))
+  (add-hook 'elpy-mode-hook
+            (lambda () (local-set-key
+                        (kbd "C-<f5>")
+                        'collie-python-save-and-rerun)))
+#+end_src
+
+*** Addin Functions
+
+**** Autopep8
+
+Automatically formats Python code to conform the PEP 8 style
+guide. To use this function in Python mode, press =M-x
+autopep8=. The following code is inspired by [[https://gist.github.com/whirm/6122031][auto pep8 example]].
+
+#+begin_src emacs-lisp
+  ;; See https://gist.github.com/whirm/6122031 for reference.
+  (defun autopep8 ()
+    "Formats python code to conform the the PEP 8 style guide."
+    (interactive)
+    (let ((orig-point (point)))
+      (shell-command-on-region (point-min) (point-max)
+                               "autopep8 - "
+                               nil t)
+      (goto-char orig-point)
+      )
+    )
+
+  (add-hook 'python-mode 'autopep8)
+#+end_src
+
+*** Troubleshooting
+
+The Python interpreter doesn't work with matplotlib in emacs
+environment on Window systems. Setting the interpreter to IPython
+solves the issue. Thus, the Python interpreter is set to IPython
+on windows by default. You can also specify the interpreter manually
+by setting ~python-interpreter~ in Table [[conf-table]].
+
+#+begin_src emacs-lisp
+  ;; Use string= for string comparasion! 
+  ;; (eq "str" "str") returns nil. 
+  (if (string= collie-python-interpreter "default")
+      (if (eq 'windows-nt system-type)
+          (progn (setq python-shell-interpreter "ipython")
+                   (setq org-babel-python-command "ipython"))
+        )
+    (progn (setq python-shell-interpreter collie-python-interpreter)
+           (setq org-babel-python-command collie-python-interpreter))
+    )
+#+end_src
+
+Flycheck has the following problems on the windows system:
+- The executable of flake8 checker should be manually specified.
+- The flycheck calls mypy whenever the python buffer is modified
+  which significantly slows down the whole buffer.
+
+  Thus, the following code is necessary on windows emacs to resolve
+  the issue.
+  #+begin_src emacs-lisp
+    (if (eq 'windows-nt system-type)
+        (progn
+          (setq flycheck-python-flake8-executable "flake8")
+          (setq flycheck-check-syntax-automatically
+                '(save idle-change mode-enabled))
+          ;; Set delay based on what suits you the best
+          (setq flycheck-idle-change-delay 4) 
+          )
+    )
+  #+end_src
+** C++ Mode
+
+Use C++-mode for .h files.
+
+#+begin_src emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+#+end_src
+
+Use space for indentation.
+
+#+begin_src emacs-lisp
+  (add-hook 'c-mode-hook
+            (lambda () (setq indent-tabs-mode nil)))
+  (add-hook 'c++-mode-hook
+            (lambda () (setq indent-tabs-mode nil)))
+#+end_src
+
+** Rust Mode
+
+Flycheck for rust mode needs initializaion.
+
+#+begin_src emacs-lisp
+  (with-eval-after-load 'rust-mode
+    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+#+end_src
+
+Use space for indentation.
+#+begin_src emacs-lisp
+  (add-hook 'rust-mode-hook
+            (lambda () (setq indent-tabs-mode nil)))
+#+end_src
+
+** Inp Mode
+   
+Abaqus inp mode.
+
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/inp-mode")
+  (require 'inp-mode)
+  (add-to-list 'auto-mode-alist '("\\.inp\\'" . inp-mode))
+#+end_src
+
