@@ -214,8 +214,8 @@ might be a BUG, but easy to fix.
 
 Smooth scrolling.
 
-#+bein_src emacs-lisp
-(setq mouse-wheel-progressive-speed nil)
+#+begin_src emacs-lisp
+  (setq mouse-wheel-progressive-speed nil)
 #+end_src
 
 ** Default Modes
