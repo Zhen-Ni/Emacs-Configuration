@@ -1,11 +1,12 @@
 #+Title: Emacs Configuration
 
-* General
+* Preparation
+** Configuration Setup
 
 This is the configuration file for my Emacs.
 
-Some Emacs settings might be system dependent, which are listed in
-Table [[conf-table]] so that they can be modified easily. Other
+Some Emacs settings needs frequenctly modification, which are listed
+in Table [[conf-table]] so that they can be changed easily. Other
 configurations can also be modified by the emacs-lisp source code
 blocks in this file.
 
@@ -18,17 +19,47 @@ blocks in this file.
 | cjk-font           | default |                            |
 | cjk-font-size      | default | font height in units of pt |
 | python-interpreter | default | default for auto-detection |
+| longitude          | 121     | calendar-longitude         |
+| latitude           | 31      | calendar-latitude          |
 
-The following code loads the field names in Table [[conf-table]] into
-emacs with a prefix "collie-".
+** Macro Definition
 
-#+begin_src emacs-lisp :exports code :var table=conf-table
-  (dolist (pair table) 
-  (set (intern (concat "collie-" (car pair))) (cadr pair))
-  )
+Get result from Table [[conf-table]].
+
+#+begin_src emacs-lisp
+  (defmacro get-conf! (key)
+    "Access to value in conf-table."
+      `(cadr (assoc ,key conf-table))
+    )
+  ;;(macroexpand-1 '(get-conf! "font"))
 #+end_src
 
-* Preferences
+Run function silently.
+
+#+begin_src emacs-lisp
+  (defun silent-forward (func &rest args)
+    "Run func with args while inhibiting its message display."
+    (let ((inhibit-message t))
+      (apply func args)
+      )
+    )
+
+  ;; The same as silent-forward using macro.
+  (defmacro silent-forward!(&rest args)
+    "Run func with args while inhibiting its message display."
+    `(let (list (inhibit-message t))
+       ,args
+      )
+    )
+
+  ;; The following two statements are equal:
+  ;; (silent-forward 'message "Message")
+  ;; (silent-forward! message "Message")
+  ;; To inspect into this macro, use macorexpand-1:
+  ;; (macroexpand-1 '(message "Message"))
+#+end_src
+
+* Preference
 ** Personal Info
 
 Set =user-full-name.=
@@ -56,7 +87,7 @@ Add melpa to package management system.
 ** Startup Screen
 *** Disable Builtin Startup Screen
 Turn off the startup screen. Type =M-x display-about-screen= to
-open it manullay if you want.
+open it manually if you want.
 
 #+begin_src emacs-lisp
   (setq inhibit-startup-screen t)
@@ -99,6 +130,7 @@ Turn off the annoying bell.
 
 * Appearance
 ** Color Theme
+*** COMMENT Set by Manually Specified Time
 
 Set color theme by time. The theme is set to =tango= from 8:00
 to 18:00, and set to =tango-dark= from 18:00 to 8:00. The code
@@ -108,8 +140,7 @@ is modified from [[https://stackoverflow.com/a/14760833/2731421][this answer on 
   ;; See https://stackoverflow.com/a/14760833/2731421 for more
   ;; information.
 
-  (load-theme 'tango)
-  (setq current-theme 'tango)
+  (setq current-theme nil)
 
   (defun synchronize-theme-helper (new-theme)
     "Set the current theme to new-theme."
@@ -127,8 +158,84 @@ is modified from [[https://stackoverflow.com/a/14760833/2731421][this answer on 
         )
       ))
 
+  ;; Although (run-with-timer) can set the theme automatically
+  ;; after initializaion of emacs, we would like the set the
+  ;; theme at startup before loading other packages like
+  ;; org-indent mode so that these modes can corrently set the
+  ;; style according to the active theme.
+  (synchronize-theme)
+
   ;; Check every 10 minutes.
   (run-with-timer 0 600 'synchronize-theme)
+#+end_src
+
+*** Set by Sunrise and Sunset Time Automatically
+
+Color theme is =tango= when sun rises and =tango-dark= when 
+sun sets.
+
+#+begin_src emacs-lisp :var conf-table=conf-table
+  (setq current-theme nil)
+
+  (defun change-theme (new-theme)
+    "Set the current theme to new-theme."
+    (if (equal current-theme new-theme) ()
+      (progn (load-theme new-theme) (setq current-theme new-theme))
+      ))
+
+  (defun find-all (pattern string)
+    ;; Reference: https://emacs.stackexchange.com/a/7150
+    "Return a list of all regexp matches in a string."
+    (reverse
+    (let ((pos 0)
+          matches)
+      (while (string-match pattern string pos)
+        (push (match-string 0 string) matches)
+        (setq pos (match-end 0)))
+      matches)))
+
+  (defun minute-in-day (hour minute)
+    "Get time in units of minute during a day."
+    (+ (* hour 60) minute))
+
+  ;; solar-setup
+  (setq calendar-longitude (get-conf! "longitude"))
+  (setq calendar-latitude (get-conf! "latitude"))
+
+  (defun synchronize-theme ()
+    "Set theme by time."
+    (let ((time-str (cdr (find-all "[0-9]?[0-9]" (current-time-string))))
+          (solar-str (find-all "[0-9]?[0-9]" (silent-forward! sunrise-sunset)))
+          hour
+          minute
+          sunrise-hour
+          sunrise-minute
+          sunset-hour
+          sunset-minute
+          )
+      (setq hour (string-to-number (pop time-str)))
+      (setq minute (string-to-number (pop time-str)))
+      (setq sunrise-hour (string-to-number (pop solar-str)))
+      (setq sunrise-minute (string-to-number (pop solar-str)))
+      (setq sunset-hour (+ (string-to-number (pop solar-str)) 12))
+      (setq sunset-minute (string-to-number (pop solar-str)))
+      (if (<  (minute-in-day sunrise-hour sunrise-minute)
+              (minute-in-day hour minute)
+              (minute-in-day sunset-hour sunset-minute))
+          (change-theme 'tango)
+        (change-theme 'tango-dark)
+        )
+      ))
+
+  ;; Although (run-with-timer) can set the theme automatically
+  ;; after initializaion of emacs, we would like the set the
+  ;; theme at startup before loading other packages like
+  ;; org-indent mode so that these modes can corrently set the
+  ;; style according to the active theme.
+  (synchronize-theme)
+
+  ;; Check every minute.
+  (run-with-timer 0 60 'synchronize-theme)
 #+end_src
 
 ** Window Layouts
@@ -146,6 +253,13 @@ I'd like to turn off menu, tool and scroll bar.
   ;; (global-linum-mode t)
 #+end_src
 
+Window split threshold. If the width of the frame is less than
+140, split horizontally, else split vertically.
+
+#+begin_src emacs-lisp
+  (setq split-width-threshold 140)
+#+end_src
+
 ** Fonts
 
 The settings of the fonts are provided in Table [[conf-table]]. On Linux
@@ -153,60 +267,64 @@ systems, The following code do nothing if font attribute are set to
 "default". On Windows systems, The default font is set to "Consolas"
 with size 110, and default cjk font is "微软雅黑" with size 22.
 
-#+begin_src emacs-lisp
-  (if (eq 'windows-nt system-type)
+#+begin_src emacs-lisp :var conf-table=conf-table
+  (let ((font (get-conf! "font"))
+        (font-size (get-conf! "font-size"))
+        (cjk-font (get-conf! "cjk-font"))
+        (cjk-font-size (get-conf! "cjk-font-size"))
+        )
+      (if (eq 'windows-nt system-type)
       (progn
-        (if (equal collie-font "default")
-            (setq collie-font "Consolas"))
-        (if (equal collie-font-size "default")
-            (setq collie-font-size 11))
-        (if (equal collie-cjk-font "default")
-            (setq collie-cjk-font "微软雅黑"))
-        (if (equal collie-cjk-font-size "default")
-            (setq collie-cjk-font-size 22))
+        (if (equal font "default")
+            (setq font "Consolas"))
+        (if (equal font-size "default")
+            (setq font-size 11))
+        (if (equal cjk-font "default")
+            (setq cjk-font "微软雅黑"))
+        (if (equal cjk-font-size "default")
+            (setq cjk-font-size 22))
         )
     )
-
-  (if (not (equal collie-font "default"))
-      (progn (set-face-attribute 'default nil :font collie-font)
-             (set-face-attribute 'fixed-pitch nil :font collie-font))
+  (if (not (equal font "default"))
+      (progn (set-face-attribute 'default nil :font font)
+             (set-face-attribute 'fixed-pitch nil :font font))
     )
-  (if (not (equal collie-font-size "default"))
+  (if (not (equal font-size "default"))
       (progn (set-face-attribute 'default nil
-                                 :height (* collie-font-size 10))
+                                 :height (* font-size 10))
              (set-face-attribute 'fixed-pitch nil
-                                 :height (* collie-font-size 10)))
+                                 :height (* font-size 10)))
     )
 
-  (dolist (charset '(kana han cjk-misc bopomofo))
-    (set-fontset-font
-     (frame-parameter nil 'font)
-     charset
-     (font-spec
-      :family (if (equal collie-cjk-font "default")
-                  nil collie-cjk-font)
-      :size (if (equal collie-cjk-font-size "default")
-                    nil collie-cjk-font-size)
-      )
-     )
+  ;; Apply the setting only in a window system, as setting the
+  ;; following fonts in terminal may fail.
+  (if (window-system)
+      (dolist (charset '(kana han cjk-misc bopomofo))
+        (set-fontset-font
+         (frame-parameter nil 'font)
+         charset
+         (font-spec
+          :family (if (equal cjk-font "default")
+                      nil cjk-font)
+          :size (if (equal cjk-font-size "default")
+                    nil cjk-font-size)
+          )
+         )
+        )
     )
+  )
 #+end_src
 
 ** Troubleshooting
+*** Window Size Issue
 
-In X11 window, the default window size seems to be very small. This
-might be a BUG, but easy to fix.
+In X11 window, the default window size seems to be very
+small. This might be a BUG, but easy to fix. The following
+function also sets consistent window sizes for all systems.
 
 #+begin_src emacs-lisp
-  ;; Set window height and width only when run in WSL.
-  ;; Note that operating-system-release might be nil on windows, 
-  ;; which can not be argument of string-match-p.
-  (if operating-system-release
-      (if (string-match-p
-           "microsoft-standard-WSL"
-           operating-system-release)
-          (setq default-frame-alist
-                '((height . 32) (width . 80)))))
+  ;; Set window height and width.
+  (setq default-frame-alist '((height . 32) (width . 80)))
 #+end_src
  
 * Editor
@@ -216,6 +334,14 @@ Smooth scrolling.
 
 #+begin_src emacs-lisp
   (setq mouse-wheel-progressive-speed nil)
+#+end_src
+
+Setting the languate environment to utf-8 to avoid some
+encoding problems. For example, if not set, elpy do not work
+well with windows system when utf-8 characters are used in
+the buffer. See [[https://github.com/jorgenschaefer/elpy/issues/1729#issuecomment-558204483][github issue]].
+#+begin_src emacs-lisp
+  (set-language-environment "UTF-8") 
 #+end_src
 
 ** Default Modes
@@ -238,6 +364,8 @@ somewhere else.
 
 #+begin_src emacs-lisp
   (global-auto-revert-mode t)
+  ;; Also revert non-file buffers such as dired.
+  (setq global-auto-revert-non-file-buffers t)
 #+end_src
 
 +Delete the selected region if text entered.+
@@ -251,13 +379,14 @@ somewhere else.
 Exclude files in =~/.emacs.d/=.
 
 #+begin_src emacs-lisp
-  (setq recentf-exclude '("~/.emacs.d/"))
+  (add-to-list 'recentf-exclude ".emacs.d/")
 #+end_src
 
 Enable recentf mode and save recent opened files every 5 minutes.
 #+begin_src emacs-lisp
   (recentf-mode t)
-  (run-at-time (current-time) (* 5 60) 'recentf-save-list)
+  (run-at-time (current-time) (* 5 60) 
+               (lambda () (silent-forward! recentf-save-list)))
 #+end_src
 
 *** Auto Complete
@@ -281,6 +410,18 @@ of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
   (setq enable-recursive-minibuffers t)
 #+end_src
     
+*** Lsp
+
+#+begin_src emacs-lisp
+  (require 'lsp)
+  (set-face-attribute 'lsp-face-highlight-textual nil
+                      :inherit nil :underline t :bold t)
+  (set-face-attribute 'lsp-face-highlight-read nil
+                      :inherit nil :underline t :bold t)
+  (set-face-attribute 'lsp-face-highlight-write nil
+                      :inherit nil :underline t :bold t)
+#+end_src
+
 *** Marginalia
 
 Marginalia in the minibuffer. [[https://github.com/minad/marginalia][Marginalia Homepage]].
@@ -362,9 +503,10 @@ cool!
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-;") 'avy-goto-char)
   (global-set-key (kbd "C-'") 'avy-goto-line)
-  (global-set-key (kbd "M-g f") 'avy-goto-line)
+  (global-set-key (kbd "M-g l") 'avy-goto-line)
   (global-set-key (kbd "M-g w") 'avy-goto-word-1)
-  (global-set-key (kbd "M-g e") 'avy-goto-word-0)
+  (global-set-key (kbd "M-g k") 'avy-kill-region)
+  (global-set-key (kbd "M-g y") 'avy-copy-region)
 #+end_src
 
 *** Ace Window
@@ -381,7 +523,7 @@ Bind =M-o= to use ace-window.
 #+begin_src emacs-lisp
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-?") 'mc/mark-all-words-like-this)
+  (global-set-key (kbd "C-?") 'mc/mark-all-dwim)
   (global-set-key (kbd "C-S-<mouse-1>") 'mc/toggle-cursor-on-click)
 #+end_src
 
@@ -406,13 +548,15 @@ delete. I don't know whether it is a bug. But it is easy to work
 around this issue.
 
 #+begin_src emacs-lisp
-     (if operating-system-release
-	 (if (string-match-p
-	      "microsoft-standard-WSL"
-	      operating-system-release)
-	     (global-set-key (kbd "<delete>") 'delete-forward-char)
-	   )
-       )
+  ;; Note that operating-system-release might be nil on windows, 
+  ;; which can not be argument of string-match-p.
+  (if operating-system-release
+      (if (string-match-p
+           "microsoft-standard-WSL"
+           operating-system-release)
+          (global-set-key (kbd "<delete>") 'delete-forward-char)
+        )
+    )
 #+end_src
    
 * Major Modes
@@ -482,7 +626,10 @@ window.
 
 #+begin_src emacs-lisp
   (if (eq (window-system) 'x)
-      (setq org-ellipsis "..⤸")
+      (progn
+        (setq org-ellipsis "..⤸")
+        (set-face-underline 'org-ellipsis nil)
+        (set-face-bold 'org-ellipsis t))
     )
 #+end_src
 
@@ -509,7 +656,7 @@ Use the current window for editing source blocks (Press C-c ' in
 source code block).
 
 #+begin_src emacs-lisp
-  (setq org-src-window-setup 'other-window)
+  (setq org-src-window-setup 'current-window)
 #+end_src
 
 Enable Python, C, C++ and D languages.
@@ -523,8 +670,6 @@ Enable Python, C, C++ and D languages.
   '((C . t)))
 #+end_src
 
-#+RESULTS:
-
 Run these codes without prompting.
 
 #+begin_src emacs-lisp
@@ -534,8 +679,16 @@ Run these codes without prompting.
   (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
 #+end_src
 
-*** Troubleshooting
+*** Export
 
+Do not re-execute the source code blocks during export.
+
+#+begin_src emacs-lisp
+  (setq org-export-babel-evaluate nil)
+#+end_src
+
+*** Troubleshooting
+**** Indentation
 The source code block should presrve the source code's
 indentation. That is, leave the whitespaces as it instead of
 converting them to tabs. However, after editing the source code
@@ -556,6 +709,7 @@ whitespaces. And to insert tab in =org-mode=, press =C-q tab=.
   (lambda () (setq indent-tabs-mode nil)))
 #+end_src
 
+**** Page-breaklines Mode Compability
 Disable page-breaklines mode because it does not work with
 org-indent-mode.
 
@@ -563,11 +717,25 @@ org-indent-mode.
   (add-hook 'org-mode-hook (lambda () (page-break-lines-mode -1)))
 #+end_src
 
-On windows systems, ob-python doesn't work well with the default
-python interpreter when matplotlib is used to plot figures. Using
-Ipython solves the problem. As this is the same issue as that in
-python-mode, the solution is given in the troubleshooting section
-in python mode settings.
+**** Babel Python Interpreter
+On windows systems, ob-python doesn't work well with the
+default python interpreter when matplotlib is used to plot
+figures. This is the same issue as that in python-mode, and
+the solution is setting the default python interpreter to
+=ipython= on windows.
+
+#+begin_src emacs-lisp :var conf-table=conf-table
+  ;; Use string= for string comparasion! 
+  ;; (eq "str" "str") returns nil.
+  (let ((interpreter (get-conf! "python-interpreter")))
+    (if (string= interpreter "default")
+        (if (eq 'windows-nt system-type)
+            (setq org-babel-python-command "ipython")
+    )
+    ;; Org babel mode.
+    (setq org-babel-python-command interpreter))
+  )
+#+end_src
 
 ** Lisp Mode
 
@@ -599,6 +767,13 @@ Disable virtualenv
 
 #+begin_src emacs-lisp
   (setq elpy-rpc-virtualenv-path 'current)
+#+end_src
+
++Use lsp-mode. (experimental)+
+Currently, elpy works better with python.
+
+#+begin_src emacs-lisp
+;(add-hook 'python-mode-hook 'lsp)
 #+end_src
 
 *** Minor Mode Settings
@@ -642,13 +817,13 @@ Press C-<f9> to kill the current python buffer and run the whole
 buffer.
 
 #+begin_src emacs-lisp
-  (defun collie-python-rerun () (interactive)
+  (defun python-rerun () (interactive)
          "Kill python shell and run current buffer or selection."
          (elpy-shell-kill) (elpy-shell-send-region-or-buffer '(4))
          )
   (add-hook 'elpy-mode-hook
             (lambda () (local-set-key (kbd "C-<f9>")
-                                      'collie-python-rerun)))
+                                      'python-rerun)))
 #+end_src
 
 Press <f5> to save all files, run the whole buffer or the selected
@@ -663,7 +838,7 @@ Press C-<f5> to save all files, kill the current python buffer and
 run the whole buffer or the selected region.
     
 #+begin_src emacs-lisp
-  (defun collie-python-save-and-rerun () (interactive)
+  (defun python-save-and-rerun () (interactive)
          "Save all buffers, kill current python buffer and run
   current buffer or selection."
          (save-some-buffers '(4)) (elpy-shell-kill)
@@ -671,11 +846,10 @@ run the whole buffer or the selected region.
   (add-hook 'elpy-mode-hook
             (lambda () (local-set-key
                         (kbd "C-<f5>")
-                        'collie-python-save-and-rerun)))
+                        'python-save-and-rerun)))
 #+end_src
 
 *** Addin Functions
-
 **** Autopep8
 
 Automatically formats Python code to conform the PEP 8 style
@@ -699,26 +873,27 @@ autopep8=. The following code is inspired by [[https://gist.github.com/whirm/612
 #+end_src
 
 *** Troubleshooting
-
+**** Capabality with Matplotlib on Windows Machines
 The Python interpreter doesn't work with matplotlib in emacs
 environment on Window systems. Setting the interpreter to IPython
 solves the issue. Thus, the Python interpreter is set to IPython
 on windows by default. You can also specify the interpreter manually
 by setting ~python-interpreter~ in Table [[conf-table]].
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :var conf-table=conf-table
   ;; Use string= for string comparasion! 
-  ;; (eq "str" "str") returns nil. 
-  (if (string= collie-python-interpreter "default")
-      (if (eq 'windows-nt system-type)
-          (progn (setq python-shell-interpreter "ipython")
-                   (setq org-babel-python-command "ipython"))
-        )
-    (progn (setq python-shell-interpreter collie-python-interpreter)
-           (setq org-babel-python-command collie-python-interpreter))
+  ;; (eq "str" "str") returns nil.
+  (let ((interpreter (get-conf! "python-interpreter")))
+    (if (string= interpreter "default")
+        (if (eq 'windows-nt system-type)
+            (setq python-shell-interpreter "ipython")
+          )
+      (setq python-shell-interpreter interpreter) 
+      )
     )
 #+end_src
 
+**** Flycheck Issues
 Flycheck has the following problems on the windows system:
 - The executable of flake8 checker should be manually specified.
 - The flycheck calls mypy whenever the python buffer is modified
@@ -752,6 +927,21 @@ Use space for indentation.
             (lambda () (setq indent-tabs-mode nil)))
   (add-hook 'c++-mode-hook
             (lambda () (setq indent-tabs-mode nil)))
+#+end_src
+
+Use lsp-mode.
+
+#+begin_src emacs-lisp
+  (add-hook 'c++-mode-hook 'lsp)
+  (add-hook 'c-mode-hook 'lsp)
+#+end_src
+
+The lsp-mode will use its own lsp-checker for flycheck. Here we 
+disable this behaviour so that it uses c/c++-clang as its 
+default checker.
+
+#+begin_src emacs-lisp
+(setq lsp-diagnostic-package :none)
 #+end_src
 
 ** Rust Mode
