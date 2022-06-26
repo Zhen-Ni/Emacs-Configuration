@@ -21,6 +21,7 @@ blocks in this file.
 | python-interpreter | default | default for auto-detection |
 | longitude          | 121     | calendar-longitude         |
 | latitude           | 31      | calendar-latitude          |
+| backup-dir         | default | backup directory           |
 
 ** Macro Definition
 
@@ -73,11 +74,11 @@ Set =user-full-name.=
 Add melpa to package management system.
 
 #+begin_src emacs-lisp
-  ;; Added by Package.el.  This must come before
-  ;; configurations of installed packages.  Don't delete this
-  ;; line.  If you don't want it, just comment it out by
-  ;; adding a semicolon to the start of the line.  You may
-  ;; delete these explanatory comments.
+  ;; Added by Package.el. This must come before configurations
+  ;; of installed packages. Don't delete this line. If you
+  ;; don't want it, just comment it out by adding a semicolon
+  ;; to the start of the line. You may delete these
+  ;; explanatory comments.
   (require 'package)
   (add-to-list'package-archives
    '("melpa-stable" . "http://melpa.org/packages/") t)
@@ -86,6 +87,7 @@ Add melpa to package management system.
 
 ** Startup Screen
 *** Disable Builtin Startup Screen
+
 Turn off the startup screen. Type =M-x display-about-screen= to
 open it manually if you want.
 
@@ -120,12 +122,26 @@ for more details.
     )
 #+end_src
 
+Use =<f5>= to refresh dashboard buffer.
+
+#+begin_src emacs-lisp
+  (add-hook 'dashboard-mode-hook
+            (lambda () (local-set-key [f5]
+                                      'dashboard-refresh-buffer)))
+#+end_src
+
 ** Misc
 
 Turn off the annoying bell.
 
 #+begin_src emacs-lisp
   (setq visible-bell t)
+#+end_src
+
+Replace yes-no answers with y-n.
+
+#+begin_src emacs-lisp
+  (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
 
 * Appearance
@@ -145,7 +161,9 @@ is modified from [[https://stackoverflow.com/a/14760833/2731421][this answer on 
   (defun synchronize-theme-helper (new-theme)
     "Set the current theme to new-theme."
     (if (equal current-theme new-theme) ()
-      (progn (load-theme new-theme) (setq current-theme new-theme))
+      (disable-theme current-theme)
+      (load-theme new-theme)
+      (setq current-theme new-theme)
       ))
 
   (defun synchronize-theme ()
@@ -179,8 +197,10 @@ sun sets.
 
   (defun change-theme (new-theme)
     "Set the current theme to new-theme."
-    (if (equal current-theme new-theme) ()
-      (progn (load-theme new-theme) (setq current-theme new-theme))
+    (unless (equal current-theme new-theme)
+      (disable-theme current-theme)
+      (load-theme new-theme)
+      (setq current-theme new-theme)
       ))
 
   (defun find-all (pattern string)
@@ -273,28 +293,24 @@ with size 110, and default cjk font is "微软雅黑" with size 22.
         (cjk-font (get-conf! "cjk-font"))
         (cjk-font-size (get-conf! "cjk-font-size"))
         )
-      (if (eq 'windows-nt system-type)
-      (progn
-        (if (equal font "default")
-            (setq font "Consolas"))
-        (if (equal font-size "default")
-            (setq font-size 11))
-        (if (equal cjk-font "default")
-            (setq cjk-font "微软雅黑"))
-        (if (equal cjk-font-size "default")
-            (setq cjk-font-size 22))
-        )
-    )
-  (if (not (equal font "default"))
-      (progn (set-face-attribute 'default nil :font font)
-             (set-face-attribute 'fixed-pitch nil :font font))
-    )
-  (if (not (equal font-size "default"))
-      (progn (set-face-attribute 'default nil
-                                 :height (* font-size 10))
-             (set-face-attribute 'fixed-pitch nil
-                                 :height (* font-size 10)))
-    )
+    (when (eq 'windows-nt system-type)
+      (if (equal font "default")
+          (setq font "Consolas"))
+      (if (equal font-size "default")
+          (setq font-size 11))
+      (if (equal cjk-font "default")
+          (setq cjk-font "微软雅黑"))
+      (if (equal cjk-font-size "default")
+          (setq cjk-font-size 22))
+      )
+    (unless (equal font "default")
+      (set-face-attribute 'default nil :font font)
+      (set-face-attribute 'fixed-pitch nil :font font))
+    (unless (equal font-size "default")
+      (set-face-attribute 'default nil
+                          :height (* font-size 10))
+      (set-face-attribute 'fixed-pitch nil
+                          :height (* font-size 10)))
 
   ;; Apply the setting only in a window system, as setting the
   ;; following fonts in terminal may fail.
@@ -328,7 +344,7 @@ function also sets consistent window sizes for all systems.
 #+end_src
  
 * Editor
-** Misc
+** Scrolling
 
 Smooth scrolling.
 
@@ -336,16 +352,32 @@ Smooth scrolling.
   (setq mouse-wheel-progressive-speed nil)
 #+end_src
 
+Preserve cursor point when scrolling.
+
+#+begin_src emacs-lisp
+  (setq scroll-preserve-screen-position t)
+#+end_src
+
+** Multilingual Environment
+
 Setting the languate environment to utf-8 to avoid some
 encoding problems. For example, if not set, elpy do not work
 well with windows system when utf-8 characters are used in
 the buffer. See [[https://github.com/jorgenschaefer/elpy/issues/1729#issuecomment-558204483][github issue]].
+
 #+begin_src emacs-lisp
   (set-language-environment "UTF-8") 
 #+end_src
 
+Use "TeX" as default input method.
+
+#+begin_src emacs-lisp
+  (setq default-input-method "TeX")
+#+end_src
+
 ** Default Modes
 *** Built-in
+**** Column Number Mode
 
 Show column number on the bottom of the editor buffer.
 
@@ -353,12 +385,15 @@ Show column number on the bottom of the editor buffer.
   (column-number-mode 1)
 #+end_src
 
+**** Show Paren Mode
+
 Show matching parentheses.
 
 #+begin_src emacs-lisp
   (show-paren-mode 1)
 #+end_src
 
+**** Auto Revert Mode
 Automatically revert buffer if its content is changed
 somewhere else.
 
@@ -368,7 +403,9 @@ somewhere else.
   (setq global-auto-revert-non-file-buffers t)
 #+end_src
 
-+Delete the selected region if text entered.+
+**** COMMENT Delete Selection Mode
+
++Delete the selected region if text entered.+ Disabled.
 
 #+begin_src emacs-lisp
   ;; (delete-selection-mode t)
@@ -383,6 +420,7 @@ Exclude files in =~/.emacs.d/=.
 #+end_src
 
 Enable recentf mode and save recent opened files every 5 minutes.
+
 #+begin_src emacs-lisp
   (recentf-mode t)
   (run-at-time (current-time) (* 5 60) 
@@ -411,6 +449,8 @@ of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
 #+end_src
     
 *** Lsp
+
+Set the font of the highlight text where cursor points to.
 
 #+begin_src emacs-lisp
   (require 'lsp)
@@ -479,20 +519,27 @@ here.
   (global-set-key (kbd "C-s") 'swiper)
   (global-set-key (kbd "M-x") 'counsel-M-x)
   (global-set-key (kbd "C-x b") 'counsel-switch-buffer)
+  (global-set-key (kbd "C-x B") 'counsel-switch-buffer-other-window)
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "C-x C-y") 'counsel-yank-pop)
   ;;(define-key ivy-minibuffer-map (kbd "C-j") 'ivy-immediate-done)
 #+end_src
 
 *** Mwim
 
 Move to the beginning/end of line, code or comment in a
-better way.
+better (?)  way. It should be mentioned that =M-m= is a
+built-in shourtcut for navigating to the first
+non-whitespace character on this line, which I think is
+idential to =mwim-beginning-of-code=.
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-a") 'mwim-beginning-of-code-or-line)
-  (global-set-key (kbd "C-e") 'mwim-end-of-code-or-line)
-  (global-set-key (kbd "<home>") 'mwim-beginning-of-line-or-code)
-  (global-set-key (kbd "<end>") 'mwim-end-of-line-or-code)
+  (autoload 'mwim-beginning-of-code "mwim" nil t)
+  (autoload 'mwim-end-of-code "mwim" nil t)
+  (global-set-key (kbd "M-g a") 'mwim-beginning-of-code)
+  (global-set-key (kbd "M-g e") 'mwim-end-of-code)
+  ;; (global-set-key (kbd "<home>") 'mwim-beginning-of-line-or-code)
+  ;; (global-set-key (kbd "<end>") 'mwim-end-of-line-or-code)
 #+end_src
 
 *** Avy
@@ -510,6 +557,7 @@ cool!
 #+end_src
 
 *** Ace Window
+
 Bind =M-o= to use ace-window.
 
 #+begin_src emacs-lisp
@@ -527,17 +575,91 @@ Bind =M-o= to use ace-window.
   (global-set-key (kbd "C-S-<mouse-1>") 'mc/toggle-cursor-on-click)
 #+end_src
 
+*** My Own Functions
+**** Open New Line
+
+Open a new line below or above the current one by using
+=S-<enter>= and =C-S-<enter>=.
+
+#+begin_src emacs-lisp
+  (defun open-and-indent-line-below (&optional n)
+    "Insert a newline below and indent and leave point after it.
+  With arg N, insert and indent N newlines."
+    (interactive "*p")
+    (when (< (prefix-numeric-value n) 0)
+      (error "Repetition argument has to be non-negative"))
+    (beginning-of-line)
+    (skip-syntax-forward " " (line-end-position))
+    (let ((indent (current-column)))
+      (end-of-line)
+      (dotimes (i n)
+        (newline)
+        (indent-to indent)
+        )
+      (forward-line (- 1 n))
+      (end-of-line)
+      )
+    )
+
+  (defun open-and-indent-line-above (&optional n)
+    "Insert a newline above and indent and leave point after it.
+  With arg N, insert and indent N newlines."
+    (interactive "*p")
+    (when (< (prefix-numeric-value n) 0)
+      (error "Repetition argument has to be non-negative"))
+    (beginning-of-line)
+    (skip-syntax-forward " " (line-end-position))
+    (let ((indent (current-column)))
+      (dotimes (i n)
+        (beginning-of-line)
+        (open-line 1)
+        (indent-to indent)
+        )
+      (end-of-line)
+      )
+    )
+
+  (global-set-key (kbd "S-<return>")
+                  'open-and-indent-line-below)
+  (global-set-key (kbd "C-S-<return>")
+                  'open-and-indent-line-above)
+#+end_src
+
+**** Reversed Yank
+
+Yank the previous kill. This is equivalent to =M-- M-y=.
+
+#+begin_src emacs-lisp
+    (defun yank-pop-reversed (&optional arg)
+      "Replace the just-yanked stretch with a more recent kill.
+    This is the reverse of builtin-function `yank-pop`, which
+    replaces the previous yanked text with a more recent kill by
+    default."
+      (interactive "*p")
+      (unless arg (setq arg 1))
+      (yank-pop (- arg)))
+  
+    (global-set-key "\C-\M-Y" 'yank-pop-reversed)
+#+end_src
+
 ** Backup Setting
 
 Set the Backup directory. Different Directories are used for
-Linux and Windows.
+Linux and Windows by default. The directory can be modified
+by =conf-table=.
 
-#+begin_src emacs-lisp
-  (if (eq 'gnu/linux system-type)
-      (setq backup-directory-alist '(("." . "~/.emacs_backups/")))
-    )
-  (if (eq 'windows-nt system-type)
-      (setq backup-directory-alist '(("." . "D:/App/Emacs/")))
+#+begin_src emacs-lisp :var conf-table=conf-table
+  (let ((dir (get-conf! "backup-dir")))
+    (if (equal dir "default")
+        (progn
+          (if (eq 'gnu/linux system-type)
+              (setq dir "~/.emacs_backups/")
+            )
+          (if (eq 'windows-nt system-type)
+              (setq dir "D:/App/Emacs/")
+            )
+          ))
+    (setq backup-directory-alist `(("." . ,dir)))
     )
 #+end_src
 
@@ -583,7 +705,10 @@ Enable shift-select.
   (setq org-support-shift-select t)
 #+end_src
 
-Use Org-indent-mode.
+Use Org-indent-mode. This mode also hides leading start in
+org-mode by locally setting =org-hide-leading-stars= to =t=.
+See [[https://orgmode.org/manual/Org-Indent-Mode.html][org mode manual]] for more details.
+
 #+begin_src emacs-lisp
   (add-hook 'org-mode-hook 'org-indent-mode)
 #+end_src
@@ -599,8 +724,10 @@ Use Org-indent-mode.
 #+end_src
 
 *** Apperance Setting
+**** Character Display
 
 Use utf-8 characters for display. Use "C-c C-x \" to toggle.
+
 #+begin_src emacs-lisp
   (setq org-pretty-entities t)
 #+end_src
@@ -611,12 +738,24 @@ Hide *, ~ and / in org text.
   (setq org-hide-emphasis-markers t)
 #+end_src
 
-+Hide the verbose leading stars before headlines. This feature is
-automatically enabled by =org-indent-mode=.+
+**** COMMENT Hide Leading Stars
+
++Hide the verbose leading stars before headlines.+
+This feature is automatically enabled by =org-indent-mode=.
 
 #+begin_src emacs-lisp
-  ;; (setq org-hide-leading-stars t)
+  (setq org-hide-leading-stars t)
 #+end_src
+
+**** Org Superstar
+
+Use Org superstar mode.
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+#+end_src
+
+**** Org Ellipsis Style
 
 I'd like something fancy instead of the ellipsis (...) that org
 displays when there's staff under a header. The arrow symbol is
@@ -642,16 +781,16 @@ Org mode keyword settings.
         '((sequence "TODO(t)" "DOING(i)"
                     "|"
                     "DONE(d)" "ABORT(a)" "POSTPONED(p)")))
-  (setq org-todo-keyword-faces '(
-    ("TODO" . "red")
-    ("DOING" . "orange")
-    ("DONE" . "dark cyan")
-    ("ABORT" ."dim grey")
-    ("POSTPONED" . "dark magenta")))
+  (setq org-todo-keyword-faces
+        '(("TODO" . "red")
+          ("DOING" . "orange")
+          ("DONE" . "dark cyan")
+          ("ABORT" . "dim grey")
+          ("POSTPONED" . "dark magenta")))
 #+end_src
 
 *** Source Code Block Setting
-    
+
 Use the current window for editing source blocks (Press C-c ' in
 source code block).
 
@@ -688,7 +827,8 @@ Do not re-execute the source code blocks during export.
 #+end_src
 
 *** Troubleshooting
-**** Indentation
+**** COMMENT Indentation
+
 The source code block should presrve the source code's
 indentation. That is, leave the whitespaces as it instead of
 converting them to tabs. However, after editing the source code
@@ -710,6 +850,7 @@ whitespaces. And to insert tab in =org-mode=, press =C-q tab=.
 #+end_src
 
 **** Page-breaklines Mode Compability
+
 Disable page-breaklines mode because it does not work with
 org-indent-mode.
 
@@ -718,6 +859,7 @@ org-indent-mode.
 #+end_src
 
 **** Babel Python Interpreter
+
 On windows systems, ob-python doesn't work well with the
 default python interpreter when matplotlib is used to plot
 figures. This is the same issue as that in python-mode, and
@@ -737,6 +879,62 @@ the solution is setting the default python interpreter to
   )
 #+end_src
 
+**** Hiding Leading Stars
+
+The leading stars of the titles in =org-mode= are hided by
+setting =org-hide-leading-starts= to =t=. This feature is
+implemented by setting the font of leading starts to
+=org-hide=, which has the same color as the
+background. However, this color doesn't change when the
+background color changes. Thus, the leading stars will show
+in a different color when the theme changes.
+
+The [[https://github.com/integral-dw/org-superstar-mode][homepage]] of =org-superstar-mode= gives a solution, which
+solves the problem when =org-indent-mode= is disabled.
+
+#+begin_src emacs-lisp
+  ;; This is usually the default, but keep in mind it must be nil
+  (setq org-hide-leading-stars nil)
+  ;; This line is necessary.
+  (setq org-superstar-leading-bullet ?\s)
+  ;; If you use Org Indent you also need to add this, otherwise the
+  ;; above has no effect while Indent is enabled.
+  (setq org-indent-mode-turns-on-hiding-stars nil)
+#+end_src
+
+To hide the leading stars inserted by =org-indent-mode=, we
+can set the foreground color of the leading stars to the
+same as the background. We can automatically run this procedure
+by function =advice-add= (see [[https://emacs.stackexchange.com/a/41250/38157][this stackexchange answer]]).
+
+#+begin_src emacs-lisp
+  (defun hide-org-indent-leading-stars (&optional theme)
+    "Hide the leading stars generated by org-indent mode."
+    (when (member 'org-indent (face-list))
+    (set-face-attribute 'org-indent nil
+                        :foreground (face-attribute 'default :background))
+    ))
+  (advice-add 'enable-theme :after #'hide-org-indent-leading-stars)
+  (advice-add 'disable-theme :after #'hide-org-indent-leading-stars)
+#+end_src
+ 
+** Prog Mode
+
+=prog-mode= is the base mode for programming.
+
+Use hungry delete from c-mode by using prefix "C-c".
+
+#+begin_src emacs-lisp
+  (add-hook 'prog-mode-hook
+            (lambda () (local-set-key
+                        (kbd "C-c <backspace>") 
+                        'c-hungry-delete-backwards)))
+  (add-hook 'prog-mode-hook
+            (lambda () (local-set-key
+                        (kbd "C-c <delete>") 
+                        'c-hungry-delete-forward)))
+#+end_src
+
 ** Lisp Mode
 
 Use rainbow-delimiters for lisp-like languages.
@@ -751,11 +949,35 @@ Use rainbow-delimiters for lisp-like languages.
 
 ** Python Mode
 *** Basic Settings
+**** Use MELPA python-mode
 
 Use melpa's python-mode.el to replace the built-in python-mode.
+
 #+begin_src emacs-lisp
   (require 'python-mode)
 #+end_src
+
+The keybindings of <backspace> and <delete> in melpa is
+different from the built-in version, which causes
+confusion. Here, we set the keybindings consistent with the
+built-in version.
+
+#+begin_src emacs-lisp
+  (add-hook 'python-mode-hook
+            (lambda () (local-set-key
+                        (kbd "<backspace>") 
+                        'python-indent-dedent-line-backspace)))
+  (add-hook 'python-mode-hook
+            (lambda () (local-set-key
+                        (kbd "<delete>") 
+                        'delete-forward-char)))
+  (add-hook 'python-mode-hook
+            (lambda () (local-set-key
+                        (kbd "C-<backspace>") 
+                        'backward-kill-word)))
+#+end_src
+
+**** Use Elpy
 
 Enable eply mode for Python.
 
@@ -769,11 +991,12 @@ Disable virtualenv
   (setq elpy-rpc-virtualenv-path 'current)
 #+end_src
 
+**** COMMENT Use LSP
 +Use lsp-mode. (experimental)+
 Currently, elpy works better with python.
 
 #+begin_src emacs-lisp
-;(add-hook 'python-mode-hook 'lsp)
+  (add-hook 'python-mode-hook 'lsp)
 #+end_src
 
 *** Minor Mode Settings
@@ -894,6 +1117,7 @@ by setting ~python-interpreter~ in Table [[conf-table]].
 #+end_src
 
 **** Flycheck Issues
+
 Flycheck has the following problems on the windows system:
 - The executable of flake8 checker should be manually specified.
 - The flycheck calls mypy whenever the python buffer is modified
@@ -902,16 +1126,27 @@ Flycheck has the following problems on the windows system:
   Thus, the following code is necessary on windows emacs to resolve
   the issue.
   #+begin_src emacs-lisp
-    (if (eq 'windows-nt system-type)
-        (progn
-          (setq flycheck-python-flake8-executable "flake8")
-          (setq flycheck-check-syntax-automatically
-                '(save idle-change mode-enabled))
-          ;; Set delay based on what suits you the best
-          (setq flycheck-idle-change-delay 4) 
-          )
-    )
+    (when (eq 'windows-nt system-type)
+      (setq flycheck-python-flake8-executable "flake8")
+      (setq flycheck-check-syntax-automatically
+            '(save idle-change mode-enabled))
+      ;; Set delay based on what suits you the best
+      (setq flycheck-idle-change-delay 4) 
+      )
   #+end_src
+**** Lsp Issue
+
+=lsp-find-definition= may be very slow or even time out when
+processing python files on Linux. A similar problem can be
+found on [[https://emacs.stackexchange.com/a/68748/38157][stackexchange]] and may be solved by disable lsp's
+file watcher. However, in Python-mode, it seems to be a
+problem realated to the performance of mypy checker. I'm not
+sure about it, and haven't found a solution.
+
+#+begin_src emacs-lisp
+  ;(setq lsp-enable-file-watchers nil)
+#+end_src
+
 ** C++ Mode
 
 Use C++-mode for .h files.
@@ -969,3 +1204,15 @@ Abaqus inp mode.
   (add-to-list 'auto-mode-alist '("\\.inp\\'" . inp-mode))
 #+end_src
 
+* Not Only an Editor
+** COMMENT Emacs Application Framework
+Not fuly installed.
+*** Setup
+#+begin_src emacs-lisp 
+  (add-to-list 'load-path
+               "~/.emacs.d/site-lisp/emacs-application-framework/")
+  (require 'eaf)
+  (require 'eaf-airshare)
+  (require 'eaf-browser)
+  (require 'eaf-camera)
+#+end_src
