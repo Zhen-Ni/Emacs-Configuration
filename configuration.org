@@ -363,7 +363,8 @@ Preserve cursor point when scrolling.
 Setting the languate environment to utf-8 to avoid some
 encoding problems. For example, if not set, elpy do not work
 well with windows system when utf-8 characters are used in
-the buffer. See [[https://github.com/jorgenschaefer/elpy/issues/1729#issuecomment-558204483][github issue]].
+the buffer. Note that this setting might screw up some
+language environments. See [[https://github.com/jorgenschaefer/elpy/issues/1729#issuecomment-558204483][github issue]].
 
 #+begin_src emacs-lisp
   (set-language-environment "UTF-8") 
@@ -554,6 +555,7 @@ cool!
   (global-set-key (kbd "M-g w") 'avy-goto-word-1)
   (global-set-key (kbd "M-g k") 'avy-kill-region)
   (global-set-key (kbd "M-g y") 'avy-copy-region)
+  (global-set-key (kbd "M-g m") 'avy-move-region)
 #+end_src
 
 *** Ace Window
@@ -1114,6 +1116,24 @@ by setting ~python-interpreter~ in Table [[conf-table]].
       (setq python-shell-interpreter interpreter) 
       )
     )
+#+end_src
+
+**** Multilingual Environment
+
+Elpy do not work well with windows system when utf-8
+characters are used in the buffer. Using
+=(set-language-environment "UTF-8")= solves the problem if the
+path of the source code file is ASCII encoded. See this [[https://github.com/jorgenschaefer/elpy/issues/1729#issuecomment-558204483][github
+issue]].
+
+#+begin_src emacs-lisp
+  (setenv "PYTHONIOENCODING" "utf-8")
+  (add-to-list 'process-coding-system-alist
+               '("elpy" . (utf-8 . utf-8)))
+  (add-to-list 'process-coding-system-alist
+               '("python" . (utf-8 . utf-8)))
+  (add-to-list 'process-coding-system-alist
+               '("flake8" . (utf-8 . utf-8)))
 #+end_src
 
 **** Flycheck Issues
