@@ -81,7 +81,10 @@ Add melpa to package management system.
   ;; explanatory comments.
   (require 'package)
   (add-to-list'package-archives
-   '("melpa-stable" . "http://melpa.org/packages/") t)
+   ; Use official source or mirror from tsinghua university.
+   ; '("melpa-stable" . "http://melpa.org/packages/")
+   '("melpa-stable" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+   t)
   (package-initialize)
 #+end_src
 
@@ -436,6 +439,14 @@ Use Company mode for auto-completion.
   (global-company-mode 1)
 #+end_src
 
+*** Yasnippet
+
+Always turn yasnippet mode on.
+
+#+begin_src emacs-lisp
+  (yas-global-mode t)
+#+end_src
+
 *** Ivy, Swiper and Counsel
 
 Do not enable the whole ivy mode as I just want to use a portion
@@ -476,7 +487,7 @@ Marginalia in the minibuffer. [[https://github.com/minad/marginalia][Marginalia 
 Enable Flycheck mode by default.
 
 #+begin_src emacs-lisp
-      (global-flycheck-mode)
+  (global-flycheck-mode)
 #+end_src
 
 *** Rainbow
@@ -554,8 +565,8 @@ cool!
   (global-set-key (kbd "M-g l") 'avy-goto-line)
   (global-set-key (kbd "M-g w") 'avy-goto-word-1)
   (global-set-key (kbd "M-g k") 'avy-kill-region)
-  (global-set-key (kbd "M-g y") 'avy-copy-region)
-  (global-set-key (kbd "M-g m") 'avy-move-region)
+  (global-set-key (kbd "M-g y") 'avy-copy-region)  ; yank
+  (global-set-key (kbd "M-g t") 'avy-move-region)  ; teleport
 #+end_src
 
 *** Ace Window
@@ -809,6 +820,9 @@ Enable Python, C, C++ and D languages.
   ;; Enable C, C++ and D.
   (org-babel-do-load-languages 'org-babel-load-languages 
   '((C . t)))
+  ;; Enable latex.
+  (org-babel-do-load-languages 'org-babel-load-languages 
+  '((latex . t)))
 #+end_src
 
 Run these codes without prompting.
@@ -1168,6 +1182,7 @@ sure about it, and haven't found a solution.
 #+end_src
 
 ** C++ Mode
+*** Basic Settings
 
 Use C++-mode for .h files.
 
@@ -1184,6 +1199,9 @@ Use space for indentation.
             (lambda () (setq indent-tabs-mode nil)))
 #+end_src
 
+*** Lsp
+**** Use lsp-mode
+
 Use lsp-mode.
 
 #+begin_src emacs-lisp
@@ -1191,12 +1209,29 @@ Use lsp-mode.
   (add-hook 'c-mode-hook 'lsp)
 #+end_src
 
+**** COMMENT Spell Check
+
 The lsp-mode will use its own lsp-checker for flycheck. Here we 
 disable this behaviour so that it uses c/c++-clang as its 
 default checker.
 
 #+begin_src emacs-lisp
-(setq lsp-diagnostic-package :none)
+  (setq lsp-diagnostic-package :none)
+#+end_src
+
+**** Work with TRAMP
+
+Enable lsp-mode when editing remote files. See [[https://github.com/syl20bnr/spacemacs/issues/13925][Gibhub topic]] and
+[[https://emacs-lsp.github.io/lsp-mode/page/remote/][official website]] for more information.
+
+#+begin_src emacs-lisp
+  (with-eval-after-load 'lsp-mode
+    (lsp-register-client
+     (make-lsp-client
+      :remote? t
+      :new-connection (lsp-tramp-connection "clangd")
+      :major-modes '(c-mode c++-mode)
+      :server-id 'clangd-remote)))
 #+end_src
 
 ** Rust Mode
