@@ -40,7 +40,8 @@ Run function silently.
 #+begin_src emacs-lisp
   (defun silent-forward (func &rest args)
     "Run func with args while inhibiting its message display."
-    (let ((inhibit-message t))
+    (let ((inhibit-message t)
+          (message-log-max nil))
       (apply func args)
       )
     )
@@ -48,7 +49,8 @@ Run function silently.
   ;; The same as silent-forward using macro.
   (defmacro silent-forward!(&rest args)
     "Run func with args while inhibiting its message display."
-    `(let (list (inhibit-message t))
+    `(let ((inhibit-message t)
+           (message-log-max nil))
        ,args
       )
     )
@@ -993,6 +995,18 @@ built-in version.
                         'backward-kill-word)))
 #+end_src
 
+The ~py-fill-paragraph~, which is binded to ~M-Q~ by setting
+~fill-paragraph-function~ has weild behavior. We fall it back to
+~python-mode~'s ~python-fill-paragraph~ instead.
+
+#+begin_src emacs-lisp
+  (add-hook 'python-mode-hook
+            (lambda () (set (make-local-variable
+            'fill-paragraph-function) 'python-fill-paragraph)))
+
+
+#+end_src
+
 **** Use Elpy
 
 Enable eply mode for Python.
@@ -1181,14 +1195,35 @@ sure about it, and haven't found a solution.
   ;(setq lsp-enable-file-watchers nil)
 #+end_src
 
+**** MELPA's Python-mode and Elpy's compability Issue
+
+If MELPA's ~python-mode~ is loaded before first calling ~(elpy-enable)~,
+some features of ~python-mode~ will be suppressed. We can reload MELPA's
+~python-mode~ to fix it. (I've found this problem on my Linux
+installation.
+
+#+begin_src emacs-lisp
+  ;; (require 'python-mode) only loads the package the first time it is called
+  ;; (load "python-mode") always reloads the package
+  (load "python-mode")
+#+end_src
+
 ** C++ Mode
 *** Basic Settings
 
-Use C++-mode for .h files.
+Use ~C++-mode~ for ~.h~ files.
 
 #+begin_src emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 #+end_src
+
+Use ~cpp-mode~ as name alias for ~c++-mode~.
+
+#+begin_src emacs-lisp
+  (defalias 'cpp-mode 'c++-mode)
+#+end_src
+
+*** Indentation
 
 Use space for indentation.
 
@@ -1197,6 +1232,14 @@ Use space for indentation.
             (lambda () (setq indent-tabs-mode nil)))
   (add-hook 'c++-mode-hook
             (lambda () (setq indent-tabs-mode nil)))
+#+end_src
+
+Do not indent namespace in c++ mode.
+
+#+begin_src emacs-lisp
+  (defun cancel-c++-namespace-indentation ()
+    (c-set-offset 'innamespace [0]))
+  (add-hook 'c++-mode-hook 'cancel-c++-namespace-indentation)
 #+end_src
 
 *** Lsp
