@@ -966,7 +966,6 @@ Use rainbow-delimiters for lisp-like languages.
   '(((((((((.)))))))))
 #+end_src
 
-
 *** Addin Funcitons
 
 Use ~C-c C-c~ to eval region or buffer, depending on whether the
@@ -984,6 +983,20 @@ selected region is active.
   (add-hook 'emacs-lisp-mode-hook
             (lambda () (local-set-key (kbd "\C-c\C-c")
                                       'eval-region-or-buffer)))
+#+end_src
+
+Press ~<f5>~ to save all buffers and run the region or buffer.
+
+#+begin_src emacs-lisp
+  (defun save-and-eval-region-or-buffer () (interactive)
+         "Save all buffers, kill current python buffer and run
+    current buffer or selection."
+         (save-some-buffers '(4))
+         (eval-region-or-buffer))
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda () (local-set-key
+                        (kbd "<f5>")
+                        'save-and-eval-region-or-buffer)))
 #+end_src
 
 ** Python Mode
