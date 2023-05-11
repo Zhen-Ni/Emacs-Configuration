@@ -106,7 +106,7 @@ open it manually if you want.
   (require 'dashboard)
   (dashboard-setup-startup-hook)
   (setq dashboard-banner-logo-title "Nice day!")
-  (setq dashboard-startup-banner 'official) ;; 
+  (setq dashboard-startup-banner 'official) ;; 也可以自定义图片
   (setq dashboard-items '(
                         ;;  (projects . 5)
                           (bookmarks . 5)  ;; number of listed bookmarks
@@ -290,7 +290,7 @@ Window split threshold. If the width of the frame is less than
 The settings of the fonts are provided in Table [[conf-table]]. On Linux
 systems, The following code do nothing if font attribute are set to
 "default". On Windows systems, The default font is set to "Consolas"
-with size 110, and default cjk font is "" with size 22.
+with size 110, and default cjk font is "微软雅黑" with size 22.
 
 #+begin_src emacs-lisp :var conf-table=conf-table
   (let ((font (get-conf! "font"))
@@ -304,7 +304,7 @@ with size 110, and default cjk font is "" with size 22.
       (if (equal font-size "default")
           (setq font-size 11))
       (if (equal cjk-font "default")
-          (setq cjk-font ""))
+          (setq cjk-font "微软雅黑"))
       (if (equal cjk-font-size "default")
           (setq cjk-font-size 22))
       )
@@ -463,7 +463,7 @@ of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
 #+end_src
     
 *** Lsp
-
+**** Highlight Text
 Set the font of the highlight text where cursor points to.
 
 #+begin_src emacs-lisp
@@ -474,6 +474,18 @@ Set the font of the highlight text where cursor points to.
                       :inherit nil :underline t :bold t)
   (set-face-attribute 'lsp-face-highlight-write nil
                       :inherit nil :underline t :bold t)
+#+end_src
+**** Auto Guess Root
+
+Automatically guess the project root using projectile/project. Do not
+use this setting unless you are familiar with ~lsp-mode~ internals and
+you are sure that all of your projects are following
+~projectile/project.el~ conventions. 
+
+Refer to [[https://emacs-lsp.github.io/lsp-mode/page/settings/mode/#lsp-auto-guess-root][this link]] for more details.
+
+#+begin_src emacs-lisp
+  (setq lsp-auto-guess-root t)
 #+end_src
 
 *** Marginalia
@@ -732,7 +744,7 @@ See [[https://orgmode.org/manual/Org-Indent-Mode.html][org mode manual]] for mor
     
 #+begin_src emacs-lisp
   (setq org-table-formula-constants
-        '(("" . "3.14159265359")
+        '(("π" . "3.14159265359")
           ("pi" . "3.14159265359")
           ("e" . "2.718281828459")
           ))
@@ -781,7 +793,7 @@ window.
 #+begin_src emacs-lisp
   (if (eq (window-system) 'x)
       (progn
-        (setq org-ellipsis "..")
+        (setq org-ellipsis "..⤸")
         (set-face-underline 'org-ellipsis nil)
         (set-face-bold 'org-ellipsis t))
     )
@@ -975,6 +987,7 @@ selected region is active.
   (defun eval-region-or-buffer ()
     "Evaluate the region if it is active, else eval the buffer."
     (interactive)
+    (message "Evaluating region or buffer...")
     (if (and transient-mark-mode mark-active)
         (eval-region (region-beginning) (region-end))
       (eval-buffer))
@@ -1312,7 +1325,21 @@ Enable lsp-mode when editing remote files. See [[https://github.com/syl20bnr/spa
 #+end_src
 
 ** Rust Mode
+*** Basic settings
+**** Use LSP 
+#+begin_src emacs-lisp
+(add-hook 'rust-mode-hook #'lsp)
+#+end_src
 
+**** Indentation
+Use space for indentation.
+#+begin_src emacs-lisp
+  (add-hook 'rust-mode-hook
+             (lambda () (setq indent-tabs-mode nil)))
+#+end_src
+
+*** Minor Mode Settings
+**** Flycheck
 Flycheck for rust mode needs initializaion.
 
 #+begin_src emacs-lisp
@@ -1320,10 +1347,19 @@ Flycheck for rust mode needs initializaion.
     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 #+end_src
 
-Use space for indentation.
+*** Addin Functions
+
+Press ~<f5>~ to save all buffers and run command ~cargo-run~.
+
 #+begin_src emacs-lisp
+  (defun rust-save-and-run () (interactive)
+         "Save all buffers, and run `rust-run`."
+         (save-some-buffers '(4))
+         (rust-run))
   (add-hook 'rust-mode-hook
-            (lambda () (setq indent-tabs-mode nil)))
+            (lambda () (local-set-key
+                        (kbd "<f5>")
+                        'rust-save-and-run)))
 #+end_src
 
 ** Inp Mode
