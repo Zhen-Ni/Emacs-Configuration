@@ -108,7 +108,7 @@ open it manually if you want.
   (setq dashboard-banner-logo-title "Nice day!")
   (setq dashboard-startup-banner 'official) ;; 也可以自定义图片
   (setq dashboard-items '(
-                        ;;  (projects . 5)
+                          (projects . 5)
                           (bookmarks . 5)  ;; number of listed bookmarks
                           (recents  . 5)  ;; number of listed recent files
                           )
@@ -461,7 +461,28 @@ of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
   ;; ivy mini buffer
   (setq enable-recursive-minibuffers t)
 #+end_src
-    
+
+*** Projectile    
+Instructions for setting up projectile is given by its [[https://github.com/bbatsov/projectile][homepage]].
+
+**** Enable Projectile and its Keymap
+
+#+begin_src emacs-lisp
+  (projectile-mode t)
+  ;; Recommended keymap prefix on Windows/Linux
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+#+end_src
+
+**** Ivy
+
+Basically, ~ivy-mode~ is automatically enabled for projectile if it is
+activated. However, we do not enable ivy in the global scope and need
+to enable it manually following [[https://docs.projectile.mx/projectile/configuration.html#completion-options][this link]].
+
+#+begin_src emacs-lisp
+  (setq projectile-completion-system 'ivy)
+#+end_src
+
 *** Lsp
 **** Highlight Text
 Set the font of the highlight text where cursor points to.
