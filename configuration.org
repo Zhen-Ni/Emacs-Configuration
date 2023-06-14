@@ -509,6 +509,16 @@ Refer to [[https://emacs-lsp.github.io/lsp-mode/page/settings/mode/#lsp-auto-gue
   (setq lsp-auto-guess-root t)
 #+end_src
 
+**** Disable SignatuRe Help Documentation
+
+Signature documentation sometimes makes the minibuffer too big when
+coding. The [[https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/][official website]] gives instructions for turning off such
+features.
+
+#+begin_src emacs-lisp
+  (setq lsp-signature-render-documentation nil)
+#+end_src
+
 *** Marginalia
 
 Marginalia in the minibuffer. [[https://github.com/minad/marginalia][Marginalia Homepage]].
