@@ -1198,6 +1198,7 @@ autopep8=. The following code is inspired by [[https://gist.github.com/whirm/612
       (shell-command-on-region (point-min) (point-max)
                                "autopep8 - "
                                nil t)
+      (python-mode)			; Revert highlights.
       (goto-char orig-point)
       )
     )
