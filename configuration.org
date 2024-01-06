@@ -102,8 +102,15 @@ open it manually if you want.
 
 *** Use Dashboard
 
+Make sure dashboard is installed.
 #+begin_src emacs-lisp
-  (require 'dashboard)
+  (use-package dashboard
+	       :ensure t
+	       )
+#+end_src
+
+#+begin_src emacs-lisp
+  ; (require 'dashboard) ;; not necessray as use-package is used
   (dashboard-setup-startup-hook)
   (setq dashboard-banner-logo-title "Nice day!")
   (setq dashboard-startup-banner 'official) ;; 也可以自定义图片
@@ -156,7 +163,7 @@ Replace yes-no answers with y-n.
 Set color theme by time. The theme is set to =tango= from 8:00
 to 18:00, and set to =tango-dark= from 18:00 to 8:00. The code
 is modified from [[https://stackoverflow.com/a/14760833/2731421][this answer on Github]].
- 
+
 #+begin_src emacs-lisp
   ;; See https://stackoverflow.com/a/14760833/2731421 for more
   ;; information.
@@ -173,7 +180,7 @@ is modified from [[https://stackoverflow.com/a/14760833/2731421][this answer on 
 
   (defun synchronize-theme ()
     "Set theme by time."
-    (let ((hour (string-to-number 
+    (let ((hour (string-to-number
                  (substring (current-time-string) 11 13))))
       (if (member hour (number-sequence 8 17))
           (synchronize-theme-helper 'tango)
@@ -194,7 +201,7 @@ is modified from [[https://stackoverflow.com/a/14760833/2731421][this answer on 
 
 *** Set by Sunrise and Sunset Time Automatically
 
-Color theme is =tango= when sun rises and =tango-dark= when 
+Color theme is =tango= when sun rises and =tango-dark= when
 sun sets.
 
 #+begin_src emacs-lisp :var conf-table=conf-table
@@ -264,7 +271,7 @@ sun sets.
 #+end_src
 
 ** Window Layouts
-   
+
 I'd like to turn off menu, tool and scroll bar.
 
 #+begin_src emacs-lisp
@@ -347,7 +354,7 @@ function also sets consistent window sizes for all systems.
   ;; Set window height and width.
   (setq default-frame-alist '((height . 32) (width . 80)))
 #+end_src
- 
+
 * Editor
 ** Scrolling
 
@@ -372,7 +379,7 @@ the buffer. Note that this setting might screw up some
 language environments. See [[https://github.com/jorgenschaefer/elpy/issues/1729#issuecomment-558204483][github issue]].
 
 #+begin_src emacs-lisp
-  (set-language-environment "UTF-8") 
+  (set-language-environment "UTF-8")
 #+end_src
 
 Use "TeX" as default input method.
@@ -429,7 +436,7 @@ Enable recentf mode and save recent opened files every 5 minutes.
 
 #+begin_src emacs-lisp
   (recentf-mode t)
-  (run-at-time (current-time) (* 5 60) 
+  (run-at-time (current-time) (* 5 60)
                (lambda () (silent-forward! recentf-save-list)))
 #+end_src
 
@@ -438,6 +445,10 @@ Enable recentf mode and save recent opened files every 5 minutes.
 Use Company mode for auto-completion.
 
 #+begin_src emacs-lisp
+  ;; First make sure it is installed.
+  (use-package company
+    :ensure t
+    )
   (global-company-mode 1)
 #+end_src
 
@@ -446,6 +457,10 @@ Use Company mode for auto-completion.
 Always turn yasnippet mode on.
 
 #+begin_src emacs-lisp
+  ;; First make sure it is installed.
+  (use-package yasnippet
+    :ensure t
+    )
   (yas-global-mode t)
 #+end_src
 
@@ -454,16 +469,27 @@ Always turn yasnippet mode on.
 Do not enable the whole ivy mode as I just want to use a portion
 of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
 1)=)
-    
+
 #+begin_src emacs-lisp
+  ;; First make sure it is installed.
+  (use-package ivy :ensure t)
+  (use-package swiper :ensure t)
+  (use-package counsel :ensure t)
   ;; ivy virtual buffer
   (setq ivy-use-virtual-buffers t)
   ;; ivy mini buffer
   (setq enable-recursive-minibuffers t)
 #+end_src
 
-*** Projectile    
+*** Projectile
 Instructions for setting up projectile is given by its [[https://github.com/bbatsov/projectile][homepage]].
+
+**** Installation
+First make sure it is installed.
+#+begin_src emacs-lisp
+  (use-package projectile
+    :ensure t)
+#+end_src
 
 **** Enable Projectile and its Keymap
 
@@ -484,11 +510,15 @@ to enable it manually following [[https://docs.projectile.mx/projectile/configur
 #+end_src
 
 *** Lsp
+**** Installation
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :ensure t)
+#+end_src
 **** Highlight Text
 Set the font of the highlight text where cursor points to.
 
 #+begin_src emacs-lisp
-  (require 'lsp)
   (set-face-attribute 'lsp-face-highlight-textual nil
                       :inherit nil :underline t :bold t)
   (set-face-attribute 'lsp-face-highlight-read nil
@@ -501,7 +531,7 @@ Set the font of the highlight text where cursor points to.
 Automatically guess the project root using projectile/project. Do not
 use this setting unless you are familiar with ~lsp-mode~ internals and
 you are sure that all of your projects are following
-~projectile/project.el~ conventions. 
+~projectile/project.el~ conventions.
 
 Refer to [[https://emacs-lsp.github.io/lsp-mode/page/settings/mode/#lsp-auto-guess-root][this link]] for more details.
 
@@ -524,7 +554,8 @@ features.
 Marginalia in the minibuffer. [[https://github.com/minad/marginalia][Marginalia Homepage]].
 
 #+begin_src emacs-lisp
-(marginalia-mode t)
+  (use-package marginalia :ensure t)
+  (marginalia-mode t)
 #+end_src
 
 *** Flycheck
@@ -532,6 +563,7 @@ Marginalia in the minibuffer. [[https://github.com/minad/marginalia][Marginalia 
 Enable Flycheck mode by default.
 
 #+begin_src emacs-lisp
+  (use-package flycheck :ensure t)
   (global-flycheck-mode)
 #+end_src
 
@@ -540,6 +572,7 @@ Enable Flycheck mode by default.
 Rainbow mode by default.
 
 #+begin_src emacs-lisp
+  (use-package rainbow-mode :ensure t)
   (add-hook 'prog-mode-hook 'rainbow-mode)
 #+end_src
 
@@ -549,6 +582,7 @@ Display ugly =^L= page breaks as tidy horizontal lines. It does not work
 fine on Windows systems and I haven't work it out.
 
 #+begin_src emacs-lisp
+  (use-package page-break-lines :ensure t)
   (global-page-break-lines-mode)
   (set-fontset-font "fontset-default"
                     (cons page-break-lines-char page-break-lines-char)
@@ -591,6 +625,7 @@ non-whitespace character on this line, which I think is
 idential to =mwim-beginning-of-code=.
 
 #+begin_src emacs-lisp
+  (use-package mwim :ensure t)
   (autoload 'mwim-beginning-of-code "mwim" nil t)
   (autoload 'mwim-end-of-code "mwim" nil t)
   (global-set-key (kbd "M-g a") 'mwim-beginning-of-code)
@@ -605,6 +640,7 @@ Jump to text using a char-based decision tree. It's really
 cool!
 
 #+begin_src emacs-lisp
+  (use-package avy :ensure t)
   (global-set-key (kbd "C-;") 'avy-goto-char)
   (global-set-key (kbd "C-'") 'avy-goto-line)
   (global-set-key (kbd "M-g l") 'avy-goto-line)
@@ -619,6 +655,7 @@ cool!
 Bind =M-o= to use ace-window.
 
 #+begin_src emacs-lisp
+  (use-package ace-window :ensure t)
   (global-set-key (kbd "M-o") 'ace-window)
 #+end_src
 
@@ -627,6 +664,7 @@ Bind =M-o= to use ace-window.
 [[https://github.com/magnars/multiple-cursors.el][Multiple cursors]] for Emacs.
 
 #+begin_src emacs-lisp
+  (use-package multiple-cursors :ensure t)
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
   (global-set-key (kbd "C-?") 'mc/mark-all-dwim)
@@ -696,7 +734,7 @@ Yank the previous kill. This is equivalent to =M-- M-y=.
       (interactive "*p")
       (unless arg (setq arg 1))
       (yank-pop (- arg)))
-  
+
     (global-set-key "\C-\M-Y" 'yank-pop-reversed)
 #+end_src
 
@@ -728,7 +766,7 @@ delete. I don't know whether it is a bug. But it is easy to work
 around this issue.
 
 #+begin_src emacs-lisp
-  ;; Note that operating-system-release might be nil on windows, 
+  ;; Note that operating-system-release might be nil on windows,
   ;; which can not be argument of string-match-p.
   (if operating-system-release
       (if (string-match-p
@@ -738,7 +776,7 @@ around this issue.
         )
     )
 #+end_src
-   
+
 * Major Modes
 ** Org Mode
 *** Basic Setting
@@ -772,7 +810,7 @@ See [[https://orgmode.org/manual/Org-Indent-Mode.html][org mode manual]] for mor
 #+end_src
 
 *** Constants
-    
+
 #+begin_src emacs-lisp
   (setq org-table-formula-constants
         '(("π" . "3.14159265359")
@@ -817,7 +855,7 @@ Use Org superstar mode.
 
 I'd like something fancy instead of the ellipsis (...) that org
 displays when there's staff under a header. The arrow symbol is
-found from [[https://unicode-table.com/en/sets/arrow-symbols/][Unicode Character Table]].  
+found from [[https://unicode-table.com/en/sets/arrow-symbols/][Unicode Character Table]].
 Due to the limitation of font set, this only works for the X11
 window.
 
@@ -863,10 +901,10 @@ Enable Python, C, C++ and D languages.
   (org-babel-do-load-languages 'org-babel-load-languages
   '((python . t)))
   ;; Enable C, C++ and D.
-  (org-babel-do-load-languages 'org-babel-load-languages 
+  (org-babel-do-load-languages 'org-babel-load-languages
   '((C . t)))
   ;; Enable latex.
-  (org-babel-do-load-languages 'org-babel-load-languages 
+  (org-babel-do-load-languages 'org-babel-load-languages
   '((latex . t)))
 #+end_src
 
@@ -928,7 +966,7 @@ the solution is setting the default python interpreter to
 =ipython= on windows.
 
 #+begin_src emacs-lisp :var conf-table=conf-table
-  ;; Use string= for string comparasion! 
+  ;; Use string= for string comparasion!
   ;; (eq "str" "str") returns nil.
   (let ((interpreter (get-conf! "python-interpreter")))
     (if (string= interpreter "default")
@@ -978,7 +1016,7 @@ by function =advice-add= (see [[https://emacs.stackexchange.com/a/41250/38157][t
   (advice-add 'enable-theme :after #'hide-org-indent-leading-stars)
   (advice-add 'disable-theme :after #'hide-org-indent-leading-stars)
 #+end_src
- 
+
 ** Prog Mode
 
 =prog-mode= is the base mode for programming.
@@ -988,11 +1026,11 @@ Use hungry delete from c-mode by using prefix "C-c".
 #+begin_src emacs-lisp
   (add-hook 'prog-mode-hook
             (lambda () (local-set-key
-                        (kbd "C-c <backspace>") 
+                        (kbd "C-c <backspace>")
                         'c-hungry-delete-backwards)))
   (add-hook 'prog-mode-hook
             (lambda () (local-set-key
-                        (kbd "C-c <delete>") 
+                        (kbd "C-c <delete>")
                         'c-hungry-delete-forward)))
 #+end_src
 
@@ -1002,6 +1040,7 @@ Use hungry delete from c-mode by using prefix "C-c".
 Use rainbow-delimiters for lisp-like languages.
 
 #+begin_src emacs-lisp
+  (use-package rainbow-delimiters :ensure t)
   (add-hook 'lisp-mode-hook 'rainbow-delimiters-mode)
   (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
   (add-hook 'scheme-mode-hook 'rainbow-delimiters-mode)
@@ -1050,7 +1089,8 @@ Press ~<f5>~ to save all buffers and run the region or buffer.
 Use melpa's python-mode.el to replace the built-in python-mode.
 
 #+begin_src emacs-lisp
-  (require 'python-mode)
+  (use-package python-mode :ensure t)
+  ;; (require 'python-mode)
 #+end_src
 
 The keybindings of <backspace> and <delete> in melpa is
@@ -1061,15 +1101,15 @@ built-in version.
 #+begin_src emacs-lisp
   (add-hook 'python-mode-hook
             (lambda () (local-set-key
-                        (kbd "<backspace>") 
+                        (kbd "<backspace>")
                         'python-indent-dedent-line-backspace)))
   (add-hook 'python-mode-hook
             (lambda () (local-set-key
-                        (kbd "<delete>") 
+                        (kbd "<delete>")
                         'delete-forward-char)))
   (add-hook 'python-mode-hook
             (lambda () (local-set-key
-                        (kbd "C-<backspace>") 
+                        (kbd "C-<backspace>")
                         'backward-kill-word)))
 #+end_src
 
@@ -1090,6 +1130,7 @@ The ~py-fill-paragraph~, which is binded to ~M-Q~ by setting
 Enable eply mode for Python.
 
 #+begin_src emacs-lisp
+  (use-package elpy :ensure t)
   (elpy-enable)
 #+end_src
 
@@ -1135,12 +1176,12 @@ are used for Linux and windows systems.
 #+end_src
 
 *** Key Bindings
-    
+
 Press <f9> to run the whole buffer or the selected region.
 
 #+begin_src emacs-lisp
   (add-hook 'elpy-mode-hook
-            (lambda () 
+            (lambda ()
               (local-set-key [f9] "\C-u\C-c\C-c")))
 #+end_src
 
@@ -1167,7 +1208,7 @@ region.
 
 Press C-<f5> to save all files, kill the current python buffer and
 run the whole buffer or the selected region.
-    
+
 #+begin_src emacs-lisp
   (defun python-save-and-rerun () (interactive)
          "Save all buffers, kill current python buffer and run
@@ -1213,14 +1254,14 @@ on windows by default. You can also specify the interpreter manually
 by setting ~python-interpreter~ in Table [[conf-table]].
 
 #+begin_src emacs-lisp :var conf-table=conf-table
-  ;; Use string= for string comparasion! 
+  ;; Use string= for string comparasion!
   ;; (eq "str" "str") returns nil.
   (let ((interpreter (get-conf! "python-interpreter")))
     (if (string= interpreter "default")
         (if (eq 'windows-nt system-type)
             (setq python-shell-interpreter "ipython")
           )
-      (setq python-shell-interpreter interpreter) 
+      (setq python-shell-interpreter interpreter)
       )
     )
 #+end_src
@@ -1258,7 +1299,7 @@ Flycheck has the following problems on the windows system:
       (setq flycheck-check-syntax-automatically
             '(save idle-change mode-enabled))
       ;; Set delay based on what suits you the best
-      (setq flycheck-idle-change-delay 4) 
+      (setq flycheck-idle-change-delay 4)
       )
   #+end_src
 **** Lsp Issue
@@ -1333,8 +1374,8 @@ Use lsp-mode.
 
 **** COMMENT Spell Check
 
-The lsp-mode will use its own lsp-checker for flycheck. Here we 
-disable this behaviour so that it uses c/c++-clang as its 
+The lsp-mode will use its own lsp-checker for flycheck. Here we
+disable this behaviour so that it uses c/c++-clang as its
 default checker.
 
 #+begin_src emacs-lisp
@@ -1358,7 +1399,7 @@ Enable lsp-mode when editing remote files. See [[https://github.com/syl20bnr/spa
 
 ** Rust Mode
 *** Basic settings
-**** Use LSP 
+**** Use LSP
 #+begin_src emacs-lisp
 (add-hook 'rust-mode-hook #'lsp)
 #+end_src
@@ -1395,7 +1436,7 @@ Press ~<f5>~ to save all buffers and run command ~cargo-run~.
 #+end_src
 
 ** Inp Mode
-   
+
 Abaqus inp mode.
 
 #+begin_src emacs-lisp
@@ -1408,7 +1449,7 @@ Abaqus inp mode.
 ** COMMENT Emacs Application Framework
 Not fuly installed.
 *** Setup
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
   (add-to-list 'load-path
                "~/.emacs.d/site-lisp/emacs-application-framework/")
   (require 'eaf)
