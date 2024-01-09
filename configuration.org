@@ -848,6 +848,7 @@ This feature is automatically enabled by =org-indent-mode=.
 Use Org superstar mode.
 
 #+begin_src emacs-lisp
+(use-package org-superstar :ensure t)
 (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 #+end_src
 
