@@ -72,7 +72,7 @@ Set =user-full-name.=
 #+END_SRC
 
 ** Package Management
-
+*** Use Melpa
 Add melpa to package management system.
 
 #+begin_src emacs-lisp
@@ -88,6 +88,13 @@ Add melpa to package management system.
    '("melpa-stable" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
    t)
   (package-initialize)
+#+end_src
+*** Use use-package
+Make sure =use-package= is installed in the first place.
+
+#+begin_src emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
 #+end_src
 
 ** Startup Screen
@@ -113,7 +120,7 @@ Make sure dashboard is installed.
   ; (require 'dashboard) ;; not necessray as use-package is used
   (dashboard-setup-startup-hook)
   (setq dashboard-banner-logo-title "Nice day!")
-  (setq dashboard-startup-banner 'official) ;; 
+  (setq dashboard-startup-banner 'official) ;;
   (setq dashboard-items '(
                           (projects . 5)
                           (bookmarks . 5)  ;; number of listed bookmarks
@@ -848,7 +855,6 @@ This feature is automatically enabled by =org-indent-mode=.
 Use Org superstar mode.
 
 #+begin_src emacs-lisp
-(use-package org-superstar :ensure t)
 (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 #+end_src
 
@@ -863,7 +869,7 @@ window.
 #+begin_src emacs-lisp
   (if (eq (window-system) 'x)
       (progn
-        (setq org-ellipsis "..")
+        (setq org-ellipsis "..⤸")
         (set-face-underline 'org-ellipsis nil)
         (set-face-bold 'org-ellipsis t))
     )
@@ -1305,7 +1311,7 @@ Flycheck has the following problems on the windows system:
   #+end_src
 **** Lsp Issue
 
-=lsp-find-definition= may be very slow or even time out when
+=lsp-find-definition= may be very slow or even timed out when
 processing python files on Linux. A similar problem can be
 found on [[https://emacs.stackexchange.com/a/68748/38157][stackexchange]] and may be solved by disable lsp's
 file watcher. However, in Python-mode, it seems to be a
@@ -1403,7 +1409,10 @@ Enable lsp-mode when editing remote files. See [[https://github.com/syl20bnr/spa
 #+begin_src emacs-lisp
   (use-package rust-mode :ensure t)
 #+end_src
+
 **** Use LSP
+Using lsp needs manually installation of =rust-analyzer=. This can be done by =rustup=: ~rustup component add rust-analyzer~.
+
 #+begin_src emacs-lisp
 (add-hook 'rust-mode-hook #'lsp)
 #+end_src
@@ -1442,7 +1451,7 @@ Press ~<f5>~ to save all buffers and run command ~cargo-run~.
 
 ** Inp Mode
 
-Abaqus inp mode.
+Abaqus inp mode. This mode needs manually installation.
 
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/inp-mode")
