@@ -82,7 +82,7 @@ Add melpa to package management system.
   ;; to the start of the line. You may delete these
   ;; explanatory comments.
   (require 'package)
-  (add-to-list'package-archives
+  (add-to-list 'package-archives
    ; Use official source or mirror from tsinghua university.
    ; '("melpa-stable" . "http://melpa.org/packages/")
    '("melpa-stable" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
