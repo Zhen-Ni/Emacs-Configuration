@@ -453,9 +453,7 @@ Use Company mode for auto-completion.
 
 #+begin_src emacs-lisp
   ;; First make sure it is installed.
-  (use-package company
-    :ensure t
-    )
+  (use-package company :ensure t :no-require t)
   (global-company-mode 1)
 #+end_src
 
@@ -465,9 +463,7 @@ Always turn yasnippet mode on.
 
 #+begin_src emacs-lisp
   ;; First make sure it is installed.
-  (use-package yasnippet
-    :ensure t
-    )
+  (use-package yasnippet :ensure t :no-require t)
   (yas-global-mode t)
 #+end_src
 
@@ -479,9 +475,9 @@ of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
 
 #+begin_src emacs-lisp
   ;; First make sure it is installed.
-  (use-package ivy :ensure t)
-  (use-package swiper :ensure t)
-  (use-package counsel :ensure t)
+  (use-package ivy :ensure t :no-require t)
+  (use-package swiper :ensure t :no-require t)
+  (use-package counsel :ensure t :no-require t)
   ;; ivy virtual buffer
   (setq ivy-use-virtual-buffers t)
   ;; ivy mini buffer
@@ -494,8 +490,7 @@ Instructions for setting up projectile is given by its [[https://github.com/bbat
 **** Installation
 First make sure it is installed.
 #+begin_src emacs-lisp
-  (use-package projectile
-    :ensure t)
+  (use-package projectile :ensure t :no-require t)
 #+end_src
 
 **** Enable Projectile and its Keymap
@@ -519,8 +514,7 @@ to enable it manually following [[https://docs.projectile.mx/projectile/configur
 *** Lsp
 **** Installation
 #+begin_src emacs-lisp
-  (use-package lsp-mode
-    :ensure t)
+  (use-package lsp-mode :ensure t)
 #+end_src
 **** Highlight Text
 Set the font of the highlight text where cursor points to.
@@ -561,7 +555,7 @@ features.
 Marginalia in the minibuffer. [[https://github.com/minad/marginalia][Marginalia Homepage]].
 
 #+begin_src emacs-lisp
-  (use-package marginalia :ensure t)
+  (use-package marginalia :ensure t :no-require t)
   (marginalia-mode t)
 #+end_src
 
@@ -570,7 +564,7 @@ Marginalia in the minibuffer. [[https://github.com/minad/marginalia][Marginalia 
 Enable Flycheck mode by default.
 
 #+begin_src emacs-lisp
-  (use-package flycheck :ensure t)
+  (use-package flycheck :ensure t :no-require t)
   (global-flycheck-mode)
 #+end_src
 
@@ -579,7 +573,7 @@ Enable Flycheck mode by default.
 Rainbow mode by default.
 
 #+begin_src emacs-lisp
-  (use-package rainbow-mode :ensure t)
+  (use-package rainbow-mode :ensure t :no-require t)
   (add-hook 'prog-mode-hook 'rainbow-mode)
 #+end_src
 
@@ -589,7 +583,7 @@ Display ugly =^L= page breaks as tidy horizontal lines. It does not work
 fine on Windows systems and I haven't work it out.
 
 #+begin_src emacs-lisp
-  (use-package page-break-lines :ensure t)
+  (use-package page-break-lines :ensure t :no-require t)
   (global-page-break-lines-mode)
   (set-fontset-font "fontset-default"
                     (cons page-break-lines-char page-break-lines-char)
@@ -632,7 +626,7 @@ non-whitespace character on this line, which I think is
 idential to =mwim-beginning-of-code=.
 
 #+begin_src emacs-lisp
-  (use-package mwim :ensure t)
+  (use-package mwim :ensure t :no-require t)
   (autoload 'mwim-beginning-of-code "mwim" nil t)
   (autoload 'mwim-end-of-code "mwim" nil t)
   (global-set-key (kbd "M-g a") 'mwim-beginning-of-code)
@@ -647,7 +641,7 @@ Jump to text using a char-based decision tree. It's really
 cool!
 
 #+begin_src emacs-lisp
-  (use-package avy :ensure t)
+  (use-package avy :ensure t :no-require t)
   (global-set-key (kbd "C-;") 'avy-goto-char)
   (global-set-key (kbd "C-'") 'avy-goto-line)
   (global-set-key (kbd "M-g l") 'avy-goto-line)
@@ -662,7 +656,7 @@ cool!
 Bind =M-o= to use ace-window.
 
 #+begin_src emacs-lisp
-  (use-package ace-window :ensure t)
+  (use-package ace-window :ensure t :no-require t)
   (global-set-key (kbd "M-o") 'ace-window)
 #+end_src
 
@@ -671,7 +665,7 @@ Bind =M-o= to use ace-window.
 [[https://github.com/magnars/multiple-cursors.el][Multiple cursors]] for Emacs.
 
 #+begin_src emacs-lisp
-  (use-package multiple-cursors :ensure t)
+  (use-package multiple-cursors :ensure t :no-require t)
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
   (global-set-key (kbd "C-?") 'mc/mark-all-dwim)
@@ -855,6 +849,7 @@ This feature is automatically enabled by =org-indent-mode=.
 Use Org superstar mode.
 
 #+begin_src emacs-lisp
+(use-package org-superstar :ensure t :no-require t)
 (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 #+end_src
 
@@ -1047,7 +1042,7 @@ Use hungry delete from c-mode by using prefix "C-c".
 Use rainbow-delimiters for lisp-like languages.
 
 #+begin_src emacs-lisp
-  (use-package rainbow-delimiters :ensure t)
+  (use-package rainbow-delimiters :ensure t :no-require t)
   (add-hook 'lisp-mode-hook 'rainbow-delimiters-mode)
   (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
   (add-hook 'scheme-mode-hook 'rainbow-delimiters-mode)
@@ -1096,7 +1091,7 @@ Press ~<f5>~ to save all buffers and run the region or buffer.
 Use melpa's python-mode.el to replace the built-in python-mode.
 
 #+begin_src emacs-lisp
-  (use-package python-mode :ensure t)
+  (use-package python-mode :ensure t :no-require t)
   ;; (require 'python-mode)
 #+end_src
 
@@ -1137,7 +1132,7 @@ The ~py-fill-paragraph~, which is binded to ~M-Q~ by setting
 Enable eply mode for Python.
 
 #+begin_src emacs-lisp
-  (use-package elpy :ensure t)
+  (use-package elpy :ensure t :no-require t)
   (elpy-enable)
 #+end_src
 
@@ -1407,7 +1402,7 @@ Enable lsp-mode when editing remote files. See [[https://github.com/syl20bnr/spa
 ** Rust Mode
 *** Basic settings
 #+begin_src emacs-lisp
-  (use-package rust-mode :ensure t)
+  (use-package rust-mode :ensure t :no-require t)
 #+end_src
 
 **** Use LSP
@@ -1429,7 +1424,7 @@ Use space for indentation.
 Flycheck for rust mode needs installation and initializaion.
 
 #+begin_src emacs-lisp
-  (use-package flycheck-rust :ensure t)
+  (use-package flycheck-rust :ensure t :no-require t)
   (with-eval-after-load 'rust-mode
     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 #+end_src
@@ -1464,7 +1459,7 @@ Abaqus inp mode. This mode needs manually installation.
 Use magit to interacting with Git.
 
 #+begin_src emacs-lisp
-  (use-package magit :ensure t)
+  (use-package magit :ensure t :no-require t)
 #+end_src
 
 ** COMMENT Emacs Application Framework
