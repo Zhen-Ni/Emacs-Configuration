@@ -68,11 +68,12 @@ Run function silently.
 Set =user-full-name.=
 
 #+BEGIN_SRC emacs-lisp
-  (setq user-full-name "Zhen Ni")
+  (setq user-full-name "Zhen NI")
 #+END_SRC
 
 ** Package Management
 *** Use Melpa
+
 Add melpa to package management system.
 
 #+begin_src emacs-lisp
@@ -89,8 +90,12 @@ Add melpa to package management system.
    t)
   (package-initialize)
 #+end_src
+
 *** Use use-package
-Make sure =use-package= is installed in the first place.
+
+Since version 29, ~use-package~ has been built into Emacs. However, we
+still need to make sure =use-package= is installed in the first place
+for older versions.
 
 #+begin_src emacs-lisp
   (unless (package-installed-p 'use-package)
@@ -115,6 +120,8 @@ Make sure dashboard is installed.
 	       :ensure t
 	       )
 #+end_src
+
+Dashboard settings.
 
 #+begin_src emacs-lisp
   ; (require 'dashboard) ;; not necessray as use-package is used
@@ -161,6 +168,11 @@ Replace yes-no answers with y-n.
 
 #+begin_src emacs-lisp
   (fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+Stop always popping warning messages.
+#+begin_src emacs-lisp
+  (setq warning-minimum-level :error)
 #+end_src
 
 * Appearance
@@ -407,13 +419,15 @@ Show column number on the bottom of the editor buffer.
 
 **** Show Paren Mode
 
-Show matching parentheses.
+Show matching parentheses. This becomes default behavior since Emacs
+version 28.
 
 #+begin_src emacs-lisp
   (show-paren-mode 1)
 #+end_src
 
 **** Auto Revert Mode
+
 Automatically revert buffer if its content is changed
 somewhere else.
 
@@ -540,7 +554,7 @@ Refer to [[https://emacs-lsp.github.io/lsp-mode/page/settings/mode/#lsp-auto-gue
   (setq lsp-auto-guess-root t)
 #+end_src
 
-**** Disable SignatuRe Help Documentation
+**** Disable Signature Help Documentation
 
 Signature documentation sometimes makes the minibuffer too big when
 coding. The [[https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/][official website]] gives instructions for turning off such
@@ -550,12 +564,20 @@ features.
   (setq lsp-signature-render-documentation nil)
 #+end_src
 
-**** Use insert instead of replace when completion
+**** Use Insert Instead of Replace When Completion
 
 The default behaviour of lsp completion replaces the word inplace, as described by [[https://stackoverflow.com/questions/76211988/stop-company-complete-selection-from-eating-following-word-in-rust-code][this question]]. This behavior is controlled by ~lsp-completion-default-behaviour~ in [[https://emacs-lsp.github.io/lsp-mode/page/settings/mode/#lsp-completion-default-behaviour][this link]], we can change it from ~:replace~ to ~:insert~ to solve the problem.
 
 #+begin_src emacs-lisp
 (setq lsp-completion-default-behaviour :insert)
+#+end_src
+
+*** COMMENT Eglot
+
+Install eglot automatically. This is built into Emacs since version 29.
+
+#+begin_src emacs-lisp
+  (use-package eglot :ensure t :no-require t)
 #+end_src
 
 *** Marginalia
@@ -602,7 +624,7 @@ fine on Windows systems and I haven't work it out.
                     (face-attribute 'default :family))
 #+end_src
 
-** Keybindings
+** Functions and Key Bindings
 *** Default Functoins
 
 Upcase and downcase region.
@@ -1050,7 +1072,7 @@ Use hungry delete from c-mode by using prefix "C-c".
 
 ** Lisp Mode
 *** Minor Mode Settings
-
+**** Rainbow Mode
 Use rainbow-delimiters for lisp-like languages.
 
 #+begin_src emacs-lisp
@@ -1062,8 +1084,9 @@ Use rainbow-delimiters for lisp-like languages.
   '(((((((((.)))))))))
 #+end_src
 
-*** Addin Funcitons
-
+*** Functions and Key Bindings
+**** My Own Funcitons
+***** Run Region or Buffer
 Use ~C-c C-c~ to eval region or buffer, depending on whether the
 selected region is active.
 
@@ -1110,7 +1133,7 @@ Use melpa's python-mode.el to replace the built-in python-mode.
   ;; (require 'python-mode)
 #+end_src
 
-***** COMMENT Functions and keybindings
+***** Functions and keybindings
 
 The keybindings of <backspace> and <delete> in melpa is
 different from the built-in version, which causes
@@ -1144,7 +1167,8 @@ The ~py-fill-paragraph~, which is binded to ~M-Q~ by setting
 
 #+end_src
 
-**** Use Elpy
+*** Minor Mode Settings
+**** Elpy
 
 Enable eply mode for Python.
 
@@ -1159,7 +1183,7 @@ Disable virtualenv
   (setq elpy-rpc-virtualenv-path 'current)
 #+end_src
 
-**** COMMENT Use LSP
+**** COMMENT LSP
 +Use lsp-mode. (experimental)+
 Currently, elpy works better with python.
 
@@ -1167,7 +1191,7 @@ Currently, elpy works better with python.
   (add-hook 'python-mode-hook 'lsp)
 #+end_src
 
-*** Minor Mode Settings
+**** Flymake
 
 The flymake mode is turned on by default in elpy. But we use
 flycheck mode in python. So, turn it off.
@@ -1175,6 +1199,8 @@ flycheck mode in python. So, turn it off.
 #+begin_src emacs-lisp
   (add-hook 'elpy-mode-hook (lambda () (flymake-mode -1)))
 #+end_src
+
+**** Flycheck
 
 Specify flycheck checkers for python.
 
@@ -1194,8 +1220,8 @@ are used for Linux and windows systems.
     )
 #+end_src
 
-*** Key Bindings
-
+*** Functions and Key Bindings
+**** Python Run Buffer or Region
 Press ~<f9>~ to run the whole buffer or the selected region.
 
 #+begin_src emacs-lisp
@@ -1240,8 +1266,8 @@ run the whole buffer or the selected region.
                         'python-save-and-rerun)))
 #+end_src
 
-*** Addin Functions
-**** Autopep8
+**** My Own Functions
+***** Autopep8
 
 Automatically formats Python code to conform the PEP 8 style
 guide. To use this function in Python mode, press =M-x
@@ -1321,7 +1347,7 @@ Flycheck has the following problems on the windows system:
       (setq flycheck-idle-change-delay 4)
       )
   #+end_src
-**** Lsp Issue
+**** COMMENT Lsp Issue
 
 =lsp-find-definition= may be very slow or even timed out when
 processing python files on Linux. A similar problem can be
@@ -1331,7 +1357,7 @@ problem realated to the performance of mypy checker. I'm not
 sure about it, and haven't found a solution.
 
 #+begin_src emacs-lisp
-  ;(setq lsp-enable-file-watchers nil)
+  (setq lsp-enable-file-watchers nil)
 #+end_src
 
 **** COMMENT MELPA's Python-mode and Elpy's compability Issue
@@ -1349,6 +1375,7 @@ installation.
 
 ** C++ Mode
 *** Basic Settings
+**** Use C++ Mode
 
 Use ~C++-mode~ for ~.h~ files.
 
@@ -1362,7 +1389,7 @@ Use ~cpp-mode~ as name alias for ~c++-mode~.
   (defalias 'cpp-mode 'c++-mode)
 #+end_src
 
-*** Indentation
+**** Indentation
 
 Use space for indentation.
 
@@ -1380,9 +1407,9 @@ Do not indent namespace in c++ mode.
     (c-set-offset 'innamespace [0]))
   (add-hook 'c++-mode-hook 'cancel-c++-namespace-indentation)
 #+end_src
-
-*** Lsp
-**** Use lsp-mode
+*** Minor Mode Settings
+**** Lsp
+***** Use ~lsp-mode~
 
 Use lsp-mode.
 
@@ -1391,7 +1418,7 @@ Use lsp-mode.
   (add-hook 'c-mode-hook 'lsp)
 #+end_src
 
-**** COMMENT Spell Check
+***** COMMENT Spell Check
 
 The lsp-mode will use its own lsp-checker for flycheck. Here we
 disable this behaviour so that it uses c/c++-clang as its
@@ -1401,7 +1428,7 @@ default checker.
   (setq lsp-diagnostic-package :none)
 #+end_src
 
-**** Work with TRAMP
+***** Work with TRAMP
 
 Enable lsp-mode when editing remote files. See [[https://github.com/syl20bnr/spacemacs/issues/13925][Gibhub topic]] and
 [[https://emacs-lsp.github.io/lsp-mode/page/remote/][official website]] for more information.
@@ -1417,10 +1444,19 @@ Enable lsp-mode when editing remote files. See [[https://github.com/syl20bnr/spa
 #+end_src
 
 ** Rust Mode
-*** Basic settings
-**** Use rust mode
+*** Basic Settings
+**** Use rust-mode
+
 #+begin_src emacs-lisp
   (use-package rust-mode :ensure t :no-require t)
+#+end_src
+
+**** COMMENT Use Rustic Mode
+
+Rustic mode is based on rust mode and provides additional features.
+
+#+begin_src emacs-lisp
+  (use-package rustic :ensure t :no-require t)
 #+end_src
 
 **** Indentation
@@ -1431,15 +1467,60 @@ Use space for indentation.
 #+end_src
 
 *** Minor Mode Settings
-**** Use LSP
-***** Setup
+**** LSP
+
 Using lsp needs manually installation of =rust-analyzer=. This can be done by =rustup=: ~rustup component add rust-analyzer~.
 
 #+begin_src emacs-lisp
 (add-hook 'rust-mode-hook #'lsp)
 #+end_src
 
-***** Inlay hints
+**** Flycheck
+Flycheck for rust mode needs installation and initializaion.
+
+#+begin_src emacs-lisp
+  (use-package flycheck-rust :ensure t :no-require t)
+  ;; Not needed if rustic mode is enabled.
+  (with-eval-after-load 'rust-mode
+    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+#+end_src
+
+**** COMMENT Eglot
+
+Compared with lsp, eglot currently cannot expand macros for rust.
+
+***** Setup
+
+Using eglot needs manually installation of =rust-analyzer=. This can be done by =rustup=: ~rustup component add rust-analyzer~.
+For more information, see [[https://rust-analyzer.github.io/manual.html#emacs][rust-analyzer's website]].
+
+#+begin_src emacs-lisp
+(add-hook 'rust-mode-hook 'eglot-ensure)
+#+end_src
+
+***** Flycheck Issues
+
+Eglot uses flymake mode by default. So we disable flycheck mode here.
+
+#+begin_src emacs-lisp
+  (add-hook 'rust-mode-hook (lambda () (flycheck-mode -1)))
+#+end_src
+
+*** Functions and Key Bindings
+**** Lsp
+***** Macro Expandsion
+
+Use ~C-c m~ to expand rust macros.
+
+#+begin_src emacs-lisp
+  (add-hook 'rust-mode-hook
+            (lambda () (local-set-key
+                        (kbd "C-c m")
+                        'lsp-rust-analyzer-expand-macro)))
+
+#+end_src
+
+***** Inlay Hints
 
 Use ~C-c i~ to show/hide inlay hints.
 
@@ -1455,6 +1536,7 @@ Use ~C-c i~ to show/hide inlay hints.
                  ;; Needs to restart lsp workspace to make inlay hints
                  ;; enabled.
                  (lsp-workspace-restart (lsp--read-workspace))
+                 ;; (lsp-restart-workspace)
                  (lsp-inlay-hints-mode t)
                  )
              ;; Else :b ) If this mode has been turned on before
@@ -1462,60 +1544,20 @@ Use ~C-c i~ to show/hide inlay hints.
              )
            )
          )
-  ;; (setq-default lsp-inlay-hints-mode nil) 
+
   (setq lsp-rust-analyzer-display-parameter-hints t)
   (setq lsp-rust-analyzer-closure-capture-hints t)
   (setq lsp-rust-analyzer-closure-return-type-hints "always")
 
-(add-hook 'rust-mode-hook
+  (add-hook 'rust-mode-hook
             (lambda () (setq lsp-inlay-hint-enable nil)))
   (add-hook 'rust-mode-hook
             (lambda () (local-set-key
                         (kbd "C-c i")
                         'rust-inlay-hints)))
 #+end_src
-
-***** Macro expandsion
-
-Use ~C-c m~ to expand rust macros.
-
-#+begin_src emacs-lisp
-  (add-hook 'rust-mode-hook
-            (lambda () (local-set-key
-                        (kbd "C-c m")
-                        'lsp-rust-analyzer-expand-macro)))
-
-#+end_src
-
-**** Flycheck
-Flycheck for rust mode needs installation and initializaion.
-
-#+begin_src emacs-lisp
-  (use-package flycheck-rust :ensure t :no-require t)
-  (with-eval-after-load 'rust-mode
-    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
-#+end_src
-
-**** COMMENT Use eglot
-
-Compared with lsp, eglot currently cannot expand macros for rust.
-
-***** Setup
-
-Install eglot automatically. This is built into Emacs since version 29.
-#+begin_src emacs-lisp
-  (use-package eglot :ensure t :no-require t)
-#+end_src
-
-
-Using eglot needs manually installation of =rust-analyzer=. This can be done by =rustup=: ~rustup component add rust-analyzer~.
-For more information, see [[https://rust-analyzer.github.io/manual.html#emacs][rust-analyzer's website]].
-
-#+begin_src emacs-lisp
-(add-hook 'rust-mode-hook 'eglot-ensure)
-#+end_src
-
-***** Inlay hints
+**** COMMENT Eglot
+***** Inlay Hints
 
 Disable inlay hints by default, and use ~C-c i~ to show/hide inlay hints.
 
@@ -1527,15 +1569,8 @@ Disable inlay hints by default, and use ~C-c i~ to show/hide inlay hints.
                         'eglot-inlay-hints-mode)))
 #+end_src
 
-
-***** Flycheck issues
-Eglot uses flymake mode by default. So we disable flycheck mode here.
-
-#+begin_src emacs-lisp
-  (add-hook 'rust-mode-hook (lambda () (flycheck-mode -1)))
-#+end_src
-
-*** Addin Functions
+**** My Own Functions
+***** Rust Run
 
 Press ~<f5>~ to save all buffers and run command ~rust-run~. If an prefix argument is given, run command ~rust-run-clippy~.
 
@@ -1565,10 +1600,56 @@ Press ~C-<f5>~ to save all buffers and run command ~rust-run-release~.
                         'rust-save-and-run-release)))
 #+end_src
 
+***** Rust Test
+
 Use ~C-c C-t~ for ~rust-test~.
 #+begin_src emacs-lisp
   (add-hook 'rust-mode-hook (lambda () (local-set-key
     (kbd "C-c C-t") (kbd "C-u C-x s C-c C-c C-t"))))
+#+end_src
+
+*** Troubleshooting
+**** Extract Signature for rust-analyzer
+
+When using hover signature in ~lsp-mode~, it extracts the first line returned by ~rust-analyzer~ by default as specfied by ~specific lsp-clients-extract-signature-on-hover~. However, the first line returned by ~rust-analyzer~ is ususlly not the type signature, which is not what I want. A basic solution is given on [[https://github.com/emacs-lsp/lsp-mode/pull/1740#issuecomment-1776493727][Github]], and a more detailed discussion can be found on [[https://tony-zorman.com/posts/fixing-lsp-mode.html][this site]].
+
+#+begin_src emacs-lisp
+  (defun syntax-highlight-string (str mode)
+    "Syntax highlight STR in MODE."
+    (with-temp-buffer
+      (insert str)
+      ;; We definitely don't want to call certain modes, so delay the mode's
+      ;; hooks until we have removed them.
+      (delay-mode-hooks (funcall mode))
+      (-map #'funcall
+            (--remove (-contains? '(lsp-mode lsp-deferred) it)
+                      (-mapcat #'symbol-value delayed-mode-hooks)))
+      ;; Now we can propertise the string.
+      (font-lock-ensure)
+      (buffer-string)))
+
+  ;; do not cache the shitty result from rust-analyzer
+  (advice-add #'lsp-eldoc-function :after (lambda (&rest _) (setq lsp--hover-saved-bounds nil)))
+  ;; extract and show short signature for rust-analyzer
+  (cl-defmethod lsp-clients-extract-signature-on-hover (contents (_server-id (eql rust-analyzer)))
+    (syntax-highlight-string
+     (let* ((value (if lsp-use-plists (plist-get contents :value) (gethash "value" contents)))
+            (groups (--partition-by (s-blank? it) (s-lines (s-trim value))))
+            (mod-group (cond ((s-equals? "```rust" (car (-fifth-item groups))) (-third-item groups))
+                             ((s-equals? "```rust" (car (-third-item groups))) (-first-item groups))
+                             (t nil)))
+            (cmt (if (null mod-group) "" (concat " // " (cadr mod-group))))
+            (sig-group (cond ((s-equals? "```rust" (car (-fifth-item groups))) (-fifth-item groups))
+                             ((s-equals? "```rust" (car (-third-item groups))) (-third-item groups))
+                             (t (-first-item groups))))
+            (sig (->> sig-group
+                      (--drop-while (s-equals? "```rust" it))
+                      (--take-while (not (s-equals? "```" it)))
+                      (--map (s-replace-regexp "//.*" "" it))
+                      (--map (s-trim it))
+                      (s-join " "))))
+       (lsp--render-element (concat "```rust\n" sig cmt "\n```")))
+     'rust-mode))
 #+end_src
 
 ** Inp Mode
