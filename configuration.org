@@ -922,7 +922,7 @@ Org mode keyword settings.
 #+end_src
 
 *** Source Code Block Setting
-
+**** Source Code Window Setting
 Use the current window for editing source blocks (Press C-c ' in
 source code block).
 
@@ -930,6 +930,7 @@ source code block).
   (setq org-src-window-setup 'current-window)
 #+end_src
 
+**** Babel Enable Languages
 Enable Python, C, C++ and D languages.
 
 #+begin_src emacs-lisp
@@ -951,6 +952,28 @@ Run these codes without prompting.
     (not (member lang '("C" "C++" "python" "emacs-lisp")))
     )
   (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+#+end_src
+
+**** Python Setting for Babel
+
+Switch python backend setted in configuration table for babel python
+mode.
+
+Note that as matplotlib do not work well in emacs on windows machines,
+the interpreter is set to ~ipython~ by default. See troubleshooting
+in python mode settings.
+
+#+begin_src emacs-lisp :var conf-table=conf-table
+  ;; Use string= for string comparasion!
+  ;; (eq "str" "str") returns nil.
+  (let ((interpreter (get-conf! "python-interpreter")))
+    (if (string= interpreter "default")
+        (if (eq 'windows-nt system-type)
+            (setq org-babel-python-command "ipython")
+           )
+        ;; Org babel mode.
+        (setq org-babel-python-command interpreter))
+  )
 #+end_src
 
 *** Export
@@ -991,27 +1014,6 @@ org-indent-mode.
 
 #+begin_src emacs-lisp
   (add-hook 'org-mode-hook (lambda () (page-break-lines-mode -1)))
-#+end_src
-
-**** Babel Python Interpreter
-
-On windows systems, ob-python doesn't work well with the
-default python interpreter when matplotlib is used to plot
-figures. This is the same issue as that in python-mode, and
-the solution is setting the default python interpreter to
-=ipython= on windows.
-
-#+begin_src emacs-lisp :var conf-table=conf-table
-  ;; Use string= for string comparasion!
-  ;; (eq "str" "str") returns nil.
-  (let ((interpreter (get-conf! "python-interpreter")))
-    (if (string= interpreter "default")
-        (if (eq 'windows-nt system-type)
-            (setq org-babel-python-command "ipython")
-    )
-    ;; Org babel mode.
-    (setq org-babel-python-command interpreter))
-  )
 #+end_src
 
 **** Hiding Leading Stars
@@ -1166,6 +1168,26 @@ The ~py-fill-paragraph~, which is binded to ~M-Q~ by setting
 
 
 #+end_src
+**** Python Interpreter Setting
+
+Switch python backend given in configuration table.
+mode.
+
+Note that as matplotlib do not work well in emacs on windows machines,
+the interpreter is set to ~ipython~ by default. See troubleshooting
+chapter.
+
+#+begin_src emacs-lisp :var conf-table=conf-table
+  ;; Use string= for string comparasion!
+  ;; (eq "str" "str") returns nil.
+  (let ((interpreter (get-conf! "python-interpreter")))
+    (if (string= interpreter "default")
+        (if (eq 'windows-nt system-type)
+            (setq python-shell-interpreter "ipython")
+         )
+        (setq python-shell-interpreter interpreter))
+  )
+#+end_src
 
 *** Minor Mode Settings
 **** Elpy
@@ -1292,24 +1314,15 @@ autopep8=. The following code is inspired by [[https://gist.github.com/whirm/612
 
 *** Troubleshooting
 **** Capabality with Matplotlib on Windows Machines
-The Python interpreter doesn't work with matplotlib in emacs
-environment on Window systems. Setting the interpreter to IPython
-solves the issue. Thus, the Python interpreter is set to IPython
-on windows by default. You can also specify the interpreter manually
-by setting ~python-interpreter~ in Table [[conf-table]].
 
-#+begin_src emacs-lisp :var conf-table=conf-table
-  ;; Use string= for string comparasion!
-  ;; (eq "str" "str") returns nil.
-  (let ((interpreter (get-conf! "python-interpreter")))
-    (if (string= interpreter "default")
-        (if (eq 'windows-nt system-type)
-            (setq python-shell-interpreter "ipython")
-          )
-      (setq python-shell-interpreter interpreter)
-      )
-    )
-#+end_src
+Matplotlib may not interactively plot figures in emacs environment on
+Window systems. This also happens in babel mode. We have change the
+interpreter to ipython by default on window OS, which relieves the
+problem. However, user still needs to change the matplotlib's backend
+to TtAgg (in ipython) to solve the problem. This can be done by adding
+~matplotlib.use("TkAgg")~ after importing ~matplotlib~, or modify the
+/matplotlibrc/ file by adding ~backend: TkAgg~, or set the system's
+environment variable ~MPLBACKEND~ to ~Tkagg~.
 
 **** Multilingual Environment
 
