@@ -1,3 +1,3 @@
 * Emacs-Configuration
 To use the configuratoin, place the files in folder =~/.emacs.d/=. The detailed configuration and explanation are organized using ~org-babel~.
-See [[file:configuration.org]] for more details.
+See [[file:.emacs.d/configuration.org]] for more details.
