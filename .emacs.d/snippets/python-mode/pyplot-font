@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: pyplot-font
+# key: pyplot?
+# --
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+mpl_fontpath = mpl.get_data_path() + '/fonts/ttf/STIXGeneral.ttf'
+mpl_fontprop = mpl.font_manager.FontProperties(fname=mpl_fontpath)
+plt.rc('font', family='STIXGeneral', weight='normal', size=${1:10})
+plt.rc('mathtext', fontset='stix')
+$0

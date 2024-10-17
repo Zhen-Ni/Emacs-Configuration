@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: unittest
+# key: unittest?
+# expand-env: ((yas-indent-line 'fixed))
+# --
+import unittest
+import ${1:package}
+
+class Test${2:$1}(unittest.TestCase):
+    def test_${3:name}(self):
+        $0self.assertTrue(True)
+
+
+if __name__ == '__main__':
+    unittest.main(argv=[''], exit=False)

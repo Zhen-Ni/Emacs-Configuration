@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: header
+# key: header?
+# --
+#ifndef ${1:`(s-replace "." "_" (upcase(buffer-name)))`}
+#define $1
+
+$0
+
+#endif    // end of $1
