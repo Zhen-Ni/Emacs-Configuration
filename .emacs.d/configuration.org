@@ -15,7 +15,7 @@ blocks in this file.
 | Field              | Value   | Description                |
 |--------------------+---------+----------------------------|
 | font               | default |                            |
-| font-size          | default | font height in units of pt |
+| font-size          | 16      | font height in units of pt |
 | cjk-font           | default |                            |
 | cjk-font-size      | default | font height in units of pt |
 | python-interpreter | default | default for auto-detection |
@@ -787,7 +787,7 @@ by =conf-table=.
               (setq dir "~/.emacs_backups/")
             )
           (if (eq 'windows-nt system-type)
-              (setq dir "D:/App/Emacs/")
+              (setq dir "C:/cache/.emacs_backups/")
             )
           ))
     (setq backup-directory-alist `(("." . ,dir)))
@@ -934,15 +934,18 @@ source code block).
 Enable Python, C, C++ and D languages.
 
 #+begin_src emacs-lisp
+  ;; Enable shell command.
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((shell . t)))
   ;; Enable Python.
   (org-babel-do-load-languages 'org-babel-load-languages
-  '((python . t)))
+                               '((python . t)))
   ;; Enable C, C++ and D.
   (org-babel-do-load-languages 'org-babel-load-languages
-  '((C . t)))
+                               '((C . t)))
   ;; Enable latex.
   (org-babel-do-load-languages 'org-babel-load-languages
-  '((latex . t)))
+                               '((latex . t)))
 #+end_src
 
 Run these codes without prompting.
@@ -1238,7 +1241,7 @@ are used for Linux and windows systems.
       ;; For Linux system.
       (setq flycheck-python-mypy-cache-dir "/home/collie/.emacs_backups/.mypy_cache/")
     ;; For Windows system.
-    (setq flycheck-python-mypy-cache-dir "D:/App/Emacs/.mypy_cache/")
+    (setq flycheck-python-mypy-cache-dir "C:/App/cache/.mypy_cache/")
     )
 #+end_src
 
