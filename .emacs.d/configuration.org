@@ -1630,22 +1630,23 @@ Use ~C-c C-t~ for ~rust-test~.
 When using hover signature in ~lsp-mode~, it extracts the first line returned by ~rust-analyzer~ by default as specfied by ~specific lsp-clients-extract-signature-on-hover~. However, the first line returned by ~rust-analyzer~ is ususlly not the type signature, which is not what I want. A basic solution is given on [[https://github.com/emacs-lsp/lsp-mode/pull/1740#issuecomment-1776493727][Github]], and a more detailed discussion can be found on [[https://tony-zorman.com/posts/fixing-lsp-mode.html][this site]].
 
 #+begin_src emacs-lisp
-  (defun syntax-highlight-string (str mode)
-    "Syntax highlight STR in MODE."
-    (with-temp-buffer
-      (insert str)
-      ;; We definitely don't want to call certain modes, so delay the mode's
-      ;; hooks until we have removed them.
-      (delay-mode-hooks (funcall mode))
-      (-map #'funcall
-            (--remove (-contains? '(lsp-mode lsp-deferred) it)
-                      (-mapcat #'symbol-value delayed-mode-hooks)))
-      ;; Now we can propertise the string.
-      (font-lock-ensure)
-      (buffer-string)))
+(defun syntax-highlight-string (str mode)
+  "Syntax highlight STR in MODE."
+  (with-temp-buffer
+    (insert str)
+    ;; We definitely don't want to call certain modes, so delay the mode's
+    ;; hooks until we have removed them.
+    (delay-mode-hooks (funcall mode))
+    (-map #'funcall
+          (--remove (-contains? '(lsp-mode lsp-deferred) it)
+                    (-mapcat #'symbol-value delayed-mode-hooks)))
+    ;; Now we can propertise the string.
+    (font-lock-ensure)
+    (buffer-string)))
 
-  ;; do not cache the shitty result from rust-analyzer
-  (advice-add #'lsp-eldoc-function :after (lambda (&rest _) (setq lsp--hover-saved-bounds nil)))
+;; do not cache the shitty result from rust-analyzer
+(advice-add #'lsp-eldoc-function :after (lambda (&rest _) (setq lsp--hover-saved-bounds nil)))
+(with-eval-after-load 'lsp-rust
   ;; extract and show short signature for rust-analyzer
   (cl-defmethod lsp-clients-extract-signature-on-hover (contents (_server-id (eql rust-analyzer)))
     (syntax-highlight-string
@@ -1666,6 +1667,7 @@ When using hover signature in ~lsp-mode~, it extracts the first line returned by
                       (s-join " "))))
        (lsp--render-element (concat "```rust\n" sig cmt "\n```")))
      'rust-mode))
+  )
 #+end_src
 
 ** Inp Mode
