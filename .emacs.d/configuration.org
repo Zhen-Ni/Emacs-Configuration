@@ -617,6 +617,7 @@ Display ugly =^L= page breaks as tidy horizontal lines.
 
 #+begin_src emacs-lisp
   (use-package page-break-lines :ensure t :no-require t)
+  (global-page-break-lines-mode)
   (set-fontset-font "fontset-default"
                     (cons page-break-lines-char page-break-lines-char)
                     (face-attribute 'default :family))
@@ -626,7 +627,6 @@ Enable this mode in all program modes.
 
 #+begin_src emacs-lisp
   (add-to-list 'page-break-lines-modes 'prog-mode)
-  (global-page-break-lines-mode)
 #+end_src
 
 ** Functions and Key Bindings
