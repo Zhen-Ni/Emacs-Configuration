@@ -611,17 +611,22 @@ Use Dap-mode for debugging.
 #+begin_src emacs-lisp
   (use-package dap-mode :ensure t)
 #+end_src
-*** POSTPONED Page Break Lines
+*** Page Break Lines
 
-Display ugly =^L= page breaks as tidy horizontal lines. It does not work
-fine on Windows systems and I haven't work it out.
+Display ugly =^L= page breaks as tidy horizontal lines.
 
 #+begin_src emacs-lisp
   (use-package page-break-lines :ensure t :no-require t)
-  (global-page-break-lines-mode)
   (set-fontset-font "fontset-default"
                     (cons page-break-lines-char page-break-lines-char)
                     (face-attribute 'default :family))
+#+end_src
+
+Enable this mode in all program modes.
+
+#+begin_src emacs-lisp
+  (add-to-list 'page-break-lines-modes 'prog-mode)
+  (global-page-break-lines-mode)
 #+end_src
 
 ** Functions and Key Bindings
