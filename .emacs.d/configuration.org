@@ -1675,16 +1675,6 @@ When using hover signature in ~lsp-mode~, it extracts the first line returned by
   )
 #+end_src
 
-** Inp Mode
-
-Abaqus inp mode. This mode needs manually installation.
-
-#+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/inp-mode")
-  (require 'inp-mode)
-  (add-to-list 'auto-mode-alist '("\\.inp\\'" . inp-mode))
-#+end_src
-
 * Not Only an Editor
 ** Magit
 Use magit to interacting with Git.
