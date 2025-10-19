@@ -83,13 +83,13 @@ Add melpa to package management system.
   ;; to the start of the line. You may delete these
   ;; explanatory comments.
   (require 'package)
-  (add-to-list 'package-archives
-   ; Use official source or mirror from tsinghua university.
-   ; '("melpa-stable" . "http://melpa.org/packages/")
-   '("melpa-stable" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-   t)
+  (setq package-archives '(("gnu"    . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+                           ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
+                           ("melpa"  . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
   (package-initialize)
 #+end_src
+
+#+RESULTS:
 
 *** Use use-package
 
@@ -98,9 +98,25 @@ still need to make sure =use-package= is installed in the first place
 for older versions.
 
 #+begin_src emacs-lisp
-  (unless (package-installed-p 'use-package)
-    (package-install 'use-package))
+    (unless (package-installed-p 'use-package)
+      (package-install 'use-package))
 #+end_src
+
+This package is essential for installing other packages. Otherwise,
+can use `(setq package-check-signature nil)` as a solution. See [[https://elpa.gnu.org/packages/gnu-elpa-keyring-update.html][this
+page]]. Here, a temporarily solution is provided by disabling signature
+check, which is given by [[https://stackoverflow.com/questions/78381013/failed-to-verify-signature-archive-contents-sig-problem-with-emacs][stackoverflow]].
+#+begin_src emacs-lisp
+  ;; (setq package-check-signature-backup package-check-signature)
+  (setq package-check-signature nil)
+  ;; (package-refresh-contents)
+  ;; (package-install 'gnu-elpa-keyring-update)
+  ;; (gnu-elpa-keyring-update)
+  ;; It seems the above code is of no use... we just disable signature
+  ;; check.
+  ; (setq package-check-signature package-check-signature-backup)
+#+end_src
+
 
 ** Startup Screen
 *** Disable Builtin Startup Screen
@@ -1198,7 +1214,10 @@ chapter.
 #+end_src
 
 *** Minor Mode Settings
-**** Elpy
+Choose between either elpy or lsp. Since the developement of elpy is
+not active now, lsp-mode is used by default.
+**** COMMENT Elpy
+***** Setup
 
 Enable eply mode for Python.
 
@@ -1213,45 +1232,7 @@ Disable virtualenv
   (setq elpy-rpc-virtualenv-path 'current)
 #+end_src
 
-**** COMMENT LSP
-+Use lsp-mode. (experimental)+
-Currently, elpy works better with python.
-
-#+begin_src emacs-lisp
-  (add-hook 'python-mode-hook 'lsp)
-#+end_src
-
-**** Flymake
-
-The flymake mode is turned on by default in elpy. But we use
-flycheck mode in python. So, turn it off.
-
-#+begin_src emacs-lisp
-  (add-hook 'elpy-mode-hook (lambda () (flymake-mode -1)))
-#+end_src
-
-**** Flycheck
-
-Specify flycheck checkers for python.
-
-#+begin_src emacs-lisp
-  (flycheck-add-next-checker 'python-flake8 'python-mypy)
-#+end_src
-
-Specify a cache directory for mypy. Different cache directories
-are used for Linux and windows systems.
-
-#+begin_src emacs-lisp
-  (if (eq 'gnu/linux system-type)
-      ;; For Linux system.
-      (setq flycheck-python-mypy-cache-dir "/home/collie/.emacs_backups/.mypy_cache/")
-    ;; For Windows system.
-    (setq flycheck-python-mypy-cache-dir "C:/App/cache/.mypy_cache/")
-    )
-#+end_src
-
-*** Functions and Key Bindings
-**** Python Run Buffer or Region
+***** Python Run Buffer or Region
 Press ~<f9>~ to run the whole buffer or the selected region.
 
 #+begin_src emacs-lisp
@@ -1296,6 +1277,185 @@ run the whole buffer or the selected region.
                         'python-save-and-rerun)))
 #+end_src
 
+***** Flymake
+
+The flymake mode is turned on by default in elpy. But we use
+flycheck mode in python. So, turn it off.
+
+#+begin_src emacs-lisp
+  (add-hook 'elpy-mode-hook (lambda () (flymake-mode -1)))
+#+end_src
+
+***** Flycheck
+
+Specify flycheck checkers for python.
+
+#+begin_src emacs-lisp
+  (flycheck-add-next-checker 'python-flake8 'python-mypy)
+#+end_src
+
+Specify a cache directory for mypy. Different cache directories
+are used for Linux and windows systems.
+
+#+begin_src emacs-lisp
+  (if (eq 'gnu/linux system-type)
+      ;; For Linux system.
+      (setq flycheck-python-mypy-cache-dir "/home/collie/.emacs_backups/.mypy_cache/")
+    ;; For Windows system.
+    (setq flycheck-python-mypy-cache-dir "C:/App/cache/.mypy_cache/")
+    )
+#+end_src
+
+**** LSP
+***** Setup
+
+To use lsp, make sure ~python-lsp-server~ is installed to unlock the
+full power of lsp-mode, by ~pip install python-lsp-server[all]~.
+
+#+begin_src emacs-lisp
+  (add-hook 'python-mode-hook 'lsp)
+#+end_src
+***** Grammar Checkers
+
+Use flycheck for mypy checker. So that I can define a directory for
+mypy temporarily files.
+
+#+begin_src emacs-lisp
+    (if (eq 'gnu/linux system-type)
+        ;; For Linux system.
+        (setq flycheck-python-mypy-cache-dir "/home/collie/.emacs_backups/.mypy_cache/")
+      ;; For Windows system.
+      (setq flycheck-python-mypy-cache-dir "C:/App/cache/.mypy_cache/")
+      )
+    (add-hook 'lsp-after-initialize-hook
+              (lambda ()
+                (when (derived-mode-p 'python-mode)
+    	      (setq-local flycheck-checker 'python-mypy)
+    	      (flycheck-add-next-checker 'python-mypy 'lsp)
+  (setq lsp-pylsp-plugins-pydocstyle-enabled nil)
+    (setq lsp-pylsp-plugins-pydocstyle-ignore ["D100" "D101" "D102"])
+    (setq flycheck-python-mypy-args '("--follow-imports=skip"))
+    	      
+    	      )))
+#+end_src
+
+Disable docstyle check. It's too annoying.
+
+#+begin_src emacs-lisp
+  (setq lsp-pylsp-plugins-pydocstyle-enabled nil)
+  (setq lsp-pylsp-plugins-pydocstyle-ignore ["D100" "D101" "D102"])
+#+end_src
+
+#+begin_src emacs-lisp
+  (setq flycheck-python-mypy-args '("--follow-imports=skip"))
+#+end_src
+
+***** Python Run Buffer or Region
+****** Helper Functions
+
+These are the helper functions.
+
+#+begin_src emacs-lisp
+  (defun python-check-shell-ready ()
+    "Check if the python shell is ready."
+    (accept-process-output (get-buffer-process (python-shell-get-buffer)) 1))
+
+  (defun python-shell-stop-process ()
+    "Stop the running python process."
+    (let ((pybuf (python-shell-get-buffer))
+  	(i 0))
+      (when pybuf
+        (with-current-buffer pybuf
+  	(comint-kill-subjob)))
+      ;; Wait a maximum of 1.0s.
+      (while (and (process-live-p (get-buffer-process pybuf)) (< i 10))
+        (sleep-for 0.1)
+        (setq i (+ i 1))
+        )
+      )
+    )
+
+  (defun python-run-buffer-or-selected-region-helper (&optional run_main)
+    "Run the current buffer or the selected region."
+    (run-python)
+    (python-check-shell-ready)
+    (if (use-region-p)
+        (python-shell-send-region (region-beginning) (region-end) run_main)
+      (python-shell-send-buffer run_main)
+      )
+    (python-shell-switch-to-shell)
+    )
+
+
+#+end_src
+
+****** Run Buffer or Selected Region
+
+Run the current buffer, or region if there's an active selected
+region.  The ~__main__~ block will not be executed unless a prefix
+argument is provided. Bind this funciton to ~C-c C-c~.
+
+#+begin_src emacs-lisp
+  (defun python-run-buffer-or-selected-region ()
+    "Run the current buffer or the selected region."
+    (interactive)
+    (python-run-buffer-or-selected-region-helper current-prefix-arg))
+
+  (add-hook 'python-mode-hook
+            (lambda () (local-set-key (kbd "C-c C-c")
+                                      'python-run-buffer-or-selected-region)))
+#+end_src
+
+Press ~<f9>~ to run the whole buffer or the selected region.
+
+#+begin_src emacs-lisp
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (local-set-key [f9] "\C-u\C-c\C-c")))
+#+end_src
+
+Press ~C-<f9>~ to kill the current python buffer and run the whole
+buffer.
+
+#+begin_src emacs-lisp
+
+  (defun python-rerun () (interactive)
+         "Kill python shell and run current buffer or selection."
+         (python-shell-stop-process)
+         (python-run-buffer-or-selected-region-helper '(4))
+         )
+  (add-hook 'python-mode-hook
+            (lambda () (local-set-key (kbd "C-<f9>")
+                                      'python-rerun)))
+#+end_src
+
+****** Save all and Run Buffer or Selected Region
+
+Press ~<f5>~ to save all files, run the whole buffer or the selected
+region.
+
+#+begin_src emacs-lisp
+  (add-hook 'python-mode-hook (lambda () (local-set-key
+    [f5] (kbd "C-u C-x s C-u C-c C-c"))))
+#+end_src
+
+Press ~C-<f5>~ to save all files, kill the current python buffer and
+run the whole buffer or the selected region.
+
+#+begin_src emacs-lisp
+  (defun python-save-and-rerun () (interactive)
+         "Save all buffers, kill current python buffer and run
+  current buffer or selection."
+         (save-some-buffers '(4))
+         (python-rerun)
+         )
+  (add-hook 'python-mode-hook
+            (lambda () (local-set-key
+                        (kbd "C-<f5>")
+                        'python-save-and-rerun)))
+#+end_src
+
+*** Functions and Key Bindings
 **** My Own Functions
 ***** Autopep8
 
@@ -1681,6 +1841,54 @@ Use magit to interacting with Git.
 
 #+begin_src emacs-lisp
   (use-package magit :ensure t :no-require t)
+#+end_src
+** COMMENT Aidermacs
+
+Use the configuration table to setup aidermacs. Set value to ~default~
+for default settings.
+
+Note that for open-ai compatiable models, ~model~ should begin with
+~openai/~, see [[https://docs.litellm.ai/docs/providers/openai_compatible][litellm page]] (as aider uses litellm as backend).
+
+The environment variables should also be set for model endpoint and
+api token. Due to security reason, it should not be listed here in the
+table.
+
+*** Configuration
+#+CAPTION: Aider Configuration
+#+NAME: aider-conf
+| Field    | Value                                     |
+|----------+-------------------------------------------|
+| model    | openai/Qwen/Qwen3-8B                      |
+| path     | "C:/msys64/home/zni/.local/bin/aider.exe" |
+
+*** Setup
+Use Aidermacs for vibe coding. Make sure [[https://aider.chat/docs/install.html][aider]] is installed first.
+
+#+begin_src emacs-lisp
+  (use-package aidermacs :ensure t
+    :bind (("C-c a" . aidermacs-transient-menu))
+    :config
+    ;; !!!The following settings are for debug use only!!!
+    (setenv "OPENAI_API_BASE" "https://api.siliconflow.cn/v1")
+    (setenv "OPENAI_API_KEY" "your-key-here")
+    :custom
+    (aidermacs-default-chat-mode 'architect))
+#+end_src
+
+User settings for aider.
+
+#+begin_src emacs-lisp :var conf=aider-conf
+  (let ((path (cadr (assoc "path" conf)))
+        (model (cadr (assoc "model" conf))))
+    (if (not (string-equal path "default"))
+        (setq aidermacs-program path)
+      )
+    (setq aidermacs-default-model
+  	(if (string-equal model "default")
+  	    "sonnet"
+  	  model))
+    )
 #+end_src
 
 ** COMMENT Emacs Application Framework
