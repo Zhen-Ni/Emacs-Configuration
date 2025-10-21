@@ -117,7 +117,6 @@ check, which is given by [[https://stackoverflow.com/questions/78381013/failed-t
   ; (setq package-check-signature package-check-signature-backup)
 #+end_src
 
-
 ** Startup Screen
 *** Disable Builtin Startup Screen
 
@@ -1081,7 +1080,11 @@ by function =advice-add= (see [[https://emacs.stackexchange.com/a/41250/38157][t
 
 ** Prog Mode
 
-=prog-mode= is the base mode for programming.
+In Emacs, =prog-mode= is the base mode for programming.
+
+*** Shortcuts
+
+**** Hungry delete
 
 Use hungry delete from c-mode by using prefix "C-c".
 
@@ -1302,7 +1305,7 @@ are used for Linux and windows systems.
       ;; For Linux system.
       (setq flycheck-python-mypy-cache-dir "/home/collie/.emacs_backups/.mypy_cache/")
     ;; For Windows system.
-    (setq flycheck-python-mypy-cache-dir "C:/App/cache/.mypy_cache/")
+    (setq flycheck-python-mypy-cache-dir "C:/cache/.mypy_cache/")
     )
 #+end_src
 
@@ -1321,22 +1324,21 @@ Use flycheck for mypy checker. So that I can define a directory for
 mypy temporarily files.
 
 #+begin_src emacs-lisp
-    (if (eq 'gnu/linux system-type)
-        ;; For Linux system.
-        (setq flycheck-python-mypy-cache-dir "/home/collie/.emacs_backups/.mypy_cache/")
-      ;; For Windows system.
-      (setq flycheck-python-mypy-cache-dir "C:/App/cache/.mypy_cache/")
-      )
-    (add-hook 'lsp-after-initialize-hook
-              (lambda ()
-                (when (derived-mode-p 'python-mode)
-    	      (setq-local flycheck-checker 'python-mypy)
-    	      (flycheck-add-next-checker 'python-mypy 'lsp)
-  (setq lsp-pylsp-plugins-pydocstyle-enabled nil)
-    (setq lsp-pylsp-plugins-pydocstyle-ignore ["D100" "D101" "D102"])
-    (setq flycheck-python-mypy-args '("--follow-imports=skip"))
-    	      
-    	      )))
+  (if (eq 'gnu/linux system-type)
+      ;; For Linux system.
+      (setq flycheck-python-mypy-cache-dir "/home/collie/.emacs_backups/.mypy_cache/")
+    ;; For Windows system.
+    (setq flycheck-python-mypy-cache-dir "C:/cache/.mypy_cache/")
+    )
+  (add-hook 'lsp-after-initialize-hook
+            (lambda ()
+              (when (derived-mode-p 'python-mode)
+  	      (setq-local flycheck-checker 'python-mypy)
+  	      (flycheck-add-next-checker 'python-mypy 'lsp)
+  	      (setq lsp-pylsp-plugins-pydocstyle-enabled nil)
+  	      (setq lsp-pylsp-plugins-pydocstyle-ignore ["D100" "D101" "D102"])
+  	      (setq flycheck-python-mypy-args '("--follow-imports=skip"))
+  	      )))
 #+end_src
 
 Disable docstyle check. It's too annoying.
@@ -1350,6 +1352,32 @@ Disable docstyle check. It's too annoying.
   (setq flycheck-python-mypy-args '("--follow-imports=skip"))
 #+end_src
 
+*** Functions and Key Bindings
+**** My Own Functions
+***** COMMENT Autopep8
+
+*Use* ~lsp-format-buffer~ *in* ~lsp~ *mode*.
+
+Automatically formats Python code to conform the PEP 8 style
+guide. To use this function in Python mode, press =M-x
+autopep8=. The following code is inspired by [[https://gist.github.com/whirm/6122031][auto pep8 example]].
+
+#+begin_src emacs-lisp
+  ;; See https://gist.github.com/whirm/6122031 for reference.
+  (defun autopep8 ()
+    "Formats python code to conform the the PEP 8 style guide."
+    (interactive)
+    (cl-assert (eq major-mode 'python-mode) nil
+               "can only use autopep8 in python-mode")
+    (let ((orig-point (point)))
+      (shell-command-on-region (point-min) (point-max)
+                               "autopep8 - "
+                               nil t)
+      (python-mode)			; Revert highlights.
+      (goto-char orig-point)
+      )
+    )
+#+end_src
 ***** Python Run Buffer or Region
 ****** Helper Functions
 
@@ -1375,18 +1403,24 @@ These are the helper functions.
       )
     )
 
+  (defun python-shell-buffer-show-string (s)
+    "TBD"
+    ())
+
   (defun python-run-buffer-or-selected-region-helper (&optional run_main)
     "Run the current buffer or the selected region."
     (run-python)
     (python-check-shell-ready)
     (if (use-region-p)
-        (python-shell-send-region (region-beginning) (region-end) run_main)
+        (progn
+  	(python-shell-buffer-show-string (buffer-substring (region-beginning) (region-end)))
+  	(python-shell-send-region (region-beginning) (region-end) run_main)
+  	)
+      (python-shell-buffer-show-string (format "<Eval buffer \"<%s>\">" (buffer-name)))
       (python-shell-send-buffer run_main)
       )
     (python-shell-switch-to-shell)
     )
-
-
 #+end_src
 
 ****** Run Buffer or Selected Region
@@ -1455,29 +1489,129 @@ run the whole buffer or the selected region.
                         'python-save-and-rerun)))
 #+end_src
 
-*** Functions and Key Bindings
-**** My Own Functions
-***** Autopep8
+***** ShiftBlocks
 
-Automatically formats Python code to conform the PEP 8 style
-guide. To use this function in Python mode, press =M-x
-autopep8=. The following code is inspired by [[https://gist.github.com/whirm/6122031][auto pep8 example]].
+Navigation functions taken from ~elpy~.
+
+****** Shift Left-and-right
+#+begin_src emacs-lisp
+  (defun elpy-nav-normalize-region ()
+    "If the first or last line are not fully selected, select them completely."
+    (let ((beg (region-beginning))
+          (end (region-end)))
+      (goto-char beg)
+      (beginning-of-line)
+      (push-mark (point) nil t)
+      (goto-char end)
+      (unless (= (point) (line-beginning-position))
+        (end-of-line))))
+
+  (defun elpy-nav-indent-shift-right (&optional _count)
+    "Shift current line by COUNT columns to the right.
+
+  COUNT defaults to `python-indent-offset'.
+  If region is active, normalize the region and shift."
+    (interactive)
+    (if (use-region-p)
+        (progn
+          (elpy-nav-normalize-region)
+          (python-indent-shift-right (region-beginning) (region-end) current-prefix-arg))
+      (python-indent-shift-right (line-beginning-position) (line-end-position) current-prefix-arg)))
+
+  (defun elpy-nav-indent-shift-left (&optional _count)
+    "Shift current line by COUNT columns to the left.
+
+  COUNT defaults to `python-indent-offset'.
+  If region is active, normalize the region and shift."
+    (interactive)
+    (if (use-region-p)
+        (progn
+          (elpy-nav-normalize-region)
+          (python-indent-shift-left (region-beginning) (region-end) current-prefix-arg))
+      (python-indent-shift-left (line-beginning-position) (line-end-position) current-prefix-arg)))
+#+end_src
+
+****** Shift Up-and-down
 
 #+begin_src emacs-lisp
-  ;; See https://gist.github.com/whirm/6122031 for reference.
-  (defun autopep8 ()
-    "Formats python code to conform the the PEP 8 style guide."
-    (interactive)
-    (cl-assert (eq major-mode 'python-mode) nil
-               "can only use autopep8 in python-mode")
-    (let ((orig-point (point)))
-      (shell-command-on-region (point-min) (point-max)
-                               "autopep8 - "
-                               nil t)
-      (python-mode)			; Revert highlights.
-      (goto-char orig-point)
-      )
-    )
+  (defun elpy-nav-move-line-or-region-down (&optional beg end)
+    "Move the current line or active region down."
+    (interactive
+     (if (use-region-p)
+         (list (region-beginning) (region-end))
+       (list nil nil)))
+    (if beg
+        (elpy--nav-move-region-vertically beg end 1)
+      (elpy--nav-move-line-vertically 1)))
+
+  (defun elpy-nav-move-line-or-region-up (&optional beg end)
+    "Move the current line or active region down."
+    (interactive
+     (if (use-region-p)
+         (list (region-beginning) (region-end))
+       (list nil nil)))
+    (if beg
+        (elpy--nav-move-region-vertically beg end -1)
+      (elpy--nav-move-line-vertically -1)))
+
+  (defun elpy--nav-move-line-vertically (dir)
+    "Move the current line vertically in direction DIR."
+    (let* ((beg (point-at-bol))
+           (end (point-at-bol 2))
+           (col (current-column))
+           (region (delete-and-extract-region beg end)))
+      (forward-line dir)
+      (save-excursion
+        (insert region))
+      (goto-char (+ (point) col))))
+
+  (defun elpy--nav-move-region-vertically (beg end dir)
+    "Move the current region vertically in direction DIR."
+    (let* ((point-before-mark (< (point) (mark)))
+           (beg (save-excursion
+                  (goto-char beg)
+                  (point-at-bol)))
+           (end (save-excursion
+                  (goto-char end)
+                  (if (bolp)
+                      (point)
+                    (point-at-bol 2))))
+           (region (delete-and-extract-region beg end)))
+      (goto-char beg)
+      (forward-line dir)
+      (save-excursion
+        (insert region))
+      (if point-before-mark
+          (set-mark (+ (point)
+                       (length region)))
+        (set-mark (point))
+        (goto-char (+ (point)
+                      (length region))))
+      (setq deactivate-mark nil)))
+#+end_src
+
+****** Keybindings
+
+#+begin_src emacs-lisp
+  (add-hook 'python-mode-hook
+            (lambda () (local-set-key
+                        (kbd "M-<down>")
+                        'elpy-nav-move-line-or-region-down)))
+
+  (add-hook 'python-mode-hook
+            (lambda () (local-set-key
+                        (kbd "M-<up>")
+                        'elpy-nav-move-line-or-region-up)))
+
+  (add-hook 'python-mode-hook
+            (lambda () (local-set-key
+                        (kbd "M-<left>")
+                        'elpy-nav-indent-shift-left)))
+
+  (add-hook 'python-mode-hook
+            (lambda () (local-set-key
+                        (kbd "M-<right>")
+                        'elpy-nav-indent-shift-right)))
 #+end_src
 
 *** Troubleshooting
@@ -1705,14 +1839,14 @@ Use ~C-c m~ to expand rust macros.
 
 Use ~C-c i~ to show/hide inlay hints.
 
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
   (defun rust-inlay-hints () (interactive)
          "Switch between lsp-inlay-hints-mode."
          (if lsp-inlay-hints-mode
              (progn (lsp-inlay-hints-mode -1))
            ;; Else :a ) If first time to enable this mode
            (if (not lsp-inlay-hint-enable)
-               (progn 
+               (progn
                  (setq lsp-inlay-hint-enable t)
                  ;; Needs to restart lsp workspace to make inlay hints
                  ;; enabled.
@@ -1742,8 +1876,8 @@ Use ~C-c i~ to show/hide inlay hints.
 
 Disable inlay hints by default, and use ~C-c i~ to show/hide inlay hints.
 
-#+begin_src emacs-lisp 
-  (setq-default eglot-inlay-hints-mode nil) 
+#+begin_src emacs-lisp
+  (setq-default eglot-inlay-hints-mode nil)
   (add-hook 'rust-mode-hook
             (lambda () (local-set-key
                         (kbd "C-c i")
@@ -1842,7 +1976,7 @@ Use magit to interacting with Git.
 #+begin_src emacs-lisp
   (use-package magit :ensure t :no-require t)
 #+end_src
-** COMMENT Aidermacs
+** Aidermacs
 
 Use the configuration table to setup aidermacs. Set value to ~default~
 for default settings.
@@ -1869,12 +2003,16 @@ Use Aidermacs for vibe coding. Make sure [[https://aider.chat/docs/install.html]
   (use-package aidermacs :ensure t
     :bind (("C-c a" . aidermacs-transient-menu))
     :config
-    ;; !!!The following settings are for debug use only!!!
-    (setenv "OPENAI_API_BASE" "https://api.siliconflow.cn/v1")
-    (setenv "OPENAI_API_KEY" "your-key-here")
+    ;; !!! The following settings are for debug use only !!!
+    ;; !!! Please save them in the environment varialbes !!!
+    ;; (setenv "OPENAI_API_BASE" "https://api.siliconflow.cn/v1")
+    ;; (setenv "OPENAI_API_KEY" "sk-<your private token here>")
     :custom
     (aidermacs-default-chat-mode 'architect))
 #+end_src
+
+#+RESULTS:
+: aidermacs-transient-menu
 
 User settings for aider.
 
