@@ -1307,6 +1307,20 @@ Run python with echo in the python shell.
   )
 #+end_src
 
+**** Python Default Path
+
+Set python default path to current project root.
+
+#+begin_src emacs-lisp
+  (defun python-set-project-root ()
+    "Set Python working directory to project root."
+    (let ((project-root (projectile-project-root)))
+      (when project-root
+        (setq-local default-directory project-root))))
+
+  (add-hook 'python-mode-hook #'python-set-project-root)
+#+end_src
+
 *** Minor Mode Settings
 Choose between either elpy or lsp. Since the developement of elpy is
 not active now, lsp-mode is used by default.
@@ -1738,12 +1752,11 @@ test the whole project.
            (module-path (replace-regexp-in-string "/" "." (file-name-sans-extension relative-path)))
            (test-target
             (cond
-             (whole-project "discover -s tests -p \"test_*.py\" -v")
+             (whole-project "discover -v")
              ((and func (string-match "\\.test_" func))
               (format "%s.%s" module-path func))
-             (t module-path))))
-      (compile (format "cd %s && python -m unittest %s"
-                       (shell-quote-argument project-root)
+             (t (concat module-path " -v")))))
+      (compile (format "python -m unittest %s"
                        test-target))))
 
   ;; C-c C-t: Run the current test function or file depending on cursor position
