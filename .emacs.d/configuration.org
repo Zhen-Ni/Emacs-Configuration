@@ -482,7 +482,7 @@ Use Company mode for auto-completion.
 
 #+begin_src emacs-lisp
   ;; First make sure it is installed.
-  (use-package company :ensure t :no-require t)
+  (use-package company :ensure t)
   (global-company-mode 1)
 #+end_src
 
@@ -492,7 +492,7 @@ Always turn yasnippet mode on.
 
 #+begin_src emacs-lisp
   ;; First make sure it is installed.
-  (use-package yasnippet :ensure t :no-require t)
+  (use-package yasnippet :ensure t)
   (yas-global-mode t)
 #+end_src
 
@@ -519,7 +519,7 @@ Instructions for setting up projectile is given by its [[https://github.com/bbat
 **** Installation
 First make sure it is installed.
 #+begin_src emacs-lisp
-  (use-package projectile :ensure t :no-require t)
+  (use-package projectile :ensure t)
 #+end_src
 
 **** Enable Projectile and its Keymap
@@ -600,7 +600,7 @@ Install eglot automatically. This is built into Emacs since version 29.
 Marginalia in the minibuffer. [[https://github.com/minad/marginalia][Marginalia Homepage]].
 
 #+begin_src emacs-lisp
-  (use-package marginalia :ensure t :no-require t)
+  (use-package marginalia :ensure t)
   (marginalia-mode t)
 #+end_src
 
@@ -631,7 +631,7 @@ Use Dap-mode for debugging.
 Display ugly =^L= page breaks as tidy horizontal lines.
 
 #+begin_src emacs-lisp
-  (use-package page-break-lines :ensure t :no-require t)
+  (use-package page-break-lines :ensure t)
   (global-page-break-lines-mode)
   (set-fontset-font "fontset-default"
                     (cons page-break-lines-char page-break-lines-char)
@@ -1159,6 +1159,7 @@ Press ~<f5>~ to save all buffers and run the region or buffer.
 *This mode is disabled because of too many inconsistent behaviors with the built-in one.*
 
 ***** Setup
+
 Use melpa's python-mode.el to replace the built-in python-mode.
 
 #+begin_src emacs-lisp
@@ -1196,13 +1197,11 @@ The ~py-fill-paragraph~, which is binded to ~M-Q~ by setting
   (add-hook 'python-mode-hook
             (lambda () (set (make-local-variable
             'fill-paragraph-function) 'python-fill-paragraph)))
-
-
 #+end_src
+
 **** Python Interpreter Setting
 
 Switch python backend given in configuration table.
-mode.
 
 Note that as matplotlib do not work well in emacs on windows machines,
 the interpreter is set to ~ipython~ by default. See troubleshooting
@@ -1217,6 +1216,94 @@ chapter.
             (setq python-shell-interpreter "ipython")
          )
         (setq python-shell-interpreter interpreter))
+  )
+#+end_src
+
+**** Echo Input in Inferior Python Mode
+
+The default python shell do not echo the input from python buffer by
+calling ~python-shell-send-string~ and etc., which may cause some
+confusion to the users. Here a function is provided to let the shell
+display the code which is being executed.
+
+***** Python Shell Output String
+
+The code in this block is inspired by code from ~elpy-shell.el~.
+
+#+begin_src emacs-lisp
+  (defun python-shell-insert-and-font-lock (string face)
+    "Inject STRING into the Python shell buffer."
+    (let ((from-point (point)))
+      (insert string)
+      (add-text-properties from-point (point)
+  			 (list 'front-sticky t 'font-lock-face face))))
+
+  (defun python-shell-append-to-shell-output (string &optional prepend-cont-prompt)
+    "Append the given STRING to the output of the Python shell buffer.
+
+  Unless NO-FONT-LOCK is set, formats STRING as shell input.
+  Prepends a continuation promt if PREPEND-CONT-PROMPT is set."
+    (unless (string-empty-p string)
+    (let* ((process (python-shell-get-process))
+           (process-buf (python-shell-get-buffer))
+           (mark-point (process-mark process)))
+      (with-current-buffer process-buf
+        (save-excursion
+          (goto-char mark-point)
+          (if prepend-cont-prompt
+              (let* ((column (+ (- (point)
+                                   (let ((inhibit-field-text-motion t))
+                                     (forward-line -1)
+                                     (end-of-line)
+                                     (point)))
+                                1))
+                     (prompt (concat (make-string (max 0 (- column 6)) ? ) "... "))
+                     (lines (split-string string "\n")))
+                (goto-char mark-point)
+                (python-shell-insert-and-font-lock
+                 (car lines) 'comint-highlight-input)
+                (when (cdr lines)
+                    ;; no additional newline at end for multiline
+                    (dolist (line (cdr lines))
+                      (insert "\n")
+                      (let ((from-point (point)))
+                        (python-shell-insert-and-font-lock
+                         prompt 'comint-highlight-prompt)
+                        (add-text-properties
+                         from-point (point)
+                         '(field output inhibit-line-move-field-capture t
+                                 rear-nonsticky t)))
+                      (python-shell-insert-and-font-lock
+                       line 'comint-highlight-input)))
+                  ;; but put one for single line
+                  (insert "\n"))
+            (python-shell-insert-and-font-lock
+             string 'comint-highlight-input))
+          (set-marker (process-mark process) (point)))))))
+
+#+end_src
+
+***** Run Python with Shell Echo
+
+Run python with echo in the python shell.
+
+#+begin_src emacs-lisp
+  (defun python-shell-send-region-with-echo (start end &optional msg no-cookie)
+    "Send the region delimited by START and END to Python process with shell
+  echo output."
+      (python-shell-append-to-shell-output (buffer-substring start end) t)
+      (python-shell-send-region start end t msg no-cookie)
+  )
+
+  (defun python-shell-send-buffer-with-echo (buffer-name &optional send-main msg)
+    "Send the current buffer to Python process with shell echoing running
+  BUFFER-NAME."
+    (python-shell-append-to-shell-output
+     (if send-main
+         (format "<running \"%s\">" buffer-name)
+         (format "<running \"%s\" without main block>" buffer-name)
+       ))
+      (python-shell-send-buffer send-main msg)
   )
 #+end_src
 
@@ -1326,7 +1413,9 @@ full power of lsp-mode, by ~pip install python-lsp-server[all]~.
 #+begin_src emacs-lisp
   (add-hook 'python-mode-hook 'lsp)
 #+end_src
-***** Grammar Checkers
+***** Grammar Checker Setting
+
+****** Mypy Cache Directory
 
 Define a directory for ~mypy~ temporarily files. Require ~pylsp-mypy~
 package to install first to enable the lsp mypy checker.
@@ -1341,12 +1430,15 @@ package to install first to enable the lsp mypy checker.
     )
 #+end_src
 
-Disable docstyle check. It's too annoying.
+****** COMMENT Docstyle Check
+
+Disable docstyle check. Sometimes it's too annoying.
 
 #+begin_src emacs-lisp
     ;(setq lsp-pylsp-plugins-pydocstyle-enabled nil)
     ;(setq lsp-pylsp-plugins-pydocstyle-ignore ["D100" "D101" "D102"])
 #+end_src
+
 **** Highlight Indentation
 
 Enable highlight indentation for python.
@@ -1354,6 +1446,7 @@ Enable highlight indentation for python.
 #+begin_src emacs-lisp
   (add-hook 'python-mode-hook #'highlight-indentation-mode)
 #+end_src
+
 **** Pyvenv
 
 Automatically enable python venv if ~.venv~ is found.
@@ -1371,13 +1464,13 @@ Automatically enable python venv if ~.venv~ is found.
                     (pyvenv-activate
   		   (expand-file-name ".venv" venv)))))))
 #+end_src
+
 *** Functions and Key Bindings
-**** My Own Functions
-***** ShiftBlocks
+**** ShiftBlocks
 
 Navigation functions taken from ~elpy~.
 
-****** Shift Left-and-right
+***** Shift Left-and-right
 #+begin_src emacs-lisp
   (defun elpy-nav-normalize-region ()
     "If the first or last line are not fully selected, select them completely."
@@ -1415,7 +1508,7 @@ Navigation functions taken from ~elpy~.
       (python-indent-shift-left (line-beginning-position) (line-end-position) current-prefix-arg)))
 #+end_src
 
-****** Shift Up-and-down
+***** Shift Up-and-down
 
 #+begin_src emacs-lisp
   (defun elpy-nav-move-line-or-region-down (&optional beg end)
@@ -1474,7 +1567,7 @@ Navigation functions taken from ~elpy~.
       (setq deactivate-mark nil)))
 #+end_src
 
-****** Keybindings
+***** Keybindings
 
 #+begin_src emacs-lisp
   (add-hook 'python-mode-hook
@@ -1498,8 +1591,8 @@ Navigation functions taken from ~elpy~.
                         'elpy-nav-indent-shift-right)))
 #+end_src
 
-***** Python Run Buffer or Region
-****** Helper Functions
+**** Python Run Buffer or Region
+***** Helper Functions
 
 These are the helper functions.
 
@@ -1523,31 +1616,24 @@ These are the helper functions.
       )
     )
 
-  (defun python-shell-buffer-show-string (s)
-    "TBD"
-    ())
-
-  (defun python-run-buffer-or-selected-region-helper (&optional run_main)
+  (defun python-run-buffer-or-selected-region-helper (&optional send-main)
     "Run the current buffer or the selected region."
     (run-python)
     (python-check-shell-ready)
     (if (use-region-p)
-        (progn
-  	(python-shell-buffer-show-string (buffer-substring (region-beginning) (region-end)))
-  	(python-shell-send-region (region-beginning) (region-end) run_main)
-  	)
-      (python-shell-buffer-show-string (format "<Eval buffer \"<%s>\">" (buffer-name)))
-      (python-shell-send-buffer run_main)
+        (python-shell-send-region-with-echo (region-beginning) (region-end))
+      (python-shell-send-buffer-with-echo (buffer-name) send-main)
       )
     (python-shell-switch-to-shell)
     )
 #+end_src
 
-****** Run Buffer or Selected Region
+***** Run Buffer or Selected Region
 
 Run the current buffer, or region if there's an active selected
-region.  The ~__main__~ block will not be executed unless a prefix
-argument is provided. Bind this funciton to ~C-c C-c~.
+region.  When running the current buffer, the ~__main__~ block will not
+be executed unless a prefix argument is provided. Bind this funciton
+to ~C-c C-c~.
 
 #+begin_src emacs-lisp
   (defun python-run-buffer-or-selected-region ()
@@ -1583,7 +1669,7 @@ buffer.
                                       'python-rerun)))
 #+end_src
 
-****** Save all and Run Buffer or Selected Region
+***** Save all and Run Buffer or Selected Region
 
 Press ~<f5>~ to save all files, run the whole buffer or the selected
 region.
@@ -1609,7 +1695,7 @@ run the whole buffer or the selected region.
                         'python-save-and-rerun)))
 #+end_src
 
-***** Autopep8
+**** Autopep8
 
 Automatically formats Python code to conform the PEP 8 style
 guide. To use this function in Python mode, press =M-x
@@ -1631,7 +1717,7 @@ autopep8=. The following code is inspired by [[https://gist.github.com/whirm/612
       )
     )
 #+end_src
-***** Unittest
+**** Unittest
 
 Use ~C-c C-t~ to test the current test funciton or file, ~C-u C-c C-t~ to
 test the whole project.
@@ -1644,7 +1730,7 @@ test the whole project.
   otherwise run all tests in the current file. If called with a prefix argument (C-u),
   run the entire test suite using unittest discovery." 
     (interactive "P")
-    (require 'projectile)
+    ;; (require 'projectile)     ; projectile is already required at startup
     (let* ((file (buffer-file-name))
            (func (python-info-current-defun))
            (project-root (projectile-project-root))
@@ -1679,7 +1765,7 @@ to TtAgg (in ipython) to solve the problem. This can be done by adding
 /matplotlibrc/ file by adding ~backend: TkAgg~, or set the system's
 environment variable ~MPLBACKEND~ to ~Tkagg~.
 
-**** Multilingual Environment
+**** COMMENT Multilingual Environment
 
 Elpy do not work well with windows system when utf-8
 characters are used in the buffer. Using
@@ -1717,6 +1803,7 @@ Flycheck has the following problems on the windows system:
       (setq flycheck-idle-change-delay 4)
       )
   #+end_src
+  
 **** COMMENT Lsp Issue
 
 =lsp-find-definition= may be very slow or even timed out when
@@ -1832,7 +1919,9 @@ Rustic mode is based on rust mode and provides additional features.
 #+end_src
 
 **** Indentation
+
 Use space for indentation.
+
 #+begin_src emacs-lisp
   (add-hook 'rust-mode-hook
              (lambda () (setq indent-tabs-mode nil)))
@@ -1848,6 +1937,7 @@ Using lsp needs manually installation of =rust-analyzer=. This can be done by =r
 #+end_src
 
 **** Flycheck
+
 Flycheck for rust mode needs installation and initializaion.
 
 #+begin_src emacs-lisp
