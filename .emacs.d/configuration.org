@@ -1201,6 +1201,8 @@ The ~py-fill-paragraph~, which is binded to ~M-Q~ by setting
 
 **** Python Interpreter Setting
 
+***** Default Setting
+
 Switch python backend given in configuration table.
 
 Note that as matplotlib do not work well in emacs on windows machines,
@@ -1217,6 +1219,19 @@ chapter.
          )
         (setq python-shell-interpreter interpreter))
   )
+#+end_src
+
+***** User Defined Interpreter
+
+Set python interpreter interactively.
+
+#+begin_src emacs-lisp
+  (defun python-shell-set-interpreter ()
+    "Set the python interpreter for the current buffer."
+    (interactive)
+    (setq-local python-shell-interpreter
+  	      (read-string "Python interpreter: "
+  			   python-shell-interpreter)))
 #+end_src
 
 **** Echo Input in Inferior Python Mode
@@ -1444,7 +1459,7 @@ package to install first to enable the lsp mypy checker.
     )
 #+end_src
 
-****** COMMENT Docstyle Check
+****** COMMENT Disable Docstyle Check
 
 Disable docstyle check. Sometimes it's too annoying.
 
