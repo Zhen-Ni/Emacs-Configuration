@@ -517,7 +517,9 @@ of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
 Instructions for setting up projectile is given by its [[https://github.com/bbatsov/projectile][homepage]].
 
 **** Installation
+
 First make sure it is installed.
+
 #+begin_src emacs-lisp
   (use-package projectile :ensure t)
 #+end_src
@@ -592,11 +594,14 @@ Enable this mode in all program modes.
 #+begin_src emacs-lisp
   (add-to-list 'page-break-lines-modes 'prog-mode)
 #+end_src
+
 *** Highlight Indentation
+
 #+begin_src emacs-lisp
   (use-package highlight-indentation
     :ensure t :no-require t)
 #+end_src
+
 ** Functions and Key Bindings
 *** Default Functoins
 
@@ -821,7 +826,7 @@ See [[https://orgmode.org/manual/Org-Indent-Mode.html][org mode manual]] for mor
 
 #+begin_src emacs-lisp
   (setq org-table-formula-constants
-        '(("" . "3.14159265359")
+        '(("π" . "3.14159265359")
           ("pi" . "3.14159265359")
           ("e" . "2.718281828459")
           ))
@@ -896,6 +901,7 @@ Org mode keyword settings.
 
 *** Source Code Block Setting
 **** Source Code Window Setting
+
 Use the current window for editing source blocks (Press C-c ' in
 source code block).
 
@@ -904,6 +910,7 @@ source code block).
 #+end_src
 
 **** Babel Enable Languages
+
 Enable Python, C, C++ and D languages.
 
 #+begin_src emacs-lisp
@@ -1054,20 +1061,30 @@ Use hungry delete from c-mode by using prefix "C-c".
 *** Minor mode settings
 **** Lsp
 ***** Installation
+
+Enable Lsp mode.
+
 #+begin_src emacs-lisp
-  (use-package lsp-mode :ensure t)
+  (use-package lsp-mode :ensure t :no-require t
+    :hook (prog-mode . lsp-deferred)
+    )
 #+end_src
+
 ***** Highlight Text
+
 Set the font of the highlight text where cursor points to.
 
 #+begin_src emacs-lisp
-  (set-face-attribute 'lsp-face-highlight-textual nil
-                      :inherit nil :underline t :bold t)
-  (set-face-attribute 'lsp-face-highlight-read nil
-                      :inherit nil :underline t :bold t)
-  (set-face-attribute 'lsp-face-highlight-write nil
-                      :inherit nil :underline t :bold t)
+  (with-eval-after-load 'lsp-mode
+    (set-face-attribute 'lsp-face-highlight-textual nil
+                        :inherit nil :underline t :bold t)
+    (set-face-attribute 'lsp-face-highlight-read nil
+                        :inherit nil :underline t :bold t)
+    (set-face-attribute 'lsp-face-highlight-write nil
+                        :inherit nil :underline t :bold t)
+    )
 #+end_src
+
 ***** Auto Guess Root
 
 Automatically guess the project root using projectile/project. Do not
@@ -1133,6 +1150,7 @@ Use rainbow-delimiters for lisp-like languages.
 *** Functions and Key Bindings
 **** My Own Funcitons
 ***** Run Region or Buffer
+
 Use ~C-c C-c~ to eval region or buffer, depending on whether the
 selected region is active.
 
@@ -1350,8 +1368,10 @@ Set python default path to current project root.
 #+end_src
 
 *** Minor Mode Settings
+
 Choose between either elpy or lsp. Since the developement of elpy is
 not active now, lsp-mode is used by default.
+
 **** COMMENT Elpy
 ***** Setup
 
@@ -1369,6 +1389,7 @@ Disable virtualenv
 #+end_src
 
 ***** Python Run Buffer or Region
+
 Press ~<f9>~ to run the whole buffer or the selected region.
 
 #+begin_src emacs-lisp
@@ -1455,8 +1476,8 @@ full power of lsp-mode, by ~pip install python-lsp-server[all]~.
 #+begin_src emacs-lisp
   (add-hook 'python-mode-hook 'lsp)
 #+end_src
-***** Grammar Checker Setting
 
+***** Grammar Checker Setting
 ****** Mypy Cache Directory
 
 Define a directory for ~mypy~ temporarily files. Require ~pylsp-mypy~
@@ -1771,6 +1792,7 @@ autopep8=. The following code is inspired by [[https://gist.github.com/whirm/612
       )
     )
 #+end_src
+
 **** Unittest
 
 Use ~C-c C-t~ to test the current test funciton or file, ~C-u C-c C-t~ to
@@ -1919,6 +1941,7 @@ Do not indent namespace in c++ mode.
     (c-set-offset 'innamespace [0]))
   (add-hook 'c++-mode-hook 'cancel-c++-namespace-indentation)
 #+end_src
+
 *** Minor Mode Settings
 **** Lsp
 ***** Use ~lsp-mode~
@@ -1983,7 +2006,8 @@ Use space for indentation.
 *** Minor Mode Settings
 **** LSP
 
-Using lsp needs manually installation of =rust-analyzer=. This can be done by =rustup=: ~rustup component add rust-analyzer~.
+Using lsp needs manually installation of =rust-analyzer=. This can be
+done by =rustup=: ~rustup component add rust-analyzer~.
 
 #+begin_src emacs-lisp
 (add-hook 'rust-mode-hook #'lsp)
@@ -2006,8 +2030,9 @@ Compared with lsp, eglot currently cannot expand macros for rust.
 
 ***** Setup
 
-Using eglot needs manually installation of =rust-analyzer=. This can be done by =rustup=: ~rustup component add rust-analyzer~.
-For more information, see [[https://rust-analyzer.github.io/manual.html#emacs][rust-analyzer's website]].
+Using eglot needs manually installation of =rust-analyzer=. This can be
+done by =rustup=: ~rustup component add rust-analyzer~.  For more
+information, see [[https://rust-analyzer.github.io/manual.html#emacs][rust-analyzer's website]].
 
 #+begin_src emacs-lisp
 (add-hook 'rust-mode-hook 'eglot-ensure)
@@ -2071,6 +2096,7 @@ Use ~C-c i~ to show/hide inlay hints.
                         (kbd "C-c i")
                         'rust-inlay-hints)))
 #+end_src
+
 **** COMMENT Eglot
 ***** Inlay Hints
 
@@ -2087,7 +2113,8 @@ Disable inlay hints by default, and use ~C-c i~ to show/hide inlay hints.
 **** My Own Functions
 ***** Rust Run
 
-Press ~<f5>~ to save all buffers and run command ~rust-run~. If an prefix argument is given, run command ~rust-run-clippy~.
+Press ~<f5>~ to save all buffers and run command ~rust-run~. If an prefix
+argument is given, run command ~rust-run-clippy~.
 
 #+begin_src emacs-lisp
   (defun rust-save-and-run (&optional arg) (interactive "P")
@@ -2126,7 +2153,12 @@ Use ~C-c C-t~ for ~rust-test~.
 *** Troubleshooting
 **** Extract Signature for rust-analyzer
 
-When using hover signature in ~lsp-mode~, it extracts the first line returned by ~rust-analyzer~ by default as specfied by ~specific lsp-clients-extract-signature-on-hover~. However, the first line returned by ~rust-analyzer~ is ususlly not the type signature, which is not what I want. A basic solution is given on [[https://github.com/emacs-lsp/lsp-mode/pull/1740#issuecomment-1776493727][Github]], and a more detailed discussion can be found on [[https://tony-zorman.com/posts/fixing-lsp-mode.html][this site]].
+When using hover signature in ~lsp-mode~, it extracts the first line
+returned by ~rust-analyzer~ by default as specfied by ~specific
+lsp-clients-extract-signature-on-hover~. However, the first line
+returned by ~rust-analyzer~ is ususlly not the type signature, which is
+not what I want. A basic solution is given on [[https://github.com/emacs-lsp/lsp-mode/pull/1740#issuecomment-1776493727][Github]], and a more
+detailed discussion can be found on [[https://tony-zorman.com/posts/fixing-lsp-mode.html][this site]].
 
 #+begin_src emacs-lisp
 (defun syntax-highlight-string (str mode)
@@ -2176,6 +2208,7 @@ Use magit to interacting with Git.
 #+begin_src emacs-lisp
   (use-package magit :ensure t :no-require t)
 #+end_src
+
 ** Aidermacs
 
 Use the configuration table to setup aidermacs. Set value to ~default~
@@ -2230,8 +2263,11 @@ User settings for aider.
 #+end_src
 
 ** COMMENT Emacs Application Framework
+
 Not fuly installed.
+
 *** Setup
+
 #+begin_src emacs-lisp
   (add-to-list 'load-path
                "~/.emacs.d/site-lisp/emacs-application-framework/")
