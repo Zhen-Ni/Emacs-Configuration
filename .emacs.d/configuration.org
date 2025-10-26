@@ -606,6 +606,70 @@ Enable this mode in all program modes.
     :ensure t :no-require t)
 #+end_src
 
+*** COMMENT Git Gutter
+
+Use ~diff-hl~ instead.
+
+**** Enable git-gutter
+
+Display file changes if a git repository is found.
+
+#+begin_src emacs-lisp
+  (use-package git-gutter :ensure t)
+  (global-git-gutter-mode t)
+  (custom-set-variables
+   '(git-gutter:update-interval 2))	; Update every 2 seconds
+#+end_src
+
+**** Styles
+
+#+begin_src emacs-lisp
+    (custom-set-variables
+   '(git-gutter:modified-sign " ")
+   '(git-gutter:added-sign " ")
+   '(git-gutter:deleted-sign "_"))
+
+  (set-face-background 'git-gutter:modified "royal blue")
+  (set-face-background 'git-gutter:added "forest green")
+  (set-face-background 'git-gutter:deleted "salmon")
+  (set-face-foreground 'git-gutter:deleted "red")
+#+end_src
+
+*** Diff-hl
+
+**** Basic Settings
+
+Use ~diff-hl~ to compare file differences in different versions.
+
+#+begin_src emacs-lisp
+  (use-package diff-hl :ensure t
+    :config
+    (global-diff-hl-mode t)
+    (add-hook 'after-save-hook 'diff-hl-update)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh) ; Refresh after magit operations
+    (diff-hl-flydiff-mode t)		; Refresh on the fly
+    )
+#+end_src
+
+**** Styles
+
+#+begin_src emacs-lisp
+  (custom-set-faces
+   '(diff-hl-insert  ((t (:background "forest green" :foreground "white"))))
+   '(diff-hl-change  ((t (:background "royal blue" :foreground "white"))))
+   '(diff-hl-delete  ((t (:background "salmon" :foreground "black")))))
+#+end_src
+
+**** Dired Mode
+
+Setup ~diff-hl-dired-mode~.
+
+#+begin_src emacs-lisp
+  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+  (add-hook 'dired-mode-hook 'diff-hl-dired-mode-unless-remote)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-dired-update)
+#+end_src
+
 ** Functions and Key Bindings
 *** Default Functoins
 
