@@ -416,6 +416,8 @@ language environments. See [[https://github.com/jorgenschaefer/elpy/issues/1729#
   (set-language-environment "UTF-8")
 #+end_src
 
+*** Input Method
+
 Use "TeX" as default input method.
 
 #+begin_src emacs-lisp
@@ -1119,6 +1121,21 @@ described by [[https://stackoverflow.com/questions/76211988/stop-company-complet
 (setq lsp-completion-default-behaviour :insert)
 #+end_src
 
+**** Lsp-ui
+
+Use ~lsp-ui~, which is an add-in package of ~lsp~.
+
+#+begin_src emacs-lisp
+  (use-package lsp-ui :ensure t
+    :hook (lsp-mode . lsp-ui-mode)
+    :custom
+    (lsp-ui-doc-enable nil)
+    (lsp-ui-sideline-enable nil)
+    (lsp-ui-sideline-show-diagnostics t)
+    (lsp-ui-sideline-show-code-actions t)
+    )
+#+end_src
+
 **** Dap
 
 Use Dap-mode for debugging. This mode is relient on ~lsp-mode~. See
@@ -1804,7 +1821,7 @@ test the whole project.
 
   If called without a prefix argument, run the current test method if the cursor is on one,
   otherwise run all tests in the current file. If called with a prefix argument (C-u),
-  run the entire test suite using unittest discovery." 
+  run the entire test suite using unittest discovery."
     (interactive "P")
     ;; (require 'projectile)     ; projectile is already required at startup
     (let* ((file (buffer-file-name))
@@ -1878,7 +1895,7 @@ Flycheck has the following problems on the windows system:
       (setq flycheck-idle-change-delay 4)
       )
   #+end_src
-  
+
 **** COMMENT Lsp Issue
 
 =lsp-find-definition= may be very slow or even timed out when
@@ -2276,5 +2293,3 @@ Not fuly installed.
   (require 'eaf-browser)
   (require 'eaf-camera)
 #+end_src
-
-
