@@ -406,6 +406,8 @@ Preserve cursor point when scrolling.
 
 ** Multilingual Environment
 
+*** COMMENT Language Coding System
+
 Setting the languate environment to utf-8 to avoid some
 encoding problems. For example, if not set, elpy do not work
 well with windows system when utf-8 characters are used in
