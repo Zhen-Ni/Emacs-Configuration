@@ -540,53 +540,6 @@ to enable it manually following [[https://docs.projectile.mx/projectile/configur
   (setq projectile-completion-system 'ivy)
 #+end_src
 
-*** Lsp
-**** Installation
-#+begin_src emacs-lisp
-  (use-package lsp-mode :ensure t)
-#+end_src
-**** Highlight Text
-Set the font of the highlight text where cursor points to.
-
-#+begin_src emacs-lisp
-  (set-face-attribute 'lsp-face-highlight-textual nil
-                      :inherit nil :underline t :bold t)
-  (set-face-attribute 'lsp-face-highlight-read nil
-                      :inherit nil :underline t :bold t)
-  (set-face-attribute 'lsp-face-highlight-write nil
-                      :inherit nil :underline t :bold t)
-#+end_src
-**** Auto Guess Root
-
-Automatically guess the project root using projectile/project. Do not
-use this setting unless you are familiar with ~lsp-mode~ internals and
-you are sure that all of your projects are following
-~projectile/project.el~ conventions.
-
-Refer to [[https://emacs-lsp.github.io/lsp-mode/page/settings/mode/#lsp-auto-guess-root][this link]] for more details.
-
-#+begin_src emacs-lisp
-  (setq lsp-auto-guess-root t)
-#+end_src
-
-**** Disable Signature Help Documentation
-
-Signature documentation sometimes makes the minibuffer too big when
-coding. The [[https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/][official website]] gives instructions for turning off such
-features.
-
-#+begin_src emacs-lisp
-  (setq lsp-signature-render-documentation nil)
-#+end_src
-
-**** Use Insert Instead of Replace When Completion
-
-The default behaviour of lsp completion replaces the word inplace, as described by [[https://stackoverflow.com/questions/76211988/stop-company-complete-selection-from-eating-following-word-in-rust-code][this question]]. This behavior is controlled by ~lsp-completion-default-behaviour~ in [[https://emacs-lsp.github.io/lsp-mode/page/settings/mode/#lsp-completion-default-behaviour][this link]], we can change it from ~:replace~ to ~:insert~ to solve the problem.
-
-#+begin_src emacs-lisp
-(setq lsp-completion-default-behaviour :insert)
-#+end_src
-
 *** COMMENT Eglot
 
 Install eglot automatically. This is built into Emacs since version 29.
@@ -621,11 +574,7 @@ Rainbow mode by default.
   (use-package rainbow-mode :ensure t :no-require t)
   (add-hook 'prog-mode-hook 'rainbow-mode)
 #+end_src
-*** COMMENT Dap
-Use Dap-mode for debugging.
-#+begin_src emacs-lisp
-  (use-package dap-mode :ensure t)
-#+end_src
+
 *** Page Break Lines
 
 Display ugly =^L= page breaks as tidy horizontal lines.
@@ -1087,7 +1036,6 @@ by function =advice-add= (see [[https://emacs.stackexchange.com/a/41250/38157][t
 In Emacs, =prog-mode= is the base mode for programming.
 
 *** Shortcuts
-
 **** Hungry delete
 
 Use hungry delete from c-mode by using prefix "C-c".
@@ -1103,9 +1051,74 @@ Use hungry delete from c-mode by using prefix "C-c".
                         'c-hungry-delete-forward)))
 #+end_src
 
+*** Minor mode settings
+**** Lsp
+***** Installation
+#+begin_src emacs-lisp
+  (use-package lsp-mode :ensure t)
+#+end_src
+***** Highlight Text
+Set the font of the highlight text where cursor points to.
+
+#+begin_src emacs-lisp
+  (set-face-attribute 'lsp-face-highlight-textual nil
+                      :inherit nil :underline t :bold t)
+  (set-face-attribute 'lsp-face-highlight-read nil
+                      :inherit nil :underline t :bold t)
+  (set-face-attribute 'lsp-face-highlight-write nil
+                      :inherit nil :underline t :bold t)
+#+end_src
+***** Auto Guess Root
+
+Automatically guess the project root using projectile/project. Do not
+use this setting unless you are familiar with ~lsp-mode~ internals and
+you are sure that all of your projects are following
+~projectile/project.el~ conventions.
+
+Refer to [[https://emacs-lsp.github.io/lsp-mode/page/settings/mode/#lsp-auto-guess-root][this link]] for more details.
+
+#+begin_src emacs-lisp
+  (setq lsp-auto-guess-root t)
+#+end_src
+
+***** Disable Signature Help Documentation
+
+Signature documentation sometimes makes the minibuffer too big when
+coding. The [[https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/][official website]] gives instructions for turning off such
+features.
+
+#+begin_src emacs-lisp
+  (setq lsp-signature-render-documentation nil)
+#+end_src
+
+***** Use Insert Instead of Replace When Completion
+
+The default behaviour of lsp completion replaces the word inplace, as
+described by [[https://stackoverflow.com/questions/76211988/stop-company-complete-selection-from-eating-following-word-in-rust-code][this question]]. This behavior is controlled by
+~lsp-completion-default-behaviour~ in [[https://emacs-lsp.github.io/lsp-mode/page/settings/mode/#lsp-completion-default-behaviour][this link]], we can change it from
+~:replace~ to ~:insert~ to solve the problem.
+
+#+begin_src emacs-lisp
+(setq lsp-completion-default-behaviour :insert)
+#+end_src
+
+**** Dap
+
+Use Dap-mode for debugging. This mode is relient on ~lsp-mode~. See
+[[https://emacs-lsp.github.io/dap-mode/page/configuration/][official website]] for more settings.
+
+#+begin_src emacs-lisp
+  (use-package dap-mode :ensure t :no-require t)
+
+  ;; Enabling only some features
+  (setq dap-auto-configure-features '(sessions locals controls tooltip))
+
+#+end_src
+
 ** Lisp Mode
 *** Minor Mode Settings
 **** Rainbow Mode
+
 Use rainbow-delimiters for lisp-like languages.
 
 #+begin_src emacs-lisp
@@ -1492,6 +1505,18 @@ Automatically enable python venv if ~.venv~ is found.
                   (when venv
                     (pyvenv-activate
   		   (expand-file-name ".venv" venv)))))))
+#+end_src
+
+**** Dap Mode
+
+Using dap mode for python. Lsp is a mandatory for this mode. See
+[[https://emacs-lsp.github.io/dap-mode/page/configuration/#python][official website]] for more details.
+
+#+begin_src emacs-lisp
+  (require 'dap-python)
+  ;; if you installed debugpy, you need to set this
+  ;; https://github.com/emacs-lsp/dap-mode/issues/306
+  (setq dap-python-debugger 'debugpy)
 #+end_src
 
 *** Functions and Key Bindings
@@ -2215,3 +2240,5 @@ Not fuly installed.
   (require 'eaf-browser)
   (require 'eaf-camera)
 #+end_src
+
+
