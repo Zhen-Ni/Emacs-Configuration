@@ -636,7 +636,6 @@ Display file changes if a git repository is found.
 #+end_src
 
 *** Diff-hl
-
 **** Basic Settings
 
 Use ~diff-hl~ to compare file differences in different versions.
@@ -648,6 +647,7 @@ Use ~diff-hl~ to compare file differences in different versions.
     (add-hook 'after-save-hook 'diff-hl-update)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh) ; Refresh after magit operations
     (diff-hl-flydiff-mode t)		; Refresh on the fly
+    (setq diff-hl-flydiff-delay 4)	; Avoid lag from constant diff updates
     )
 #+end_src
 
@@ -657,7 +657,7 @@ Use ~diff-hl~ to compare file differences in different versions.
   (custom-set-faces
    '(diff-hl-insert  ((t (:background "forest green" :foreground "white"))))
    '(diff-hl-change  ((t (:background "royal blue" :foreground "white"))))
-   '(diff-hl-delete  ((t (:background "salmon" :foreground "black")))))
+   '(diff-hl-delete  ((t (:background "orange red" :foreground "white")))))
 #+end_src
 
 **** Dired Mode
@@ -1134,7 +1134,7 @@ Enable Lsp mode.
 
 #+begin_src emacs-lisp
   (use-package lsp-mode :ensure t :no-require t
-    :hook (prog-mode . lsp-deferred)
+    ;; :hook (prog-mode . lsp-deferred)
     )
 #+end_src
 
@@ -2282,6 +2282,16 @@ detailed discussion can be found on [[https://tony-zorman.com/posts/fixing-lsp-m
        (lsp--render-element (concat "```rust\n" sig cmt "\n```")))
      'rust-mode))
   )
+#+end_src
+
+** QML Mode
+
+Edit QT QML code.
+
+#+begin_src emacs-lisp
+  (use-package qml-mode
+    :ensure t
+    :mode "\\.qml\\'")
 #+end_src
 
 * Not Only an Editor
