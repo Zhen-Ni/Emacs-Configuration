@@ -305,6 +305,8 @@ sun sets.
 #+end_src
 
 ** Window Layouts
+*** Window Components
+**** Menu, Tools and Scroll Bar
 
 I'd like to turn off menu, tool and scroll bar.
 
@@ -314,10 +316,50 @@ I'd like to turn off menu, tool and scroll bar.
   (scroll-bar-mode 0)
 #+end_src
 
-+Show line numbers on the left of the window.+
+**** COMMENT Show Line Numbers
+
+Show line numbers on the left of the window.
+
 #+begin_src emacs-lisp
-  ;; (global-linum-mode t)
+  (global-linum-mode t)
 #+end_src
+
+**** Mode line
+
+***** COMMENT Hide All Minor Modes
+#+begin_src emacs-lisp
+  (use-package minions
+    :ensure t
+    :config
+    (setq minions-prominent-modes '(eldoc-mode company-mode rainbow-mode yas-minor-mode))
+    (setq minions-mode-line-lighter "+")
+    (minions-mode 1)
+    )
+#+end_src
+
+***** Simplify Some Mode Lines
+
+To hide the minor mode displays in the mode line. Some modes cannot be
+simply hided using ~delight~ package, such as ~projectile~ due to its
+dynamic parameters, which will be handled seperately in the mode's
+configuration.
+
+#+begin_src emacs-lisp
+  (use-package delight
+    :ensure t
+    :config
+    (delight 'highlight-indentation-mode nil "highlight-indentation")
+    (delight 'rainbow-mode nil "rainbow")
+    (delight 'page-break-lines-mode nil "page-break-lines")
+    (delight 'lsp-lens-mode nil "lsp-lens")
+    (delight 'yas-minor-mode nil "yasnippet")
+    (delight 'rainbow-mode nil "rainbow-mode")
+    (delight 'company-mode nil "company")
+    (delight 'eldoc-mode nil "eldoc")
+    )
+#+end_src
+
+*** Window Split
 
 Window split threshold. If the width of the frame is less than
 140, split horizontally, else split vertically.
@@ -518,6 +560,7 @@ of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
 #+end_src
 
 *** Projectile
+
 Instructions for setting up projectile is given by its [[https://github.com/bbatsov/projectile][homepage]].
 
 **** Installation
@@ -534,6 +577,14 @@ First make sure it is installed.
   (projectile-mode t)
   ;; Recommended keymap prefix on Windows/Linux
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+#+end_src
+
+**** Projectile Mode Line
+
+Use Abbreviation for `Projectile`.
+
+#+begin_src emacs-lisp
+  (setq projectile-mode-line-prefix " Proj")
 #+end_src
 
 **** Ivy
@@ -564,6 +615,7 @@ Marginalia in the minibuffer. [[https://github.com/minad/marginalia][Marginalia 
 #+end_src
 
 *** Flycheck
+
 
 Enable Flycheck mode by default.
 
@@ -1187,6 +1239,15 @@ described by [[https://stackoverflow.com/questions/76211988/stop-company-complet
 (setq lsp-completion-default-behaviour :insert)
 #+end_src
 
+***** Diagnostics Message
+
+Use ~flycheck~ to show the diagnostic messages instead of ~lsp~'s native
+one.
+
+#+begin_src emacs-lisp
+  (setq lsp-modeline-diagnostics-enable nil)
+#+end_src
+
 **** Lsp-ui
 
 Use ~lsp-ui~, which is an add-in package of ~lsp~.
@@ -1217,7 +1278,7 @@ Use Dap-mode for debugging. This mode is relient on ~lsp-mode~. See
 
 ** Lisp Mode
 *** Minor Mode Settings
-**** Rainbow Mode
+**** Rainbow Delimiters Mode
 
 Use rainbow-delimiters for lisp-like languages.
 
