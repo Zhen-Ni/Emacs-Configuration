@@ -1239,13 +1239,25 @@ described by [[https://stackoverflow.com/questions/76211988/stop-company-complet
 (setq lsp-completion-default-behaviour :insert)
 #+end_src
 
-***** Diagnostics Message
+***** Mode Line
+****** Diagnostics Message
 
 Use ~flycheck~ to show the diagnostic messages instead of ~lsp~'s native
 one.
 
 #+begin_src emacs-lisp
   (setq lsp-modeline-diagnostics-enable nil)
+#+end_src
+
+****** Code Action Icon
+
+The original icon 💡 cannot be displayed properly on windows
+system. Replace it with other symbol.
+
+#+begin_src emacs-lisp
+  (when (eq 'windows-nt system-type)
+    (setq lsp-modeline-code-action-fallback-icon "!")
+    )
 #+end_src
 
 **** Lsp-ui
