@@ -711,6 +711,10 @@ Use ~diff-hl~ to compare file differences in different versions.
    '(diff-hl-insert  ((t (:background "forest green" :foreground "white"))))
    '(diff-hl-change  ((t (:background "royal blue" :foreground "white"))))
    '(diff-hl-delete  ((t (:background "orange red" :foreground "white")))))
+
+  (setq diff-hl-margin-symbols-alist
+        '((insert . "+") (delete . "-") (change . "~")
+  	(unknown . "?") (ignored . "i") (reference . " ")))
 #+end_src
 
 **** Dired Mode
