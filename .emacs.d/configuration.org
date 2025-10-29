@@ -695,6 +695,7 @@ Use ~diff-hl~ to compare file differences in different versions.
 #+begin_src emacs-lisp
   (use-package diff-hl :ensure t
     :config
+    (require 'diff-hl-dired)
     (global-diff-hl-mode t)
     (add-hook 'after-save-hook 'diff-hl-update)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh) ; Refresh after magit operations
