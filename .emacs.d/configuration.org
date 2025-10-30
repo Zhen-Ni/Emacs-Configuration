@@ -585,6 +585,17 @@ Use Abbreviation for `Projectile`.
 
 #+begin_src emacs-lisp
   (setq projectile-mode-line-prefix " Proj")
+
+  ;; Hide project type by self-defined mode line funciton.
+  (setq projectile-mode-line-function
+        (lambda ()
+  	"Report project name in the modeline."
+  	(let ((project-name (projectile-project-name)))
+  	  (format "%s[%s]"
+  		  projectile-mode-line-prefix
+  		  (or project-name "-")
+  		  )))
+        )
 #+end_src
 
 **** Ivy
