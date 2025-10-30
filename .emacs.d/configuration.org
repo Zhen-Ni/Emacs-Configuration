@@ -356,6 +356,7 @@ configuration.
     (delight 'rainbow-mode nil "rainbow-mode")
     (delight 'company-mode nil "company")
     (delight 'eldoc-mode nil "eldoc")
+    (delight 'lsp-mode nil)
     )
 #+end_src
 
