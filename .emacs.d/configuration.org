@@ -1,3 +1,4 @@
+
 #+Title: Emacs Configuration
 
 * Preparation
@@ -304,72 +305,8 @@ sun sets.
   (run-with-timer 0 60 'synchronize-theme)
 #+end_src
 
-** Window Layouts
-*** Window Components
-**** Menu, Tools and Scroll Bar
-
-I'd like to turn off menu, tool and scroll bar.
-
-#+begin_src emacs-lisp
-  (menu-bar-mode 0)
-  (tool-bar-mode 0)
-  (scroll-bar-mode 0)
-#+end_src
-
-**** COMMENT Show Line Numbers
-
-Show line numbers on the left of the window.
-
-#+begin_src emacs-lisp
-  (global-linum-mode t)
-#+end_src
-
-**** Mode line
-
-***** COMMENT Hide All Minor Modes
-#+begin_src emacs-lisp
-  (use-package minions
-    :ensure t
-    :config
-    (setq minions-prominent-modes '(eldoc-mode company-mode rainbow-mode yas-minor-mode))
-    (setq minions-mode-line-lighter "+")
-    (minions-mode 1)
-    )
-#+end_src
-
-***** Simplify Some Mode Lines
-
-To hide the minor mode displays in the mode line. Some modes cannot be
-simply hided using ~delight~ package, such as ~projectile~ due to its
-dynamic parameters, which will be handled seperately in the mode's
-configuration.
-
-#+begin_src emacs-lisp
-  (use-package delight
-    :ensure t
-    :config
-    (delight 'highlight-indentation-mode nil "highlight-indentation")
-    (delight 'rainbow-mode nil "rainbow")
-    (delight 'page-break-lines-mode nil "page-break-lines")
-    (delight 'lsp-lens-mode nil "lsp-lens")
-    (delight 'yas-minor-mode nil "yasnippet")
-    (delight 'rainbow-mode nil "rainbow-mode")
-    (delight 'company-mode nil "company")
-    (delight 'eldoc-mode nil "eldoc")
-    (delight 'lsp-mode nil)
-    )
-#+end_src
-
-*** Window Split
-
-Window split threshold. If the width of the frame is less than
-140, split horizontally, else split vertically.
-
-#+begin_src emacs-lisp
-  (setq split-width-threshold 140)
-#+end_src
-
 ** Fonts
+*** Fonts for Emacs
 
 The settings of the fonts are provided in Table [[conf-table]]. On Linux
 systems, The following code do nothing if font attribute are set to
@@ -418,6 +355,139 @@ with size 110, and default cjk font is "" with size 22.
         )
     )
   )
+#+end_src
+
+*** All the Icons
+
+Need to run ~all-the-icons-install-fonts~ to install the icons.
+
+Use ~all-the-icons-check-installation~ to check whether ~all-the-icons~
+has been successfully installed.
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons :ensure t
+    :if (display-graphic-p))
+
+  (defun all-the-icons-installed ()
+    "Check if all-the-icons fonts have been installed."
+    (find-font (font-spec :name "all-the-icons"))
+    )
+
+  (unless (all-the-icons-installed)
+    (message "All the icons requires installation.")
+    (all-the-icons-install-fonts)
+    )
+
+#+end_src
+
+** Window Layouts
+*** Window Components
+**** Menu, Tools and Scroll Bar
+
+I'd like to turn off menu, tool and scroll bar.
+
+#+begin_src emacs-lisp
+  (menu-bar-mode 0)
+  (tool-bar-mode 0)
+  (scroll-bar-mode 0)
+#+end_src
+
+**** COMMENT Show Line Numbers
+
+Show line numbers on the left of the window.
+
+#+begin_src emacs-lisp
+  (global-linum-mode t)
+#+end_src
+
+**** Mode line
+***** Mode Line Format
+
+Define the mode-line style.
+
+Currently, using git icon to replace vc-mode display.
+
+Please make sure ~all-the-icons~ is properly installed first to enable
+icon display.
+
+#+begin_src emacs-lisp
+  (defun get-vc-mode-with-icon ()
+      "Return VC mode string with icon and perserved properties"
+    (when (and vc-mode (all-the-icons-installed))
+      (let* ((map (get-text-property 1 'local-map vc-mode))
+             (mouse (get-text-property 1 'mouse-face vc-mode))
+             (icon (propertize
+                    (all-the-icons-octicon "git-branch"
+                                           :face '(:height 1.0 :family "github-octicons")
+                                           :v-adjust 0.0)
+                    'local-map map
+                    'mouse-face mouse))
+             (branch (replace-regexp-in-string "^ Git:" "" vc-mode)))
+        (concat " " icon " " branch)))
+    )
+
+  (setq-default mode-line-format
+  '("%e" mode-line-front-space
+   (:propertize
+    ("" mode-line-mule-info mode-line-client mode-line-modified
+     mode-line-remote mode-line-window-dedicated)
+    display (min-width (5.0)))
+   mode-line-frame-identification mode-line-buffer-identification "   "
+   mode-line-position (project-mode-line project-mode-line-format)
+
+   ;; The default value of the next block is:
+   ;; (vc-mode vc-mode)
+   ;; I want it to be evaluated online, to avoid out-of-dated version
+   ;; display.
+  (:eval (get-vc-mode-with-icon))
+   
+   ;;
+   "  " mode-line-modes mode-line-misc-info
+   mode-line-end-spaces)
+  )
+#+end_src
+
+***** Hide Unnecessarily Displayed Modes
+
+To hide the minor mode displays in the mode line. Some modes cannot be
+simply hided using ~delight~ package, such as ~projectile~ due to its
+dynamic parameters, which will be handled seperately in the mode's
+configuration.
+
+#+begin_src emacs-lisp
+  (use-package delight
+    :ensure t
+    :config
+    (delight 'highlight-indentation-mode nil "highlight-indentation")
+    (delight 'rainbow-mode nil "rainbow")
+    (delight 'page-break-lines-mode nil "page-break-lines")
+    (delight 'lsp-lens-mode nil "lsp-lens")
+    (delight 'yas-minor-mode nil "yasnippet")
+    (delight 'rainbow-mode nil "rainbow-mode")
+    (delight 'company-mode nil "company")
+    (delight 'eldoc-mode nil "eldoc")
+    (delight 'lsp-mode nil)
+    )
+#+end_src
+
+***** COMMENT Hide All Minor Modes
+#+begin_src emacs-lisp
+  (use-package minions
+    :ensure t
+    :config
+    (setq minions-prominent-modes '(eldoc-mode company-mode rainbow-mode yas-minor-mode))
+    (setq minions-mode-line-lighter "+")
+    (minions-mode 1)
+    )
+#+end_src
+
+*** Window Split
+
+Window split threshold. If the width of the frame is less than
+140, split horizontally, else split vertically.
+
+#+begin_src emacs-lisp
+  (setq split-width-threshold 140)
 #+end_src
 
 ** Troubleshooting
@@ -585,18 +655,25 @@ First make sure it is installed.
 Use Abbreviation for `Projectile`.
 
 #+begin_src emacs-lisp
-  (setq projectile-mode-line-prefix " Proj")
+  (setq projectile-mode-line-prefix
+        (if (and nil (all-the-icons-installed))          ;; TO BE FINISHED!!!!
+  	  (concat " " (all-the-icons-octicon
+  		   "repo"
+  		   :face '(:height 1.0 :family "github-octicons")
+                     :v-adjust 0.0))
+  	" Proj"))
 
+  (defun projectile-simplified-mode-line ()
+    "Report project name in the modeline."
+    (let ((project-name (projectile-project-name)))
+      (concat projectile-mode-line-prefix
+  	     "["
+  	     (or project-name "-")
+  	     "]"
+  	     )))
+    
   ;; Hide project type by self-defined mode line funciton.
-  (setq projectile-mode-line-function
-        (lambda ()
-  	"Report project name in the modeline."
-  	(let ((project-name (projectile-project-name)))
-  	  (format "%s[%s]"
-  		  projectile-mode-line-prefix
-  		  (or project-name "-")
-  		  )))
-        )
+  (setq projectile-mode-line-function #'projectile-simplified-mode-line)
 #+end_src
 
 **** Ivy
