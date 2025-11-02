@@ -530,6 +530,19 @@ function also sets consistent window sizes for all systems.
   (setq default-frame-alist '((height . 32) (width . 80)))
 #+end_src
 
+** Dired
+
+Use icons for dired. Requires ~all-the-icons~ to be properly installed.
+
+#+begin_src emacs-lisp
+  (when (all-the-icons-installed)
+   (use-package all-the-icons-dired
+    :ensure t
+    :hook (dired-mode . all-the-icons-dired-mode)
+    )
+   )
+#+end_src
+
 * Editor
 ** Scrolling
 
@@ -643,6 +656,8 @@ Always turn yasnippet mode on.
 
 *** Ivy, Swiper and Counsel
 
+**** Basic Settings
+
 Do not enable the whole ivy mode as I just want to use a portion
 of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
 1)=)
@@ -656,6 +671,24 @@ of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
   (setq ivy-use-virtual-buffers t)
   ;; ivy mini buffer
   (setq enable-recursive-minibuffers t)
+#+end_src
+
+**** Use Icons
+
+Use icons for ivy. Requires ~all-the-icons~ to be properly installed.
+
+#+begin_src emacs-lisp
+  (when (all-the-icons-installed)
+    (use-package all-the-icons-ivy-rich
+    :ensure t
+    :init (all-the-icons-ivy-rich-mode 1))
+    
+    (use-package ivy-rich
+      :ensure t
+      :init (ivy-rich-mode 1))
+   )
+
+  (setq all-the-icons-ivy-rich-color-icon nil)
 #+end_src
 
 *** Projectile
