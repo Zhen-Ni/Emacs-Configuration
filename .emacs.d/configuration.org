@@ -411,19 +411,44 @@ Please make sure ~all-the-icons~ is properly installed first to enable
 icon display.
 
 #+begin_src emacs-lisp
+  (defun get-project-mode-with-icon ()
+    "Return Project mode string with icon and perserved properties"
+    (when vc-mode
+      (let* ((proj-str (replace-regexp-in-string "^ " "" (project-mode-line-format)))
+  	   (map (get-text-property 1 'local-map proj-str))
+             (mouse (get-text-property 1 'mouse-face proj-str))
+             (icon (propertize
+  		  (if (all-the-icons-installed)
+  		      (concat (all-the-icons-octicon
+  			       "repo"
+                                 :face '(:height 0.95 :family "github-octicons")
+                                 :v-adjust 0.0)
+  			      " ")
+  		    "Proj:")
+                    'local-map map
+                    'mouse-face mouse))
+             )
+        (concat " " icon proj-str)))
+    )
+
   (defun get-vc-mode-with-icon ()
-      "Return VC mode string with icon and perserved properties"
-    (when (and vc-mode (all-the-icons-installed))
+    "Return VC mode string with icon and perserved properties"
+    (when vc-mode
       (let* ((map (get-text-property 1 'local-map vc-mode))
              (mouse (get-text-property 1 'mouse-face vc-mode))
              (icon (propertize
-                    (all-the-icons-octicon "git-branch"
-                                           :face '(:height 1.0 :family "github-octicons")
-                                           :v-adjust 0.0)
+  		  (if (all-the-icons-installed)
+  		      (concat (all-the-icons-octicon
+  			       "git-branch"
+                                 :face '(:height 1.0 :family "github-octicons")
+                                 :v-adjust 0.0)
+  			      " ")
+  		    "Git:")
                     'local-map map
-                    'mouse-face mouse))
+                    'mouse-face mouse)
+  		 )
              (branch (replace-regexp-in-string "^ Git:" "" vc-mode)))
-        (concat " " icon " " branch)))
+        (concat " " icon branch)))
     )
 
   (setq-default mode-line-format
@@ -433,13 +458,15 @@ icon display.
      mode-line-remote mode-line-window-dedicated)
     display (min-width (5.0)))
    mode-line-frame-identification mode-line-buffer-identification "   "
-   mode-line-position (project-mode-line project-mode-line-format)
+   mode-line-position
 
-   ;; The default value of the next block is:
+   ;; The default values for the next block are:
+   ;;(project-mode-line project-mode-line-format)
    ;; (vc-mode vc-mode)
-   ;; I want it to be evaluated online, to avoid out-of-dated version
-   ;; display.
-  (:eval (get-vc-mode-with-icon))
+   ;; I want these to be evaluated online, to avoid out-of-dated version
+   ;; display. 
+   (:eval (get-project-mode-with-icon))
+   (:eval (get-vc-mode-with-icon))
    
    ;;
    "  " mode-line-modes mode-line-misc-info
@@ -466,6 +493,7 @@ configuration.
     (delight 'rainbow-mode nil "rainbow-mode")
     (delight 'company-mode nil "company")
     (delight 'eldoc-mode nil "eldoc")
+    (delight 'projectile-mode nil "projectile")
     (delight 'lsp-mode nil)
     )
 #+end_src
@@ -650,13 +678,16 @@ First make sure it is installed.
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 #+end_src
 
-**** Projectile Mode Line
+**** COMMENT Projectile Mode Line
+
+*Use the built-in project mode line. Projectile mode line is suppressed
+in mode line settings*
 
 Use Abbreviation for `Projectile`.
 
 #+begin_src emacs-lisp
   (setq projectile-mode-line-prefix
-        (if (and nil (all-the-icons-installed))          ;; TO BE FINISHED!!!!
+        (if (and t (all-the-icons-installed))          ;; TO BE FINISHED!!!!
   	  (concat " " (all-the-icons-octicon
   		   "repo"
   		   :face '(:height 1.0 :family "github-octicons")
