@@ -361,19 +361,22 @@ with size 110, and default cjk font is "" with size 22.
 
 Need to run ~all-the-icons-install-fonts~ to install the icons.
 
-Use ~all-the-icons-check-installation~ to check whether ~all-the-icons~
-has been successfully installed.
+Use ~all-the-icons-available~ to check whether ~all-the-icons~ is
+available now.
 
 #+begin_src emacs-lisp
   (use-package all-the-icons :ensure t
     :if (display-graphic-p))
 
-  (defun all-the-icons-installed ()
-    "Check if all-the-icons fonts have been installed."
-    (find-font (font-spec :name "all-the-icons"))
+  (defun all-the-icons-available ()
+    "Check if all-the-icons fonts are available."
+    (if (display-graphic-p)
+        (find-font (font-spec :name "all-the-icons"))
+      nil
+      )
     )
 
-  (unless (all-the-icons-installed)
+  (when (and (not (all-the-icons-available)) (display-graphic-p))
     (message "All the icons requires installation.")
     (all-the-icons-install-fonts)
     )
@@ -419,7 +422,7 @@ icon display.
   	   (map (get-text-property 1 'local-map proj-str))
              (mouse (get-text-property 1 'mouse-face proj-str))
              (icon (propertize
-  		  (if (all-the-icons-installed)
+  		  (if (all-the-icons-available)
   		      (concat (all-the-icons-octicon
   			       "repo"
                                  :face '(:height 0.9 :family "github-octicons")
@@ -438,7 +441,7 @@ icon display.
       (let* ((map (get-text-property 1 'local-map vc-mode))
              (mouse (get-text-property 1 'mouse-face vc-mode))
              (icon (propertize
-  		  (if (all-the-icons-installed)
+  		  (if (all-the-icons-available)
   		      (concat (all-the-icons-octicon
   			       "git-branch"
                                  :face '(:height 0.95 :family "github-octicons")
@@ -536,7 +539,7 @@ function also sets consistent window sizes for all systems.
 Use icons for dired. Requires ~all-the-icons~ to be properly installed.
 
 #+begin_src emacs-lisp
-  (when (all-the-icons-installed)
+  (when (all-the-icons-available)
    (use-package all-the-icons-dired
     :ensure t
     :hook (dired-mode . all-the-icons-dired-mode)
@@ -679,7 +682,7 @@ of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
 Use icons for ivy. Requires ~all-the-icons~ to be properly installed.
 
 #+begin_src emacs-lisp
-  (when (all-the-icons-installed)
+  (when (all-the-icons-available)
     (use-package all-the-icons-ivy-rich
     :ensure t
     :init (all-the-icons-ivy-rich-mode 1))
@@ -721,7 +724,7 @@ Use Abbreviation for `Projectile`.
 
 #+begin_src emacs-lisp
   (setq projectile-mode-line-prefix
-        (if (and t (all-the-icons-installed))          ;; TO BE FINISHED!!!!
+        (if (and t (all-the-icons-available))          ;; TO BE FINISHED!!!!
   	  (concat " " (all-the-icons-octicon
   		   "repo"
   		   :face '(:height 1.0 :family "github-octicons")
