@@ -1422,6 +1422,33 @@ system. Replace it with other symbol.
     )
 #+end_src
 
+****** Lsp Progress Prefix
+
+Set icon for lsp-progress displayed in mode-line, which was originally
+using utf-8 char ~⌛~, and may not be properly displayed on some
+platforms.
+
+#+begin_src emacs-lisp
+  (if (all-the-icons-available)
+      (setq lsp-progress-prefix
+  	  (all-the-icons-faicon "hourglass-half"
+  				:face '(:height 0.9 :family "FontAwesome")
+                                  :v-adjust 0.02))
+    (setq lsp-progress-prefix "")
+    )
+#+end_src
+
+****** Lsp Headerline Arrow
+
+Set icons for lsp headerline arrow. These is to avoid unproper display
+of ">" sign on some platforms.
+
+#+begin_src emacs-lisp
+  (unless (all-the-icons-available)
+    (setq lsp-headerline-arrow " >")
+    )
+#+end_src
+
 **** Lsp-ui
 
 Use ~lsp-ui~, which is an add-in package of ~lsp~.
