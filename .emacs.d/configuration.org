@@ -966,6 +966,14 @@ Bind =M-o= to use ace-window.
   (global-set-key (kbd "C-S-<mouse-1>") 'mc/toggle-cursor-on-click)
 #+end_src
 
+*** Hide Lines
+
+Hide lines using regexp.
+
+#+begin_src emacs-lisp
+  (use-package hide-lines :ensure t)
+#+end_src
+
 *** My Own Functions
 **** Open New Line
 
