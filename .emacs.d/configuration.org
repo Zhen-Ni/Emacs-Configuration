@@ -422,8 +422,8 @@ icon display.
   		  (if (all-the-icons-installed)
   		      (concat (all-the-icons-octicon
   			       "repo"
-                                 :face '(:height 0.95 :family "github-octicons")
-                                 :v-adjust 0.0)
+                                 :face '(:height 0.9 :family "github-octicons")
+                                 :v-adjust 0.02)
   			      " ")
   		    "Proj:")
                     'local-map map
@@ -441,8 +441,8 @@ icon display.
   		  (if (all-the-icons-installed)
   		      (concat (all-the-icons-octicon
   			       "git-branch"
-                                 :face '(:height 1.0 :family "github-octicons")
-                                 :v-adjust 0.0)
+                                 :face '(:height 0.95 :family "github-octicons")
+                                 :v-adjust 0.02)
   			      " ")
   		    "Git:")
                     'local-map map
