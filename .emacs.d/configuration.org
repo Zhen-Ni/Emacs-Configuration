@@ -413,8 +413,9 @@ icon display.
 #+begin_src emacs-lisp
   (defun get-project-mode-with-icon ()
     "Return Project mode string with icon and perserved properties"
-    (when vc-mode
-      (let* ((proj-str (replace-regexp-in-string "^ " "" (project-mode-line-format)))
+    (let ((proj-str-orig (project-mode-line-format)))
+    (when proj-str-orig
+      (let* ((proj-str (replace-regexp-in-string "^ " "" proj-str-orig))
   	   (map (get-text-property 1 'local-map proj-str))
              (mouse (get-text-property 1 'mouse-face proj-str))
              (icon (propertize
@@ -428,7 +429,7 @@ icon display.
                     'local-map map
                     'mouse-face mouse))
              )
-        (concat " " icon proj-str)))
+        (concat " " icon proj-str))))
     )
 
   (defun get-vc-mode-with-icon ()
