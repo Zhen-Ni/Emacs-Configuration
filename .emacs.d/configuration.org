@@ -447,7 +447,7 @@ icon display.
                     'local-map map
                     'mouse-face mouse)
   		 )
-             (branch (replace-regexp-in-string "^ Git:" "" vc-mode)))
+             (branch (replace-regexp-in-string "^ Git[:\\-]" "" vc-mode)))
         (concat " " icon branch)))
     )
 
