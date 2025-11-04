@@ -534,19 +534,6 @@ function also sets consistent window sizes for all systems.
   (setq default-frame-alist '((height . 32) (width . 80)))
 #+end_src
 
-** Dired
-
-Use icons for dired. Requires ~all-the-icons~ to be properly installed.
-
-#+begin_src emacs-lisp
-  (when (all-the-icons-available)
-   (use-package all-the-icons-dired
-    :ensure t
-    :hook (dired-mode . all-the-icons-dired-mode)
-    )
-   )
-#+end_src
-
 * Editor
 ** Scrolling
 
@@ -582,6 +569,20 @@ Use "TeX" as default input method.
 
 #+begin_src emacs-lisp
   (setq default-input-method "TeX")
+#+end_src
+
+** Tools
+*** Dired
+
+Use icons for dired. Requires ~all-the-icons~ to be properly installed.
+
+#+begin_src emacs-lisp
+  (when (all-the-icons-available)
+   (use-package all-the-icons-dired
+    :ensure t
+    :hook (dired-mode . all-the-icons-dired-mode)
+    )
+   )
 #+end_src
 
 ** Default Modes
