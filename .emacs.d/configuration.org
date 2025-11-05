@@ -94,17 +94,18 @@ Add melpa to package management system.
 
 *** Use use-package
 
-Since version 29, ~use-package~ has been built into Emacs. However, we
-still need to make sure =use-package= is installed in the first place
-for older versions.
+Since version 29, ~use-package~ has been built into Emacs.
+
+For any reasons if =use-package= needs installation, the following code
+can be used.
 
 #+begin_src emacs-lisp
-    (unless (package-installed-p 'use-package)
-      (package-install 'use-package))
+  ;; (unless (package-installed-p 'use-package)
+  ;;   (package-install 'use-package))
 #+end_src
 
-This package is essential for installing other packages. Otherwise,
-can use `(setq package-check-signature nil)` as a solution. See [[https://elpa.gnu.org/packages/gnu-elpa-keyring-update.html][this
+Package ~keyring~ is essential for installing other packages. Otherwise, can
+use `(setq package-check-signature nil)` as a solution. See [[https://elpa.gnu.org/packages/gnu-elpa-keyring-update.html][this
 page]]. Here, a temporarily solution is provided by disabling signature
 check, which is given by [[https://stackoverflow.com/questions/78381013/failed-to-verify-signature-archive-contents-sig-problem-with-emacs][stackoverflow]].
 #+begin_src emacs-lisp
@@ -753,14 +754,6 @@ to enable it manually following [[https://docs.projectile.mx/projectile/configur
 
 #+begin_src emacs-lisp
   (setq projectile-completion-system 'ivy)
-#+end_src
-
-*** COMMENT Eglot
-
-Install eglot automatically. This is built into Emacs since version 29.
-
-#+begin_src emacs-lisp
-  (use-package eglot :ensure t :no-require t)
 #+end_src
 
 *** Marginalia
