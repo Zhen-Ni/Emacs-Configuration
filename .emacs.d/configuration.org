@@ -1434,7 +1434,7 @@ platforms.
   (if (all-the-icons-available)
       (setq lsp-progress-prefix
   	  (all-the-icons-faicon "hourglass-half"
-  				:face '(:height 0.9 :family "FontAwesome")
+  				:face '(:height 0.8 :family "FontAwesome")
                                   :v-adjust 0.02))
     (setq lsp-progress-prefix "")
     )
