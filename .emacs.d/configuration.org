@@ -1569,13 +1569,16 @@ one.
 
 ****** Code Action Icon
 
-The original icon 💡 cannot be displayed properly on windows
-system. Replace it with other symbol.
+The original icon 💡 cannot be displayed properly on some
+systems. Replace it with other symbol.
 
 #+begin_src emacs-lisp
-  (when (eq 'windows-nt system-type)
-    (setq lsp-modeline-code-action-fallback-icon "!")
-    )
+  ;; Do not use the light-bulb icon provided by lsp as the default one
+  ;; is too large.
+  (setq lsp-modeline-code-action-icons-enable nil)
+
+  (setq lsp-modeline-code-actions-segments '(icon count))
+  (setq lsp-modeline-code-action-fallback-icon "!")
 #+end_src
 
 ****** Lsp Progress Prefix
