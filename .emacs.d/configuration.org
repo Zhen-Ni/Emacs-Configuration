@@ -404,116 +404,6 @@ Show line numbers on the left of the window.
   (global-linum-mode t)
 #+end_src
 
-**** Mode line
-***** Mode Line Format
-
-Define the mode-line style.
-
-Currently, using git icon to replace vc-mode display.
-
-Please make sure ~all-the-icons~ is properly installed first to enable
-icon display.
-
-#+begin_src emacs-lisp
-  (defun get-project-mode-with-icon ()
-    "Return Project mode string with icon and perserved properties"
-    (let ((proj-str-orig (project-mode-line-format)))
-    (when proj-str-orig
-      (let* ((proj-str (replace-regexp-in-string "^ " "" proj-str-orig))
-  	   (map (get-text-property 1 'local-map proj-str))
-             (mouse (get-text-property 1 'mouse-face proj-str))
-             (icon (propertize
-  		  (if (all-the-icons-available)
-  		      (concat (all-the-icons-octicon
-  			       "repo"
-                                 :face '(:height 0.9 :family "github-octicons")
-                                 :v-adjust 0.02)
-  			      " ")
-  		    "Proj:")
-                    'local-map map
-                    'mouse-face mouse))
-             )
-        (concat " " icon proj-str))))
-    )
-
-  (defun get-vc-mode-with-icon ()
-    "Return VC mode string with icon and perserved properties"
-    (when vc-mode
-      (let* ((map (get-text-property 1 'local-map vc-mode))
-             (mouse (get-text-property 1 'mouse-face vc-mode))
-             (icon (propertize
-  		  (if (all-the-icons-available)
-  		      (concat (all-the-icons-octicon
-  			       "git-branch"
-                                 :face '(:height 0.95 :family "github-octicons")
-                                 :v-adjust 0.02)
-  			      " ")
-  		    "Git:")
-                    'local-map map
-                    'mouse-face mouse)
-  		 )
-             (branch (replace-regexp-in-string "^ Git[:\\-]" "" vc-mode)))
-        (concat " " icon branch)))
-    )
-
-  (setq-default mode-line-format
-  '("%e" mode-line-front-space
-   (:propertize
-    ("" mode-line-mule-info mode-line-client mode-line-modified
-     mode-line-remote mode-line-window-dedicated)
-    display (min-width (5.0)))
-   mode-line-frame-identification mode-line-buffer-identification "   "
-   mode-line-position
-
-   ;; The default values for the next block are:
-   ;;(project-mode-line project-mode-line-format)
-   ;; (vc-mode vc-mode)
-   ;; I want these to be evaluated online, to avoid out-of-dated version
-   ;; display. 
-   (:eval (get-project-mode-with-icon))
-   (:eval (get-vc-mode-with-icon))
-   
-   ;;
-   "  " mode-line-modes mode-line-misc-info
-   mode-line-end-spaces)
-  )
-#+end_src
-
-***** Hide Unnecessarily Displayed Modes
-
-To hide the minor mode displays in the mode line. Some modes cannot be
-simply hided using ~delight~ package, such as ~projectile~ due to its
-dynamic parameters, which will be handled seperately in the mode's
-configuration.
-
-#+begin_src emacs-lisp
-  (use-package delight
-    :ensure t
-    :config
-    (delight 'highlight-indentation-mode nil "highlight-indentation")
-    (delight 'rainbow-mode nil "rainbow")
-    (delight 'page-break-lines-mode nil "page-break-lines")
-    (delight 'lsp-lens-mode nil "lsp-lens")
-    (delight 'yas-minor-mode nil "yasnippet")
-    (delight 'rainbow-mode nil "rainbow-mode")
-    (delight 'company-mode nil "company")
-    (delight 'eldoc-mode nil "eldoc")
-    (delight 'projectile-mode nil "projectile")
-    (delight 'lsp-mode nil)
-    )
-#+end_src
-
-***** COMMENT Hide All Minor Modes
-#+begin_src emacs-lisp
-  (use-package minions
-    :ensure t
-    :config
-    (setq minions-prominent-modes '(eldoc-mode company-mode rainbow-mode yas-minor-mode))
-    (setq minions-mode-line-lighter "+")
-    (minions-mode 1)
-    )
-#+end_src
-
 *** Window Split
 
 Window split threshold. If the width of the frame is less than
@@ -687,7 +577,7 @@ Use icons for ivy. Requires ~all-the-icons~ to be properly installed.
     (use-package all-the-icons-ivy-rich
     :ensure t
     :init (all-the-icons-ivy-rich-mode 1))
-    
+
     (use-package ivy-rich
       :ensure t
       :init (ivy-rich-mode 1))
@@ -740,7 +630,7 @@ Use Abbreviation for `Projectile`.
   	     (or project-name "-")
   	     "]"
   	     )))
-    
+
   ;; Hide project type by self-defined mode line funciton.
   (setq projectile-mode-line-function #'projectile-simplified-mode-line)
 #+end_src
@@ -765,7 +655,6 @@ Marginalia in the minibuffer. [[https://github.com/minad/marginalia][Marginalia 
 #+end_src
 
 *** Flycheck
-
 
 Enable Flycheck mode by default.
 
@@ -1032,6 +921,272 @@ Yank the previous kill. This is equivalent to =M-- M-y=.
       (yank-pop (- arg)))
 
     (global-set-key "\C-\M-Y" 'yank-pop-reversed)
+#+end_src
+
+** Mode line Format
+*** Mode Line Format
+
+Define the mode-line style.
+
+Please make sure ~all-the-icons~ is properly installed first to enable
+icon display.
+
+**** Syntax Checker Mode Line
+
+Use flycheck for syntax checking and display the result in the mode
+line.
+
+#+begin_src emacs-lisp
+  (if (all-the-icons-available)
+      (progn
+        (setq flycheck-warning-icon
+  	    (all-the-icons-faicon "exclamation-triangle"
+  				  :face 'warning :height 0.8 :v-adjust 0.0))
+        (setq flycheck-error-icon
+  	    (all-the-icons-faicon "times-circle"
+  				  :face 'error :height 0.8 :v-adjust 0.0))
+        (setq flycheck-check-passed-icon
+  	    (all-the-icons-faicon "check-circle"
+  				  :height 0.8 :v-adjust 0.0))
+        (setq flycheck-checking-icon
+  	    (all-the-icons-faicon "spinner"
+  				  :height 0.8 :v-adjust 0.0))
+        (setq flycheck-suspicious-icon
+  	    (all-the-icons-faicon "question"
+  				  :height 0.8 :v-adjust 0.0))
+        (setq flycheck-exclamation-icon
+  	    (all-the-icons-faicon "exclamation"
+  				  :height 0.8 :v-adjust 0.0))
+        (setq flycheck-no-checker-icon
+  	    (all-the-icons-faicon "minus-circle"
+  				  :height 0.8 :v-adjust 0.0))
+        (setq flycheck-not-checked-icon
+  	    (all-the-icons-faicon "minus-circle"
+  				  :face 'shadow :height 0.8 :v-adjust 0.0))
+        (setq flycheck-interrupted-icon
+  	    (all-the-icons-faicon "circle-o"
+  				  :height 0.8 :v-adjust 0.0))
+        )
+    (setq flycheck-warning-icon (propertize "!" 'face 'warning))
+    (setq flycheck-error-icon (propertize "×" 'face 'error))
+    (setq flycheck-check-passed-icon "√")
+    (setq flycheck-checking-icon "...")
+    (setq flycheck-suspicious-icon "?")
+    (setq flycheck-exclamation-icon "!")
+    (setq flycheck-no-checker-icon "-")
+    (setq flycheck-not-checked-icon (propertize "-" 'face 'shadow))
+    (setq flycheck-interrupted-icon "o")
+    )
+
+  (defun flycheck-popup-menu ()
+    "The popup window for flycheck in mode-line."
+    (interactive)
+    (let ((menu
+           (list "Syntax checking"
+                 (vector "Turn on/off syntax checker"
+                         #'flycheck-mode
+                         )
+  	       "--"
+                 (vector "Check current buffer"
+                         #'flycheck-buffer
+                         (not (not (and flycheck-mode
+  				      (flycheck-get-checker-for-buffer)))))
+  	       "--"
+                 (vector "Go to previous error"
+                         #'flycheck-previous-error
+                         (flycheck-has-current-errors-p))
+                 (vector "Go to next error"
+                         #'flycheck-next-error
+                         (flycheck-has-current-errors-p))
+                 (vector "Show all errors"
+                         #'flycheck-list-errors
+                         (flycheck-has-current-errors-p))
+                 (vector "Explain error at point"
+                         #'flycheck-explain-error-at-point
+                         (flycheck-has-current-errors-p))
+  	       )))
+      (popup-menu menu)))
+
+  (defun get-flycheck-mode-line-with-icon ()
+    "Display the flycheck status."
+    (let* ((current-status flycheck-last-status-change)
+           (indicator
+  	  (pcase current-status
+              (`not-checked flycheck-not-checked-icon)
+              (`no-checker flycheck-no-checker-icon)
+              (`running flycheck-checking-icon)
+              (`errored flycheck-exclamation-icon)
+              (`finished
+               (let-alist (flycheck-count-errors flycheck-current-errors)
+  	       (if (and .error .warning)
+  		   (format "%s%s %s%s"
+  			   flycheck-error-icon .error
+  			   flycheck-warning-icon .warning)
+  		 (if .error
+  		     (format "%s%s" flycheck-error-icon .error)
+  		   (if .warning
+  		       (format "%s%s" flycheck-warning-icon .warning)
+  		     flycheck-check-passed-icon
+  		     )))))
+              (`interrupted flycheck-interrupted-icon)
+              (`suspicious flycheck-suspicious-icon)))
+  	 (status-message
+  	  (pcase current-status
+  	    (`not-checked "not checked")
+  	    (`no-checker "no checker")
+  	    (`running "checking")
+  	    (`errored "checker error")
+  	    (`finished
+  	     (let-alist (flycheck-count-errors flycheck-current-errors)
+  	       (format "finished - errors: %s, warnings: %s"
+  		       (or .error 0) (or .warning 0))))
+  	    (`interrupted "interrupted")
+  	    (`suspicious "suspicious")))
+           (text (format "%3s" indicator))
+  	 (map (let ((m (make-sparse-keymap)))
+                  (define-key m [mode-line mouse-1] #'flycheck-popup-menu)
+                  m)))
+      (propertize text
+                  'mouse-face 'mode-line-highlight
+                  'help-echo (format "Syntax checking status\n"
+  				   "%s\n"
+  				   "mouse-1: Syntax checker menu"
+  				   status-message)
+  		'local-map map
+  		)))
+#+end_src
+
+**** Project Mode Line
+
+Set project mode display function in mode line.
+
+#+begin_src emacs-lisp
+  (setq project-mode-icon
+        (if (all-the-icons-available)
+  	  (concat (all-the-icons-octicon
+  		   "repo"
+  		   :face '(:height 0.9 :family "github-octicons")
+  		   :v-adjust 0.02)
+  		  " ")
+  	"Proj:"))
+
+  (defun get-project-mode-with-icon ()
+    "Return Project mode string with icon and perserved properties"
+    (let ((proj-str-orig (project-mode-line-format)))
+    (when proj-str-orig
+      (let* ((proj-str (replace-regexp-in-string "^ " "" proj-str-orig))
+  	   (map (get-text-property 1 'local-map proj-str))
+             (mouse (get-text-property 1 'mouse-face proj-str))
+  	   (echo (get-text-property 1 'help-echo proj-str))
+             (icon (propertize
+  		  project-mode-icon
+                    'local-map map
+                    'mouse-face mouse
+  		  'help-echo echo))
+             )
+        (concat " " icon proj-str))))
+    )
+#+end_src
+
+**** Version Control Mode Line
+
+Set version control display function in mode line.
+
+Currently, using git icon to replace vc-mode display.
+
+#+begin_src emacs-lisp
+  (setq vc-mode-git-icon
+        (if (all-the-icons-available)
+  	  (concat (all-the-icons-octicon
+  		   "git-branch"
+                     :face '(:height 0.95 :family "github-octicons")
+                     :v-adjust 0.02)
+  		  " ")
+  		    "Git:"))
+
+  (defun get-vc-mode-with-icon ()
+    "Return VC mode string with icon and perserved properties"
+    (when vc-mode
+      (let* ((map (get-text-property 1 'local-map vc-mode))
+             (mouse (get-text-property 1 'mouse-face vc-mode))
+  	   (echo (get-text-property 1 'help-echo vc-mode))
+             (icon (propertize
+  		  vc-mode-git-icon
+                    'local-map map
+                    'mouse-face mouse
+  		  'help-echo echo)
+  		 )
+             (branch (replace-regexp-in-string "^ Git[:\\-]" "" vc-mode)))
+        (concat " " icon branch)))
+    )
+#+end_src
+
+**** Mode Line Content
+
+Set mode line format.
+
+#+begin_src emacs-lisp
+  (setq-default mode-line-format
+  '("%e" mode-line-front-space
+   (:propertize
+    ("" mode-line-mule-info mode-line-client mode-line-modified
+     mode-line-remote mode-line-window-dedicated)
+    display (min-width (5.0)))
+   mode-line-frame-identification mode-line-buffer-identification "  "
+
+   mode-line-position
+
+   ;; Add information for syntax checking.
+   (:eval (get-flycheck-mode-line-with-icon)) " "
+
+   ;; The default values for the next block are:
+   ;;(project-mode-line project-mode-line-format)
+   ;; (vc-mode vc-mode)
+   ;; I want these to be evaluated online, to avoid out-of-dated version
+   ;; display.
+   (:eval (get-vc-mode-with-icon))
+   (:eval (get-project-mode-with-icon))
+   ;;
+
+   "  " mode-line-modes mode-line-misc-info
+   mode-line-end-spaces)
+  )
+#+end_src
+
+*** Hide Unnecessarily Displayed Modes
+
+To hide the minor mode displays in the mode line. Some modes cannot be
+simply hided using ~delight~ package, such as ~projectile~ due to its
+dynamic parameters, which will be handled seperately in the mode's
+configuration.
+
+#+begin_src emacs-lisp
+  (use-package delight
+    :ensure t
+    :config
+    (delight 'highlight-indentation-mode nil "highlight-indentation")
+    (delight 'rainbow-mode nil "rainbow")
+    (delight 'page-break-lines-mode nil "page-break-lines")
+    (delight 'lsp-lens-mode nil "lsp-lens")
+    (delight 'yas-minor-mode nil "yasnippet")
+    (delight 'rainbow-mode nil "rainbow-mode")
+    (delight 'company-mode nil "company")
+    (delight 'eldoc-mode nil "eldoc")
+    (delight 'projectile-mode nil "projectile")
+    (delight 'flycheck-mode nil "flycheck")
+    (delight 'lsp-mode nil)
+    )
+#+end_src
+
+*** COMMENT Hide All Minor Modes
+#+begin_src emacs-lisp
+  (use-package minions
+    :ensure t
+    :config
+    (setq minions-prominent-modes '(eldoc-mode company-mode rainbow-mode yas-minor-mode))
+    (setq minions-mode-line-lighter "+")
+    (minions-mode 1)
+    )
 #+end_src
 
 ** Backup Setting
