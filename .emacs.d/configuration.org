@@ -554,14 +554,13 @@ Preserve cursor point when scrolling.
 
 *** COMMENT Language Coding System
 
-Setting the languate environment to utf-8 to avoid some
-encoding problems. For example, if not set, elpy do not work
-well with windows system when utf-8 characters are used in
-the buffer. Note that this setting might screw up some
-language environments. See [[https://github.com/jorgenschaefer/elpy/issues/1729#issuecomment-558204483][github issue]].
+Set prefered coding system to ~utf-8~. Note that
+~(set-language-environment "UTF-8")~ is not used because it may ruin
+some environments, such as aidermacs.
 
 #+begin_src emacs-lisp
-  (set-language-environment "UTF-8")
+  ;; (set-language-environment "UTF-8")
+  (prefer-coding-system 'utf-8)
 #+end_src
 
 *** Input Method
