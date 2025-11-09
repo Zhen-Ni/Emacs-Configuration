@@ -1581,8 +1581,9 @@ systems. Replace it with other symbol.
   (setq lsp-modeline-code-action-fallback-icon "Hints")
 
   (custom-set-faces
-    '(lsp-modeline-code-actions-face
-       ((t :inherit mode-line))))
+   '(lsp-modeline-code-actions-face
+     ((((active)) :inherit mode-line)
+      (t :inherit mode-line-inactive))))
 #+end_src
 
 ****** Lsp Progress Prefix
