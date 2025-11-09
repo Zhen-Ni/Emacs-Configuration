@@ -315,47 +315,52 @@ systems, The following code do nothing if font attribute are set to
 with size 110, and default cjk font is "" with size 22.
 
 #+begin_src emacs-lisp :var conf-table=conf-table
-  (let ((font (get-conf! "font"))
-        (font-size (get-conf! "font-size"))
-        (cjk-font (get-conf! "cjk-font"))
-        (cjk-font-size (get-conf! "cjk-font-size"))
-        )
-    (when (eq 'windows-nt system-type)
-      (if (equal font "default")
-          (setq font "Consolas"))
-      (if (equal font-size "default")
-          (setq font-size 11))
-      (if (equal cjk-font "default")
-          (setq cjk-font ""))
-      (if (equal cjk-font-size "default")
-          (setq cjk-font-size 22))
-      )
-    (unless (equal font "default")
-      (set-face-attribute 'default nil :font font)
-      (set-face-attribute 'fixed-pitch nil :font font))
-    (unless (equal font-size "default")
-      (set-face-attribute 'default nil
-                          :height (* font-size 10))
-      (set-face-attribute 'fixed-pitch nil
-                          :height (* font-size 10)))
+   (let ((font (get-conf! "font"))
+         (font-size (get-conf! "font-size"))
+         (cjk-font (get-conf! "cjk-font"))
+         (cjk-font-size (get-conf! "cjk-font-size"))
+         )
+     (when (eq 'windows-nt system-type)
+       (if (equal font "default")
+           (setq font "Consolas"))
+       (if (equal font-size "default")
+           (setq font-size 11))
+       (if (equal cjk-font "default")
+           (setq cjk-font ""))
+       (if (equal cjk-font-size "default")
+           (setq cjk-font-size 22))
+       )
+     (unless (equal font "default")
+       (set-face-attribute 'default nil :font font)
+       (set-face-attribute 'fixed-pitch nil :font font))
+     (unless (equal font-size "default")
+       (set-face-attribute 'default nil
+                           :height (* font-size 10))
+       (set-face-attribute 'fixed-pitch nil
+                           :height (* font-size 10)))
 
-  ;; Apply the setting only in a window system, as setting the
-  ;; following fonts in terminal may fail.
-  (if (window-system)
-      (dolist (charset '(kana han cjk-misc bopomofo))
-        (set-fontset-font
-         (frame-parameter nil 'font)
-         charset
-         (font-spec
-          :family (if (equal cjk-font "default")
-                      nil cjk-font)
-          :size (if (equal cjk-font-size "default")
-                    nil cjk-font-size)
+   ;; Apply the setting only in a window system, as setting the
+   ;; following fonts in terminal may fail.
+   (if (window-system)
+       (dolist (charset '(kana han cjk-misc bopomofo))
+         (set-fontset-font
+          (frame-parameter nil 'font)
+          charset
+          (font-spec
+           :family (if (equal cjk-font "default")
+                       nil cjk-font)
+           :size (if (equal cjk-font-size "default")
+                     nil cjk-font-size)
+           )
           )
          )
-        )
+     )
+   )
+
+  ;; Set fallback fonts for windows GUI.
+  (when (and (window-system) (eq system-type 'windows-nt))
+    (set-fontset-font t 'unicode "Segoe UI Symbol" nil 'append)
     )
-  )
 #+end_src
 
 *** All the Icons
@@ -1308,16 +1313,15 @@ Use Org superstar mode.
 I'd like something fancy instead of the ellipsis (...) that org
 displays when there's staff under a header. The arrow symbol is
 found from [[https://unicode-table.com/en/sets/arrow-symbols/][Unicode Character Table]].
-Due to the limitation of font set, this only works for the X11
-window.
+
+This feature will only be enabled if the desired character is
+displayable in the current environment.
 
 #+begin_src emacs-lisp
-  (if (eq (window-system) 'x)
-      (progn
-        (setq org-ellipsis "..⤸")
-        (set-face-underline 'org-ellipsis nil)
-        (set-face-bold 'org-ellipsis t))
-    )
+  (when (char-displayable-p ?⤸)
+    (setq org-ellipsis "..⤸")
+    (set-face-underline 'org-ellipsis nil)
+    (set-face-bold 'org-ellipsis t))
 #+end_src
 
 *** "TODO" List Setting
@@ -1598,7 +1602,10 @@ platforms.
   	  (all-the-icons-faicon "hourglass-half"
   				:face '(:height 0.8 :family "FontAwesome")
                                   :v-adjust 0.02))
-    (setq lsp-progress-prefix "")
+    (if (char-displayable-p ?⌛)
+        (setq lsp-progress-prefix "⌛")
+      (setq lsp-progress-prefix "")
+      )
     )
 #+end_src
 
