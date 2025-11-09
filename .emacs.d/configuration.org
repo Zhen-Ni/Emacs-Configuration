@@ -1153,7 +1153,7 @@ Set mode line format.
   )
 #+end_src
 
-*** Hide Unnecessarily Displayed Modes
+*** COMMENT Hide Unnecessarily Displayed Modes
 
 To hide the minor mode displays in the mode line. Some modes cannot be
 simply hided using ~delight~ package, such as ~projectile~ due to its
@@ -1178,13 +1178,13 @@ configuration.
     )
 #+end_src
 
-*** COMMENT Hide All Minor Modes
+*** Hide All Minor Modes
 #+begin_src emacs-lisp
   (use-package minions
     :ensure t
     :config
-    (setq minions-prominent-modes '(eldoc-mode company-mode rainbow-mode yas-minor-mode))
-    (setq minions-mode-line-lighter "+")
+    (setq minions-prominent-modes '())
+    (setq minions-mode-line-lighter "Modes")
     (minions-mode 1)
     )
 #+end_src
@@ -1577,8 +1577,12 @@ systems. Replace it with other symbol.
   ;; is too large.
   (setq lsp-modeline-code-action-icons-enable nil)
 
-  (setq lsp-modeline-code-actions-segments '(icon count))
-  (setq lsp-modeline-code-action-fallback-icon "!")
+  (setq lsp-modeline-code-actions-segments '(icon))
+  (setq lsp-modeline-code-action-fallback-icon "Hints")
+
+  (custom-set-faces
+    '(lsp-modeline-code-actions-face
+       ((t :inherit mode-line))))
 #+end_src
 
 ****** Lsp Progress Prefix
