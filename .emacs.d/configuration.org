@@ -1191,7 +1191,8 @@ configuration.
     :ensure t
     :config
     (setq minions-prominent-modes '())
-    (setq minions-mode-line-lighter "☰")
+    (setq minions-mode-line-lighter
+  	(if (char-displayable-p ?☰) "☰" "Modes"))
     (minions-mode 1)
     )
 #+end_src
@@ -1584,7 +1585,8 @@ systems. Replace it with other symbol.
   (setq lsp-modeline-code-action-icons-enable nil)
 
   (setq lsp-modeline-code-actions-segments '(icon))
-  (setq lsp-modeline-code-action-fallback-icon "💡")
+  (setq lsp-modeline-code-action-fallback-icon
+        (if (char-displayable-p ?💡) "💡" "Hints"))
 
   (custom-set-faces
    '(lsp-modeline-code-actions-face
