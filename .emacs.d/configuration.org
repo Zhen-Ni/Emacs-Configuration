@@ -449,7 +449,7 @@ Preserve cursor point when scrolling.
 
 ** Multilingual Environment
 
-*** COMMENT Language Coding System
+*** Language Coding System
 
 Set prefered coding system to ~utf-8~. Note that
 ~(set-language-environment "UTF-8")~ is not used because it may ruin
