@@ -18,7 +18,6 @@ blocks in this file.
 | font               | default |                            |
 | font-size          | 16      | font height in units of pt |
 | cjk-font           | default |                            |
-| cjk-font-size      | 38      | font height in units of pt |
 | python-interpreter | default | default for auto-detection |
 | longitude          | 121     | calendar-longitude         |
 | latitude           | 31      | calendar-latitude          |
@@ -312,7 +311,7 @@ sun sets.
 The settings of the fonts are provided in Table [[conf-table]]. On Linux
 systems, The following code do nothing if font attribute are set to
 "default". On Windows systems, The default font is set to "Consolas"
-with size 110, and default cjk font is "微软雅黑" with size 250.
+with size 110, and default cjk font is "微软雅黑".
 
 #+begin_src emacs-lisp :var conf-table=conf-table
    (let ((font (get-conf! "font"))
@@ -327,8 +326,6 @@ with size 110, and default cjk font is "微软雅黑" with size 250.
            (setq font-size 11))
        (if (equal cjk-font "default")
            (setq cjk-font "微软雅黑"))
-       (if (equal cjk-font-size "default")
-           (setq cjk-font-size 25))
        )
      (unless (equal font "default")
        (set-face-attribute 'default nil :font font)
@@ -349,8 +346,6 @@ with size 110, and default cjk font is "微软雅黑" with size 250.
           (font-spec
            :family (if (equal cjk-font "default")
                        nil cjk-font)
-           :size (if (equal cjk-font-size "default")
-                     nil cjk-font-size)
            )
           )
          )
