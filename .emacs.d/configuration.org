@@ -1482,23 +1482,17 @@ by function =advice-add= (see [[https://emacs.stackexchange.com/a/41250/38157][t
 
 In Emacs, =prog-mode= is the base mode for programming.
 
-*** Shortcuts
-**** Hungry delete
+*** Minor mode settings
+**** Hs Minor Mode
 
-Use hungry delete from c-mode by using prefix "C-c".
+Enable ~hs-minor-mode~ for all prog modes. Use ~C-`~ for toggle hiding.
 
 #+begin_src emacs-lisp
-  (add-hook 'prog-mode-hook
-            (lambda () (local-set-key
-                        (kbd "C-c <backspace>")
-                        'c-hungry-delete-backwards)))
-  (add-hook 'prog-mode-hook
-            (lambda () (local-set-key
-                        (kbd "C-c <delete>")
-                        'c-hungry-delete-forward)))
+  (add-hook 'prog-mode-hook #'hs-minor-mode)
+  (with-eval-after-load 'hideshow
+    (define-key hs-minor-mode-map (kbd "C-`") #'hs-toggle-hiding))
 #+end_src
 
-*** Minor mode settings
 **** Lsp
 ***** Installation
 
@@ -1618,7 +1612,6 @@ of ">" sign on some platforms.
     (setq lsp-headerline-arrow " >")
     )
 #+end_src
-
 **** Lsp-ui
 
 Use ~lsp-ui~, which is an add-in package of ~lsp~.
@@ -1645,6 +1638,22 @@ Use Dap-mode for debugging. This mode is relient on ~lsp-mode~. See
   ;; Enabling only some features
   (setq dap-auto-configure-features '(sessions locals controls tooltip))
 
+#+end_src
+
+*** Shortcuts
+**** Hungry delete
+
+Use hungry delete from c-mode by using prefix "C-c".
+
+#+begin_src emacs-lisp
+  (add-hook 'prog-mode-hook
+            (lambda () (local-set-key
+                        (kbd "C-c <backspace>")
+                        'c-hungry-delete-backwards)))
+  (add-hook 'prog-mode-hook
+            (lambda () (local-set-key
+                        (kbd "C-c <delete>")
+                        'c-hungry-delete-forward)))
 #+end_src
 
 ** Lisp Mode
@@ -1980,6 +1989,69 @@ are used for Linux and windows systems.
     ;; For Windows system.
     (setq flycheck-python-mypy-cache-dir "C:/cache/.mypy_cache/")
     )
+#+end_src
+
+**** Hs Minor Mode
+
+Use ~S-<tab>~ for Org-style folding.
+
+#+begin_src emacs-lisp
+  (defvar hs-toggle-state 'hide-all "Record python block hide-show status.")
+
+  (defun python-hs-outline ()
+    "Only show function and class declarations in Python (hide their bodies)."
+    (interactive)
+    (hs-show-all)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "^\\s-*\\(def\\|class\\)\\s-+" nil t)
+        (let ((ppss (syntax-ppss)))
+          ;; Rule out `def/class` in docstrings.
+          (unless (nth 4 ppss)
+            (beginning-of-line)
+            (hs-hide-block)
+            (forward-line 1)))))
+    (message "Showing Python outline"))
+
+  (defun python-hs-all ()
+    "Show everything in Python buffer."
+    (interactive)
+    (hs-show-all)
+    (message "Showing all blocks")
+    )
+
+  (defun python-hs-top-level ()
+    "Show only top-level Python function and class declarations."
+    (interactive)
+    (hs-hide-all)
+    (message "Hiding all blocks")
+    )
+
+  (defun python-hs-toggle ()
+    "Toggle Hide-show status in Python.
+  If called multiple times, the status will switch between `hide-all`,
+  `show-outline`, `show-all`."
+    (interactive)
+    (unless (eq last-command 'python-hs-toggle)
+      (setq hs-toggle-state 'hide-all)
+      )
+    (cond
+     ((eq hs-toggle-state 'hide-all)
+      (python-hs-top-level)
+      (setq hs-toggle-state 'outline))
+     ((eq hs-toggle-state 'outline)
+      (python-hs-outline)
+      (setq hs-toggle-state 'show-all))
+     ((eq hs-toggle-state 'show-all)
+      (python-hs-all)
+      (setq hs-toggle-state 'hide-all))
+     )
+    )
+
+  (add-hook 'python-mode-hook
+            (lambda () (local-set-key
+                        (kbd "C-<tab>")
+                        'python-hs-toggle)))
 #+end_src
 
 **** LSP
