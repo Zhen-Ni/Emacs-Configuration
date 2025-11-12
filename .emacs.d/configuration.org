@@ -1485,12 +1485,51 @@ In Emacs, =prog-mode= is the base mode for programming.
 *** Minor mode settings
 **** Hs Minor Mode
 
-Enable ~hs-minor-mode~ for all prog modes. Use ~C-`~ for toggle hiding.
+***** Enabler
+
+Enable ~hs-minor-mode~ for all prog modes.
 
 #+begin_src emacs-lisp
   (add-hook 'prog-mode-hook #'hs-minor-mode)
+#+end_src
+
+***** Toggle Hidding Shortcut
+
+Use ~C-`~ for toggle hiding.
+
+#+begin_src emacs-lisp
   (with-eval-after-load 'hideshow
-    (define-key hs-minor-mode-map (kbd "C-`") #'hs-toggle-hiding))
+      (define-key hs-minor-mode-map (kbd "C-`") #'hs-toggle-hiding))
+#+end_src
+
+***** Code Folding Shortcut
+
+Use ~S-<tab>~ for Org-style folding.
+
+#+begin_src emacs-lisp
+  (defvar-local hs-toggle-state 'hide-all "Record block hide-show status.")
+
+  (defun hs-toggle-buffer ()
+    "Toggle Hide-show status in the current buffer.
+  The status will switch between `hide-all`, `show-all`."
+    (interactive)
+    (unless (eq last-command 'hs-toggle-buffer)
+      (setq hs-toggle-state 'hide-all)
+      )
+    (cond
+     ((eq hs-toggle-state 'hide-all)
+      (hs-hide-all)
+      (setq hs-toggle-state 'show-all))
+     ((eq hs-toggle-state 'show-all)
+      (hs-show-all)
+      (setq hs-toggle-state 'hide-all))
+     )
+    )
+
+  (add-hook 'prog-mode-hook
+            (lambda () (local-set-key
+                        (kbd "C-<tab>")
+                        'hs-toggle-buffer)))
 #+end_src
 
 **** Lsp
@@ -1996,7 +2035,7 @@ are used for Linux and windows systems.
 Use ~S-<tab>~ for Org-style folding.
 
 #+begin_src emacs-lisp
-  (defvar hs-toggle-state 'hide-all "Record python block hide-show status.")
+  (defvar-local hs-toggle-state 'hide-all "Record python block hide-show status.")
 
   (defun python-hs-outline ()
     "Only show function and class declarations in Python (hide their bodies)."
