@@ -2050,28 +2050,30 @@ Use ~S-<tab>~ for Org-style folding.
             (beginning-of-line)
             (hs-hide-block)
             (forward-line 1)))))
-    (message "Showing Python outline"))
+    (message "Show Python outline"))
 
   (defun python-hs-all ()
     "Show everything in Python buffer."
     (interactive)
     (hs-show-all)
-    (message "Showing all blocks")
+    (message "Show all blocks")
     )
 
   (defun python-hs-top-level ()
     "Show only top-level Python function and class declarations."
     (interactive)
-    (hs-hide-all)
-    (message "Hiding all blocks")
+    (save-excursion
+      (goto-char (point-min))
+      (hs-hide-level 0))
+    (message "Hide all blocks")
     )
 
-  (defun python-hs-toggle ()
+  (defun python-hs-toggle-buffer ()
     "Toggle Hide-show status in Python.
   If called multiple times, the status will switch between `hide-all`,
   `show-outline`, `show-all`."
     (interactive)
-    (unless (eq last-command 'python-hs-toggle)
+    (unless (eq last-command 'python-hs-toggle-buffer)
       (setq hs-toggle-state 'hide-all)
       )
     (cond
@@ -2090,7 +2092,7 @@ Use ~S-<tab>~ for Org-style folding.
   (add-hook 'python-mode-hook
             (lambda () (local-set-key
                         (kbd "C-<tab>")
-                        'python-hs-toggle)))
+                        'python-hs-toggle-buffer)))
 #+end_src
 
 **** LSP
