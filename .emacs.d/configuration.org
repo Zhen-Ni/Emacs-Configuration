@@ -1641,7 +1641,15 @@ platforms.
     )
 #+end_src
 
-****** Lsp Headerline Arrow
+***** Headerline
+
+****** Turn off Lsp Headerline by Default
+
+#+begin_src emacs-lisp
+  (setq lsp-headerline-breadcrumb-enable nil)
+#+end_src
+
+****** Lsp Headerline Arror
 
 Set icons for lsp headerline arrow. These is to avoid unproper display
 of ">" sign on some platforms.
@@ -1651,6 +1659,7 @@ of ">" sign on some platforms.
     (setq lsp-headerline-arrow " >")
     )
 #+end_src
+
 **** Lsp-ui
 
 Use ~lsp-ui~, which is an add-in package of ~lsp~.
