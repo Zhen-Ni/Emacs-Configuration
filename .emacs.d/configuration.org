@@ -1050,10 +1050,11 @@ line.
                   m)))
       (propertize text
                   'mouse-face 'mode-line-highlight
-                  'help-echo (format "Syntax checking status\n"
-  				   "%s\n"
+                  'help-echo (concat "Syntax checking status\n"
+  				   status-message
+  				   "\n"
   				   "mouse-1: Syntax checker menu"
-  				   status-message)
+  				   )
   		'local-map map
   		)))
 #+end_src
