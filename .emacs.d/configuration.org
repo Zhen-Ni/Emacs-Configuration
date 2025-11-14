@@ -1485,13 +1485,28 @@ In Emacs, =prog-mode= is the base mode for programming.
 
 *** Minor mode settings
 **** Hs Minor Mode
-
 ***** Enabler
 
 Enable ~hs-minor-mode~ for all prog modes.
 
 #+begin_src emacs-lisp
   (add-hook 'prog-mode-hook #'hs-minor-mode)
+#+end_src
+***** Overlay Style
+
+Show different fonts for overlay.
+
+#+begin_src emacs-lisp
+  (defun hs-display-overlay (ov)
+    "Display custom indicator for hidden code indicated by OV."
+    (when (eq 'code (overlay-get ov 'hs))
+      (let* ((nlines (count-lines (overlay-start ov) (overlay-end ov)))
+             (info (propertize (format " ... ")
+  			     'face
+  			     'org-ellipsis)))
+        (overlay-put ov 'display info))))
+
+  (setq hs-set-up-overlay #'hs-display-overlay)
 #+end_src
 
 ***** Toggle Hidding Shortcut
@@ -2041,6 +2056,7 @@ are used for Linux and windows systems.
 #+end_src
 
 **** Hs Minor Mode
+***** Org-style Folding
 
 Use ~S-<tab>~ for Org-style folding.
 
@@ -2103,6 +2119,32 @@ Use ~S-<tab>~ for Org-style folding.
             (lambda () (local-set-key
                         (kbd "C-<tab>")
                         'python-hs-toggle-buffer)))
+#+end_src
+
+***** Overlay Style
+
+Use org-ellipsis than vanilla "..." for hided text, and show line numbers.
+
+One of the reasons is the default symbol ~...~ may lead to ambiguity in
+python, so a different representation shall be used.
+
+#+begin_src emacs-lisp
+  (defun python-hs-display-code-line-counts (ov)
+    "Display custom indicator for hidden code indicated by OV."
+    (when (eq 'code (overlay-get ov 'hs))
+      (let* ((nlines (- (count-lines (overlay-start ov) (overlay-end ov)) 1))
+             (info (propertize (format " %s [%d %s]"
+  				     org-ellipsis
+  				     nlines
+  				     (if (eq nlines 1) "line" "lines"))
+  			     'face
+  			     'org-ellipsis)))
+        (overlay-put ov 'display info))))
+
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (setq-local hs-set-up-overlay
+                          #'python-hs-display-code-line-counts)))
 #+end_src
 
 **** LSP
