@@ -2148,13 +2148,18 @@ python, so a different representation shall be used.
   (defun python-hs-display-code-line-counts (ov)
     "Display custom indicator for hidden code indicated by OV."
     (when (eq 'code (overlay-get ov 'hs))
-      (let* ((nlines (- (count-lines (overlay-start ov) (overlay-end ov)) 1))
-             (info (propertize (format " %s [%d %s]"
-  				     org-ellipsis
-  				     nlines
-  				     (if (eq nlines 1) "line" "lines"))
-  			     'face
-  			     'org-ellipsis)))
+      (let* ((ellipsis-str (format " %s " org-ellipsis))
+  	   (nlines (- (count-lines (overlay-start ov) (overlay-end ov)) 1))
+  	   (line-count-str (format "[%d %s]"
+  				   nlines
+  				   (if (eq nlines 1) "line" "lines")))
+             (info (concat (propertize ellipsis-str
+  				     'face
+  				     'org-ellipsis)
+  			 (propertize line-count-str
+  				     'face
+  				     '(:height 0.8 :inherit shadow))
+  			 )))
         (overlay-put ov 'display info))))
 
   (add-hook 'python-mode-hook
