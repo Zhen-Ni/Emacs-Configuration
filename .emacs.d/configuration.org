@@ -1408,6 +1408,20 @@ Do not re-execute the source code blocks during export.
   (setq org-export-babel-evaluate nil)
 #+end_src
 
+*** Keybindings
+
+Use ~C-<tab>~ for toggle hiding of the buffer, ~C-~`~ for toggle the
+current block. This is to achieve consistent experience with
+~hs-toggle-buffer~ and ~hs-toggle-hidding~ function.
+
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (define-key org-mode-map (kbd "C-<tab>") #'org-cycle-global)
+              (define-key org-mode-map (kbd "C-`") #'org-cycle)
+  	    ))
+#+end_src
+
 *** Troubleshooting
 **** COMMENT Indentation
 
@@ -1704,7 +1718,7 @@ Use Dap-mode for debugging. This mode is relient on ~lsp-mode~. See
 
 #+end_src
 
-*** Shortcuts
+*** Keybindings
 **** Hungry delete
 
 Use hungry delete from c-mode by using prefix "C-c".
