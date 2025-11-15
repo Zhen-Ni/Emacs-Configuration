@@ -1317,10 +1317,12 @@ This feature will only be enabled if the desired character is
 displayable in the current environment.
 
 #+begin_src emacs-lisp
-  (when (char-displayable-p ?⤸)
-    (setq org-ellipsis "..⤸")
+  (if (char-displayable-p ?⤸)
+      (setq org-ellipsis "..⤸")
+    (setq org-ellipsis "...")
+    )
     (set-face-underline 'org-ellipsis nil)
-    (set-face-bold 'org-ellipsis t))
+    (set-face-bold 'org-ellipsis t)
 #+end_src
 
 *** "TODO" List Setting
