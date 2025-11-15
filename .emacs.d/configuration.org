@@ -1317,12 +1317,17 @@ This feature will only be enabled if the desired character is
 displayable in the current environment.
 
 #+begin_src emacs-lisp
-  (if (char-displayable-p ?⤸)
-      (setq org-ellipsis "..⤸")
-    (setq org-ellipsis "...")
-    )
-    (set-face-underline 'org-ellipsis nil)
-    (set-face-bold 'org-ellipsis t)
+  ;; I'd like to use a fancy symbol, such as "..⤸" for folded code. However,
+  ;; org-ellipsis font fails to fallback when fringe display is enableb.
+  ;; (e.g., diff-hl-mode). 
+  ;; (if (char-displayable-p ?⤸)
+  ;;     (setq org-ellipsis "..⤸")
+  ;;   (setq org-ellipsis "...")
+  ;;   )
+
+  (setq org-ellipsis " <···> ")
+  (set-face-underline 'org-ellipsis nil)
+  (set-face-bold 'org-ellipsis t)
 #+end_src
 
 *** "TODO" List Setting
@@ -1516,8 +1521,9 @@ Show different fonts for overlay.
   (defun hs-display-overlay (ov)
     "Display custom indicator for hidden code indicated by OV."
     (when (eq 'code (overlay-get ov 'hs))
-      (let* ((nlines (count-lines (overlay-start ov) (overlay-end ov)))
-             (info (propertize (format " ... ")
+      (let* ((ellipsis "...")
+  	   (nlines (count-lines (overlay-start ov) (overlay-end ov)))
+             (info (propertize (format " %s " ellipsis)
   			     'face
   			     'org-ellipsis)))
         (overlay-put ov 'display info))))
@@ -2139,7 +2145,7 @@ Use ~S-<tab>~ for Org-style folding.
 
 ***** Overlay Style
 
-Use org-ellipsis than vanilla "..." for hided text, and show line numbers.
+Use special ellipsis than vanilla "..." for hided text, and show line counts.
 
 One of the reasons is the default symbol ~...~ may lead to ambiguity in
 python, so a different representation shall be used.
@@ -2148,7 +2154,7 @@ python, so a different representation shall be used.
   (defun python-hs-display-code-line-counts (ov)
     "Display custom indicator for hidden code indicated by OV."
     (when (eq 'code (overlay-get ov 'hs))
-      (let* ((ellipsis-str (format " %s " org-ellipsis))
+      (let* ((ellipsis-str (format " %s " (if (char-displayable-p ?⤸) "..⤸" "...")))
   	   (nlines (- (count-lines (overlay-start ov) (overlay-end ov)) 1))
   	   (line-count-str (format "[%d %s]"
   				   nlines
