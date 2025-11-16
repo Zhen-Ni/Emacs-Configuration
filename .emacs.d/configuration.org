@@ -1325,7 +1325,10 @@ displayable in the current environment.
   ;;   (setq org-ellipsis "...")
   ;;   )
 
-  (setq org-ellipsis " <···> ")
+  (if (char-displayable-p ?·) ; `·` should be in most fonts
+      (setq org-ellipsis " <···> ")
+    (setq org-ellipsis " <...> ")
+    )
   (set-face-underline 'org-ellipsis nil)
   (set-face-bold 'org-ellipsis t)
 #+end_src
@@ -1520,13 +1523,12 @@ Show different fonts for overlay.
 #+begin_src emacs-lisp
   (defun hs-display-overlay (ov)
     "Display custom indicator for hidden code indicated by OV."
-    (when (eq 'code (overlay-get ov 'hs))
-      (let* ((ellipsis "...")
+      (let* ((ellipsis (if (char-displayable-p ?·) "···" "..."))
   	   (nlines (count-lines (overlay-start ov) (overlay-end ov)))
              (info (propertize (format " %s " ellipsis)
   			     'face
   			     'org-ellipsis)))
-        (overlay-put ov 'display info))))
+        (overlay-put ov 'display info)))
 
   (setq hs-set-up-overlay #'hs-display-overlay)
 #+end_src
@@ -1798,7 +1800,8 @@ Press ~<f5>~ to save all buffers and run the region or buffer.
 *** Basic Settings
 **** COMMENT Use MELPA python-mode
 
-*This mode is disabled because of too many inconsistent behaviors with the built-in one.*
+*This mode is disabled because of too many inconsistent behaviors with
+the built-in one.*
 
 ***** Setup
 
@@ -2072,9 +2075,11 @@ are used for Linux and windows systems.
 #+begin_src emacs-lisp
   (if (eq 'gnu/linux system-type)
       ;; For Linux system.
-      (setq flycheck-python-mypy-cache-dir "/home/collie/.emacs_backups/.mypy_cache/")
+      (setq flycheck-python-mypy-cache-dir
+  	  "/home/collie/.emacs_backups/.mypy_cache/")
     ;; For Windows system.
-    (setq flycheck-python-mypy-cache-dir "C:/cache/.mypy_cache/")
+    (setq flycheck-python-mypy-cache-dir
+  	"C:/cache/.mypy_cache/")
     )
 #+end_src
 
@@ -2084,7 +2089,8 @@ are used for Linux and windows systems.
 Use ~S-<tab>~ for Org-style folding.
 
 #+begin_src emacs-lisp
-  (defvar-local hs-toggle-state 'hide-all "Record python block hide-show status.")
+  (defvar-local hs-toggle-state 'hide-all
+    "Record python block hide-show status.")
 
   (defun python-hs-outline ()
     "Only show function and class declarations in Python (hide their bodies)."
@@ -2146,7 +2152,8 @@ Use ~S-<tab>~ for Org-style folding.
 
 ***** Overlay Style
 
-Use special ellipsis than vanilla "..." for hided text, and show line counts.
+Use special ellipsis than vanilla "..." for hided text, and show line
+counts.
 
 One of the reasons is the default symbol ~...~ may lead to ambiguity in
 python, so a different representation shall be used.
@@ -2154,20 +2161,22 @@ python, so a different representation shall be used.
 #+begin_src emacs-lisp
   (defun python-hs-display-code-line-counts (ov)
     "Display custom indicator for hidden code indicated by OV."
-    (when (eq 'code (overlay-get ov 'hs))
-      (let* ((ellipsis-str (format " %s " (if (char-displayable-p ?⤸) "..⤸" "...")))
-  	   (nlines (- (count-lines (overlay-start ov) (overlay-end ov)) 1))
-  	   (line-count-str (format "[%d %s]"
-  				   nlines
-  				   (if (eq nlines 1) "line" "lines")))
-             (info (concat (propertize ellipsis-str
-  				     'face
-  				     'org-ellipsis)
-  			 (propertize line-count-str
-  				     'face
-  				     '(:height 0.8 :inherit shadow))
-  			 )))
-        (overlay-put ov 'display info))))
+    (let* ((ellipsis-str
+  	  (format " %s " (if (and (char-displayable-p ?⤸)
+  				  (char-displayable-p ?·))
+  			     "··⤸" "...")))
+  	 (nlines (- (count-lines (overlay-start ov) (overlay-end ov)) 1))
+  	 (line-count-str (format "[%d %s]"
+  				 nlines
+  				 (if (eq nlines 1) "line" "lines")))
+           (info (concat (propertize ellipsis-str
+  				   'face
+  				   'org-ellipsis)
+  		       (propertize line-count-str
+  				   'face
+  				   '(:height 0.8 :inherit shadow))
+  		       )))
+      (overlay-put ov 'display info)))
 
   (add-hook 'python-mode-hook
             (lambda ()
@@ -2195,9 +2204,11 @@ package to install first to enable the lsp mypy checker.
   (setq lsp-pylsp-plugins-mypy-enabled t)
   (if (eq 'gnu/linux system-type)
       ;; For Linux system.
-      (setq lsp-pylsp-plugins-mypy-overrides [t "--cache-dir=/home/collie/.emacs_backups/.mypy_cache/"])
+      (setq lsp-pylsp-plugins-mypy-overrides
+  	  [t "--cache-dir=/home/collie/.emacs_backups/.mypy_cache/"])
     ;; For Windows system.
-    (setq lsp-pylsp-plugins-mypy-overrides [t "--cache-dir=C:/cache/.mypy_cache/"])
+    (setq lsp-pylsp-plugins-mypy-overrides
+  	[t "--cache-dir=C:/cache/.mypy_cache/"])
     )
 #+end_src
 
@@ -2256,7 +2267,8 @@ Navigation functions taken from ~elpy~.
 ***** Shift Left-and-right
 #+begin_src emacs-lisp
   (defun elpy-nav-normalize-region ()
-    "If the first or last line are not fully selected, select them completely."
+    "If the first or last line are not fully selected, select them
+  completely."
     (let ((beg (region-beginning))
           (end (region-end)))
       (goto-char beg)
@@ -2275,8 +2287,10 @@ Navigation functions taken from ~elpy~.
     (if (use-region-p)
         (progn
           (elpy-nav-normalize-region)
-          (python-indent-shift-right (region-beginning) (region-end) current-prefix-arg))
-      (python-indent-shift-right (line-beginning-position) (line-end-position) current-prefix-arg)))
+          (python-indent-shift-right
+  	 (region-beginning) (region-end) current-prefix-arg))
+      (python-indent-shift-right
+       (line-beginning-position) (line-end-position) current-prefix-arg)))
 
   (defun elpy-nav-indent-shift-left (&optional _count)
     "Shift current line by COUNT columns to the left.
@@ -2287,8 +2301,10 @@ Navigation functions taken from ~elpy~.
     (if (use-region-p)
         (progn
           (elpy-nav-normalize-region)
-          (python-indent-shift-left (region-beginning) (region-end) current-prefix-arg))
-      (python-indent-shift-left (line-beginning-position) (line-end-position) current-prefix-arg)))
+          (python-indent-shift-left
+  	 (region-beginning) (region-end) current-prefix-arg))
+      (python-indent-shift-left
+       (line-beginning-position) (line-end-position) current-prefix-arg)))
 #+end_src
 
 ***** Shift Up-and-down
