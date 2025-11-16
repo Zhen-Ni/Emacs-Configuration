@@ -1652,12 +1652,13 @@ systems. Replace it with other symbol.
 
   (setq lsp-modeline-code-actions-segments '(icon))
   (setq lsp-modeline-code-action-fallback-icon
-        (if (char-displayable-p ?💡) "💡" "Hints"))
+        (if (char-displayable-p ?✨) "✨" "Hints"))
 
-  (custom-set-faces
-   '(lsp-modeline-code-actions-face
-     ((((active)) :inherit mode-line)
-      (t :inherit mode-line-inactive))))
+  ;; Clear lsp-modeline-code-actions-face.
+  (with-eval-after-load 'lsp-mode
+    (custom-set-faces
+     '(lsp-modeline-code-actions-face
+       ((t)))))
 #+end_src
 
 ****** Lsp Progress Prefix
