@@ -2582,6 +2582,32 @@ this [[https://github.com/jorgenschaefer/elpy/issues/1729#issuecomment-558204483
   ;;              '("flake8" . (utf-8 . utf-8)))
 #+end_src
 
+**** Python Lsp
+
+Pylsp becomes very slow when dealing with large libraries such as
+Transformers, which can cause Emacs to freeze. Use Pyright instead if
+~pyrightconfig.json~ can be found in the path. See setup instructions on
+[[https://emacs-lsp.github.io/lsp-pyright/][this site]].
+
+#+begin_src emacs-lisp
+  (use-package lsp-pyright
+  :ensure t)
+
+  (defun python-select-lsp ()
+    "Choose between pylsp and pyright for python lsp."
+    (if (and (locate-dominating-file default-directory "pyrightconfig.json")
+  	   (executable-find "pyright-langserver"))
+        (progn
+  	(setq-local lsp-disabled-clients '(pylsp))
+          (require 'lsp-pyright)
+          (lsp-deferred))
+      (setq-local lsp-disabled-clients '(pyright))
+      (lsp-deferred))
+    )
+
+  (add-hook 'python-mode-hook #'python-select-lsp)
+#+end_src
+
 **** COMMENT Flycheck Issues
 
 /As now switched to lsp, this issue no longer exsits./
