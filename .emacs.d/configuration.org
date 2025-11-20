@@ -1849,7 +1849,6 @@ The ~py-fill-paragraph~, which is binded to ~M-Q~ by setting
 #+end_src
 
 **** Python Interpreter Setting
-
 ***** Default Setting
 
 Switch python backend given in configuration table.
@@ -2588,10 +2587,7 @@ this [[https://github.com/jorgenschaefer/elpy/issues/1729#issuecomment-558204483
 
 **** Python Lsp
 
-Pylsp becomes very slow when dealing with large libraries such as
-Transformers, which can cause Emacs to freeze. Use Pyright instead if
-~pyrightconfig.json~ can be found in the path. See setup instructions on
-[[https://emacs-lsp.github.io/lsp-pyright/][this site]].
+Pylsp becomes very slow when dealing with large libraries such as Transformers, which can cause Emacs to freeze. Use Pyright instead. See setup instructions on [[https://emacs-lsp.github.io/lsp-pyright/][this site]].
 
 #+begin_src emacs-lisp
   (use-package lsp-pyright
@@ -2963,6 +2959,13 @@ Edit QT QML code.
   (use-package qml-mode
     :ensure t
     :mode "\\.qml\\'")
+#+end_src
+
+Use space for indentation.
+
+#+begin_src emacs-lisp
+  (add-hook 'qml-mode-hook
+            (lambda () (setq indent-tabs-mode nil)))
 #+end_src
 
 * Not Only an Editor
