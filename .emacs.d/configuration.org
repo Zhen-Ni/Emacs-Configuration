@@ -769,7 +769,7 @@ Setup ~diff-hl-dired-mode~.
 #+end_src
 
 ** Functions and Key Bindings
-*** Default Functoins
+*** Upcase and Downcase Region
 
 Upcase and downcase region.
 
@@ -925,7 +925,19 @@ Yank the previous kill. This is equivalent to =M-- M-y=.
     (global-set-key "\C-\M-Y" 'yank-pop-reversed)
 #+end_src
 
-** Mode line Format
+**** Set Buffer Directory
+
+Set default path to current project root.
+
+#+begin_src emacs-lisp
+  (defun project-set-default-directory ()
+    "Set working directory to project root."
+    (let ((project-root (projectile-project-root)))
+      (when project-root
+        (setq-local default-directory project-root))))
+#+end_src
+
+** Mode Line Format
 *** Mode Line Format
 
 Define the mode-line style.
@@ -1975,13 +1987,7 @@ Run python with echo in the python shell.
 Set python default path to current project root.
 
 #+begin_src emacs-lisp
-  (defun python-set-project-root ()
-    "Set Python working directory to project root."
-    (let ((project-root (projectile-project-root)))
-      (when project-root
-        (setq-local default-directory project-root))))
-
-  (add-hook 'python-mode-hook #'python-set-project-root)
+  (add-hook 'python-mode-hook #'project-set-default-directory)
 #+end_src
 
 *** Minor Mode Settings
@@ -2951,7 +2957,9 @@ detailed discussion can be found on [[https://tony-zorman.com/posts/fixing-lsp-m
   )
 #+end_src
 
-** QML Mode
+** Qml Mode
+*** Basic Settings
+**** Qml Mode
 
 Edit QT QML code.
 
@@ -2960,6 +2968,16 @@ Edit QT QML code.
     :ensure t
     :mode "\\.qml\\'")
 #+end_src
+
+**** Default Path
+Set qml default path to current project root.
+
+#+begin_src emacs-lisp
+  (add-hook 'qml-mode-hook #'project-set-default-directory)
+#+end_src
+
+*** Minor Mode Settings
+**** Indentation
 
 Use space for indentation.
 
