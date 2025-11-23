@@ -403,7 +403,7 @@ I'd like to turn off menu, tool and scroll bar.
 Show line numbers on the left of the window.
 
 #+begin_src emacs-lisp
-  (global-linum-mode t)
+  (global-display-line-numbers-mode t)
 #+end_src
 
 *** Window Split
