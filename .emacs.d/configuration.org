@@ -507,6 +507,14 @@ somewhere else.
   (setq global-auto-revert-non-file-buffers t)
 #+end_src
 
+**** Which Key Mode
+
+Enable ~which-key-mode~ by default.
+
+#+begin_src emacs-lisp
+  (which-key-mode t)
+#+end_src
+
 **** COMMENT Delete Selection Mode
 
 +Delete the selected region if text entered.+ Disabled.
