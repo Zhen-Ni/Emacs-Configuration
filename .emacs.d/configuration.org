@@ -933,18 +933,6 @@ Yank the previous kill. This is equivalent to =M-- M-y=.
     (global-set-key "\C-\M-Y" 'yank-pop-reversed)
 #+end_src
 
-**** Set Buffer Directory
-
-Set default path to current project root.
-
-#+begin_src emacs-lisp
-  (defun project-set-default-directory ()
-    "Set working directory to project root."
-    (let ((project-root (projectile-project-root)))
-      (when project-root
-        (setq-local default-directory project-root))))
-#+end_src
-
 ** Mode Line Format
 *** Mode Line Format
 
@@ -1990,14 +1978,6 @@ Run python with echo in the python shell.
   )
 #+end_src
 
-**** Python Default Path
-
-Set python default path to current project root.
-
-#+begin_src emacs-lisp
-  (add-hook 'python-mode-hook #'project-set-default-directory)
-#+end_src
-
 *** Minor Mode Settings
 
 Choose between either elpy or lsp. Since the developement of elpy is
@@ -2434,7 +2414,9 @@ These are the helper functions.
 
   (defun python-run-buffer-or-selected-region-helper (&optional send-main)
     "Run the current buffer or the selected region."
-    (run-python)
+    (let ((default-directory (or (projectile-project-root) default-directory)))
+      (run-python)
+      )
     (python-check-shell-ready)
     (if (use-region-p)
         (python-shell-send-region-with-echo (region-beginning) (region-end))
@@ -2551,6 +2533,7 @@ test the whole project.
     (let* ((file (buffer-file-name))
            (func (python-info-current-defun))
            (project-root (projectile-project-root))
+  	 (default-directory (or project-root default-directory))
            (relative-path (file-relative-name file project-root))
            (module-path (replace-regexp-in-string "/" "." (file-name-sans-extension relative-path)))
            (test-target
@@ -2967,7 +2950,6 @@ detailed discussion can be found on [[https://tony-zorman.com/posts/fixing-lsp-m
 
 ** Qml Mode
 *** Basic Settings
-**** Qml Mode
 
 Edit QT QML code.
 
@@ -2975,13 +2957,6 @@ Edit QT QML code.
   (use-package qml-mode
     :ensure t
     :mode "\\.qml\\'")
-#+end_src
-
-**** Default Path
-Set qml default path to current project root.
-
-#+begin_src emacs-lisp
-  (add-hook 'qml-mode-hook #'project-set-default-directory)
 #+end_src
 
 *** Minor Mode Settings
@@ -2992,6 +2967,44 @@ Use space for indentation.
 #+begin_src emacs-lisp
   (add-hook 'qml-mode-hook
             (lambda () (setq indent-tabs-mode nil)))
+#+end_src
+
+*** Functions and Keybindings
+**** Make from Project Root
+
+Press ~[f9]~ for compiling in project root using makefile.
+
+#+begin_src emacs-lisp
+  (defun make-from-project-root ()
+    "Run makefile from project root without confirmation."
+    (interactive)
+    (let ((default-directory (or (projectile-project-root default-directory))))
+      (compile "make -k")
+      )
+    )
+
+  (add-hook 'qml-mode-hook
+            (lambda () (local-set-key (kbd "C-<f9>")
+                                      'make-from-project-root)))
+#+end_src
+
+**** Save and Make from Project Root
+
+Press ~[f5]~ for saving and compiling in project root.
+
+#+begin_src emacs-lisp
+  (defun save-and-make-from-project-root ()
+    "Save all buffers and run makefile from project root without confirmation."
+    (interactive)
+    (save-some-buffers '(4))
+    (let ((default-directory (or (projectile-project-root default-directory))))
+      (compile "make -k")
+      )
+    )
+
+  (add-hook 'qml-mode-hook
+            (lambda () (local-set-key (kbd "C-<f9>")
+                                      'save-and-make-from-project-root)))
 #+end_src
 
 * Not Only an Editor
