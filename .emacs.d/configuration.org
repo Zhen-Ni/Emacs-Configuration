@@ -2984,7 +2984,7 @@ Press ~[f9]~ for compiling in project root using makefile.
     )
 
   (add-hook 'qml-mode-hook
-            (lambda () (local-set-key (kbd "C-<f9>")
+            (lambda () (local-set-key [f9]
                                       'make-from-project-root)))
 #+end_src
 
@@ -3003,7 +3003,7 @@ Press ~[f5]~ for saving and compiling in project root.
     )
 
   (add-hook 'qml-mode-hook
-            (lambda () (local-set-key (kbd "C-<f9>")
+            (lambda () (local-set-key [f5]
                                       'save-and-make-from-project-root)))
 #+end_src
 
