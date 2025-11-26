@@ -2968,6 +2968,20 @@ Use space for indentation.
   (add-hook 'qml-mode-hook
             (lambda () (setq indent-tabs-mode nil)))
 #+end_src
+**** Lsp
+
+Lsp mode settings for ~qml-mode~.
+
+#+begin_src emacs-lisp
+  ;; Set path for qmlls executable.
+  (setq qml-lsp-client-path "qmlls")
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection '(qml-lsp-client-path))
+    :major-modes '(qml-mode)
+    :server-id 'qmlls))
+#+end_src
 
 *** Functions and Keybindings
 **** Make from Project Root
