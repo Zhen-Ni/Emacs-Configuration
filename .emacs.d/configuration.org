@@ -204,12 +204,15 @@ is modified from [[https://stackoverflow.com/a/14760833/2731421][this answer on 
   ;; information.
 
   (setq current-theme nil)
+  (setq theme-light 'tango)
+  (setq theme-dark 'tango-dark)
+
 
   (defun synchronize-theme-helper (new-theme)
     "Set the current theme to new-theme."
     (if (equal current-theme new-theme) ()
       (disable-theme current-theme)
-      (load-theme new-theme)
+      (load-theme new-theme t)
       (setq current-theme new-theme)
       ))
 
@@ -218,8 +221,8 @@ is modified from [[https://stackoverflow.com/a/14760833/2731421][this answer on 
     (let ((hour (string-to-number
                  (substring (current-time-string) 11 13))))
       (if (member hour (number-sequence 8 17))
-          (synchronize-theme-helper 'tango)
-        (synchronize-theme-helper 'tango-dark)
+          (synchronize-theme-helper 'theme-light)
+        (synchronize-theme-helper 'theme-dark)
         )
       ))
 
@@ -236,17 +239,19 @@ is modified from [[https://stackoverflow.com/a/14760833/2731421][this answer on 
 
 *** Set by Sunrise and Sunset Time Automatically
 
-Color theme is =tango= when sun rises and =tango-dark= when
+Use light theme when sun rises and dark theme when
 sun sets.
 
 #+begin_src emacs-lisp :var conf-table=conf-table
   (setq current-theme nil)
+  (setq theme-light 'tango)
+  (setq theme-dark 'tango-dark)
 
   (defun change-theme (new-theme)
     "Set the current theme to new-theme."
     (unless (equal current-theme new-theme)
       (disable-theme current-theme)
-      (load-theme new-theme)
+      (load-theme new-theme t)
       (setq current-theme new-theme)
       ))
 
@@ -286,11 +291,11 @@ sun sets.
       (setq sunrise-minute (string-to-number (pop solar-str)))
       (setq sunset-hour (+ (string-to-number (pop solar-str)) 12))
       (setq sunset-minute (string-to-number (pop solar-str)))
-      (if (<  (minute-in-day sunrise-hour sunrise-minute)
-              (minute-in-day hour minute)
-              (minute-in-day sunset-hour sunset-minute))
-          (change-theme 'tango)
-        (change-theme 'tango-dark)
+      (if (< (minute-in-day sunrise-hour sunrise-minute)
+             (minute-in-day hour minute)
+             (minute-in-day sunset-hour sunset-minute))
+          (change-theme theme-light)
+        (change-theme theme-dark)
         )
       ))
 
@@ -303,6 +308,36 @@ sun sets.
 
   ;; Check every minute.
   (run-with-timer 0 60 'synchronize-theme)
+#+end_src
+
+*** Set Theme Pairs
+
+User can set theme pairs interactively.
+
+#+begin_src emacs-lisp
+  (use-package solarized-theme :ensure t)
+
+  (defun set-theme ()
+    "Interactively set Emacs theme pairs based on contrast level: 'high' or 'medium'."
+    (interactive)
+    (let ((choice (completing-read "Choose contrast level (high/medium/low): " '("high" "medium" "low") nil t)))
+      (cond
+       ((string= choice "high")
+        (setq theme-light 'modus-operandi-tinted)
+        (setq theme-dark 'modus-vivendi-tinted)
+        (message "Loaded high contrast theme: modus"))
+       ((string= choice "medium")
+        (setq theme-light 'tango)
+        (setq theme-dark 'tango-dark)
+        (message "Loaded medium contrast theme: tango"))
+       ((string= choice "low")
+        (setq theme-light 'solarized-light)
+        (setq theme-dark 'solarized-dark)
+        (message "Loaded medium contrast theme: tango"))
+       (t
+        (message "Invalid choice: %s" choice)))
+      (synchronize-theme)
+      ))
 #+end_src
 
 ** Fonts
