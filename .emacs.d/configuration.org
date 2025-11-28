@@ -3013,7 +3013,7 @@ Lsp mode settings for ~qml-mode~.
 
   (lsp-register-client
    (make-lsp-client
-    :new-connection (lsp-stdio-connection '(qml-lsp-client-path))
+    :new-connection (lsp-stdio-connection (list qml-lsp-client-path))
     :major-modes '(qml-mode)
     :server-id 'qmlls))
 #+end_src
