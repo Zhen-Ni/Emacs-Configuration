@@ -570,16 +570,6 @@ Enable recentf mode and save recent opened files every 5 minutes.
                (lambda () (silent-forward! recentf-save-list)))
 #+end_src
 
-*** Auto Complete
-
-Use Company mode for auto-completion.
-
-#+begin_src emacs-lisp
-  ;; First make sure it is installed.
-  (use-package company :ensure t)
-  (global-company-mode 1)
-#+end_src
-
 *** Yasnippet
 
 Always turn yasnippet mode on.
@@ -1547,6 +1537,18 @@ by function =advice-add= (see [[https://emacs.stackexchange.com/a/41250/38157][t
 In Emacs, =prog-mode= is the base mode for programming.
 
 *** Minor mode settings
+**** Company Mode
+
+Use Company mode for auto-completion.
+
+Please note ~company-mode~ in ~python-shell~ would lead to undefined behavior for ~input()~ function in ~python~. Only activate this mode for ~prog-mode~.
+
+#+begin_src emacs-lisp
+  ;; First make sure it is installed.
+  (use-package company :ensure t)
+  (add-hook 'prog-mode-hook #'company-mode)
+#+end_src
+
 **** Hs Minor Mode
 ***** Enabler
 
