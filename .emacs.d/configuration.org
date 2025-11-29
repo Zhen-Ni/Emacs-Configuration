@@ -259,12 +259,12 @@ sun sets.
     ;; Reference: https://emacs.stackexchange.com/a/7150
     "Return a list of all regexp matches in a string."
     (reverse
-    (let ((pos 0)
-          matches)
-      (while (string-match pattern string pos)
-        (push (match-string 0 string) matches)
-        (setq pos (match-end 0)))
-      matches)))
+     (let ((pos 0)
+           matches)
+       (while (string-match pattern string pos)
+         (push (match-string 0 string) matches)
+         (setq pos (match-end 0)))
+       matches)))
 
   (defun minute-in-day (hour minute)
     "Get time in units of minute during a day."
@@ -299,15 +299,9 @@ sun sets.
         )
       ))
 
-  ;; Although (run-with-timer) can set the theme automatically
-  ;; after initializaion of emacs, we would like the set the
-  ;; theme at startup before loading other packages like
-  ;; org-indent mode so that these modes can corrently set the
-  ;; style according to the active theme.
-  (synchronize-theme)
-
-  ;; Check every minute.
-  (run-with-timer 0 60 'synchronize-theme)
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (run-with-timer 0 60 #'synchronize-theme)))
 #+end_src
 
 *** Set Theme Pairs
@@ -317,25 +311,27 @@ User can set theme pairs interactively.
 #+begin_src emacs-lisp
   (use-package solarized-theme :ensure t)
 
-  (defun set-theme ()
-    "Interactively set Emacs theme pairs based on contrast level: 'high' or 'medium'."
+  (defun theme-set ()
+    "Interactively set Emacs theme pairs."
     (interactive)
-    (let ((choice (completing-read "Choose contrast level (high/medium/low): " '("high" "medium" "low") nil t)))
+    (let ((choice (completing-read
+  		 "Choose contrast level (modus/tango/solarized): "
+  		 '("modus" "tango" "solarized") nil t)))
       (cond
-       ((string= choice "high")
+       ((string= choice "modus")
         (setq theme-light 'modus-operandi-tinted)
-        (setq theme-dark 'modus-vivendi-tinted)
-        (message "Loaded high contrast theme: modus"))
-       ((string= choice "medium")
+        (setq theme-dark 'modus-vivendi-tinted))
+       ((string= choice "tango")
         (setq theme-light 'tango)
-        (setq theme-dark 'tango-dark)
-        (message "Loaded medium contrast theme: tango"))
-       ((string= choice "low")
+        (setq theme-dark 'tango-dark))
+       ((string= choice "solarized")
         (setq theme-light 'solarized-light)
-        (setq theme-dark 'solarized-dark)
-        (message "Loaded medium contrast theme: tango"))
+        (setq theme-dark 'solarized-dark))
        (t
         (message "Invalid choice: %s" choice)))
+      (customize-save-variable 'theme-light theme-light)
+      (customize-save-variable 'theme-dark theme-dark)
+      (message (format "Loaded theme: %s" choice))
       (synchronize-theme)
       ))
 #+end_src
