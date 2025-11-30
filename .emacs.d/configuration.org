@@ -309,24 +309,22 @@ sun sets.
 User can set theme pairs interactively.
 
 #+begin_src emacs-lisp
-  (use-package solarized-theme :ensure t)
-
   (defun theme-set ()
     "Interactively set Emacs theme pairs."
     (interactive)
     (let ((choice (completing-read
-  		 "Choose contrast level (modus/tango/solarized): "
-  		 '("modus" "tango" "solarized") nil t)))
+  		 "Choose contrast level (modus/modus-tinted/tango): "
+  		 '("modus" "modus-tinted" "tango") nil t)))
       (cond
        ((string= choice "modus")
+        (setq theme-light 'modus-operandi)
+        (setq theme-dark 'modus-vivendi))
+       ((string= choice "modus-tinted")
         (setq theme-light 'modus-operandi-tinted)
         (setq theme-dark 'modus-vivendi-tinted))
        ((string= choice "tango")
         (setq theme-light 'tango)
         (setq theme-dark 'tango-dark))
-       ((string= choice "solarized")
-        (setq theme-light 'solarized-light)
-        (setq theme-dark 'solarized-dark))
        (t
         (message "Invalid choice: %s" choice)))
       (customize-save-variable 'theme-light theme-light)
