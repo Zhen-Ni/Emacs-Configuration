@@ -2999,6 +2999,7 @@ Use space for indentation.
   (add-hook 'qml-mode-hook
             (lambda () (setq indent-tabs-mode nil)))
 #+end_src
+
 **** Lsp
 
 Lsp mode settings for ~qml-mode~.
@@ -3012,6 +3013,15 @@ Lsp mode settings for ~qml-mode~.
     :new-connection (lsp-stdio-connection (list qml-lsp-client-path))
     :major-modes '(qml-mode)
     :server-id 'qmlls))
+#+end_src
+
+**** Highlight Indentation
+
+Enable highlight indentation for qml.
+
+#+begin_src emacs-lisp
+  (add-hook 'qml-mode-hook #'highlight-indentation-mode)
+  (highlight-indentation-set-offset 4)
 #+end_src
 
 *** Functions and Keybindings
