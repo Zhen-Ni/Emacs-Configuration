@@ -3020,8 +3020,10 @@ Lsp mode settings for ~qml-mode~.
 Enable highlight indentation for qml.
 
 #+begin_src emacs-lisp
-  (add-hook 'qml-mode-hook #'highlight-indentation-mode)
-  (highlight-indentation-set-offset 4)
+  (add-hook 'qml-mode-hook
+    	  (lambda ()
+    	    (highlight-indentation-mode t)
+    	    (highlight-indentation-set-offset 4)))
 #+end_src
 
 *** Functions and Keybindings
