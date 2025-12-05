@@ -3005,10 +3005,10 @@ Use space for indentation.
 Lsp mode settings for ~qml-mode~.
 
 #+begin_src emacs-lisp
-  ;; Start lsp for qml-mode only when qmllsp exists.
+  ;; Start lsp for qml-mode only when qmlls exists.
   (add-hook 'qml-mode-hook
             (lambda ()
-              (when (executable-find "qmllsp")
+              (when (executable-find "qmlls")
                 (lsp))))
 
   ;; Set path for qmlls executable.
