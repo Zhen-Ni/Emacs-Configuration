@@ -419,12 +419,18 @@ available now.
 *** Window Components
 **** Menu, Tools and Scroll Bar
 
-I'd like to turn off menu, tool and scroll bar.
+I'd like to turn off menu, tool and scroll bar by default.
 
 #+begin_src emacs-lisp
   (menu-bar-mode 0)
   (tool-bar-mode 0)
   (scroll-bar-mode 0)
+#+end_src
+
+However, scroll bar mode can be toggled by the middle key of the
+mouse.
+#+begin_src emacs-lisp
+  (global-set-key (kbd "<mouse-2>") 'scroll-bar-mode)
 #+end_src
 
 **** COMMENT Show Line Numbers
