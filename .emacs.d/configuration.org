@@ -1146,7 +1146,7 @@ Currently, using git icon to replace vc-mode display.
                     'mouse-face mouse
   		  'help-echo echo)
   		 )
-             (branch (replace-regexp-in-string "^ Git[:\\-]" "" vc-mode)))
+             (branch (replace-regexp-in-string "^ Git[:\\-\\@]" "" vc-mode)))
         (concat " " icon branch)))
     )
 #+end_src
