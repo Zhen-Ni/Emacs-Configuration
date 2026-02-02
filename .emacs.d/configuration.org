@@ -465,10 +465,10 @@ function also sets consistent window sizes for all systems.
 * Editor
 ** Scrolling
 
-Smooth scrolling.
+Uncomment the next code block for smooth scrolling.
 
 #+begin_src emacs-lisp
-  (setq mouse-wheel-progressive-speed nil)
+  ; (setq mouse-wheel-progressive-speed nil)
 #+end_src
 
 Preserve cursor point when scrolling.
