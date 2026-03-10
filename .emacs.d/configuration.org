@@ -3099,10 +3099,11 @@ table.
 *** Configuration
 #+CAPTION: Aider Configuration
 #+NAME: aider-conf
-| Field    | Value                                     |
-|----------+-------------------------------------------|
-| model    | openai/Qwen/Qwen3-8B                      |
-| path     | "C:/msys64/home/zni/.local/bin/aider.exe" |
+| Field      | Value                                     |
+|------------+-------------------------------------------|
+| model      | openai/Pro/zai-org/GLM-4.7                |
+| weak-model | openai/zai-org/GLM-4.5-Air                |
+| path       | "C:/msys64/home/zni/.local/bin/aider.exe" |
 
 *** Setup
 Use Aidermacs for vibe coding. Make sure [[https://aider.chat/docs/install.html][aider]] is installed first.
@@ -3119,21 +3120,19 @@ Use Aidermacs for vibe coding. Make sure [[https://aider.chat/docs/install.html]
     (aidermacs-default-chat-mode 'architect))
 #+end_src
 
-#+RESULTS:
-: aidermacs-transient-menu
-
 User settings for aider.
 
 #+begin_src emacs-lisp :var conf=aider-conf
   (let ((path (cadr (assoc "path" conf)))
-        (model (cadr (assoc "model" conf))))
+        (model (cadr (assoc "model" conf)))
+        (weak-model (cadr (assoc "weak-model" conf))))
     (if (not (string-equal path "default"))
         (setq aidermacs-program path)
       )
-    (setq aidermacs-default-model
-  	(if (string-equal model "default")
-  	    "sonnet"
-  	  model))
+    (if (not (string-equal model "default"))
+        (setq aidermacs-default-model model))
+    (if (not (string-equal weak-model "default"))
+        (setq aidermacs-weak-model model))
     )
 #+end_src
 
