@@ -3132,7 +3132,7 @@ User settings for aider.
     (if (not (string-equal model "default"))
         (setq aidermacs-default-model model))
     (if (not (string-equal weak-model "default"))
-        (setq aidermacs-weak-model model))
+        (setq aidermacs-weak-model weak-model))
     )
 #+end_src
 
