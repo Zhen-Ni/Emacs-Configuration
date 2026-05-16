@@ -1452,7 +1452,7 @@ Do not re-execute the source code blocks during export.
 #+end_src
 
 *** Keybindings
-
+**** Toggle blocks
 Use ~C-<tab>~ for toggle hiding of the buffer, ~C-~`~ for toggle the
 current block. This is to achieve consistent experience with
 ~hs-toggle-buffer~ and ~hs-toggle-hidding~ function.
@@ -1462,6 +1462,17 @@ current block. This is to achieve consistent experience with
             (lambda ()
               (define-key org-mode-map (kbd "C-<tab>") #'org-cycle-global)
               (define-key org-mode-map (kbd "C-`") #'org-cycle)
+  	    ))
+#+end_src
+
+**** Calendar
+The original keybinding for ~org-agenda~ is ~C-c a~. But it is binded to
+[[Aidermacs]]. Bind it to ~C-c c~ instead.
+
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (define-key org-mode-map (kbd "C-c c") #'org-agenda)
   	    ))
 #+end_src
 
