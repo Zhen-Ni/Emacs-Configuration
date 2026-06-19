@@ -3112,7 +3112,7 @@ table.
 #+NAME: aider-conf
 | Field      | Value                                     |
 |------------+-------------------------------------------|
-| model      | openai/Pro/zai-org/GLM-5.1                |
+| model      | openai/zai-org/GLM-5.2                    |
 | weak-model | openai/zai-org/GLM-4.5-Air                |
 | path       | "C:/msys64/home/zni/.local/bin/aider.exe" |
 
