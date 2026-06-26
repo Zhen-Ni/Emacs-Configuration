@@ -3094,6 +3094,14 @@ Use magit to interacting with Git.
 #+begin_src emacs-lisp
   (use-package magit :ensure t :no-require t)
 #+end_src
+** Vterm
+Vterm is not for you [[https://github.com/akermu/emacs-libvterm/issues/12][if you are using Windows]].
+
+#+begin_src emacs-lisp
+  (unless (eq 'windows-nt system-type)
+    (use-package vterm :ensure t :no-require t)
+    )
+#+end_src
 
 ** Aidermacs
 
@@ -3110,11 +3118,10 @@ table.
 *** Configuration
 #+CAPTION: Aider Configuration
 #+NAME: aider-conf
-| Field      | Value                                     |
-|------------+-------------------------------------------|
-| model      | openai/zai-org/GLM-5.2                    |
-| weak-model | openai/zai-org/GLM-4.5-Air                |
-| path       | "C:/msys64/home/zni/.local/bin/aider.exe" |
+| Field | Value                                     |
+|-------+-------------------------------------------|
+| path  | "C:/msys64/home/zni/.local/bin/aider.exe" |
+| conf  | "~/.aider.conf.yml"                       |
 
 *** Setup
 Use Aidermacs for vibe coding. Make sure [[https://aider.chat/docs/install.html][aider]] is installed first.
@@ -3122,28 +3129,21 @@ Use Aidermacs for vibe coding. Make sure [[https://aider.chat/docs/install.html]
 #+begin_src emacs-lisp
   (use-package aidermacs :ensure t
     :bind (("C-c a" . aidermacs-transient-menu))
-    :config
-    ;; !!! The following settings are for debug use only !!!
-    ;; !!! Please save them in the environment varialbes !!!
-    ;; (setenv "OPENAI_API_BASE" "https://api.siliconflow.cn/v1")
-    ;; (setenv "OPENAI_API_KEY" "sk-<your private token here>")
     :custom
     (aidermacs-default-chat-mode 'architect))
 #+end_src
 
 User settings for aider.
 
-#+begin_src emacs-lisp :var conf=aider-conf
-  (let ((path (cadr (assoc "path" conf)))
-        (model (cadr (assoc "model" conf)))
-        (weak-model (cadr (assoc "weak-model" conf))))
+#+begin_src emacs-lisp :var config=aider-conf
+  (let ((path (cadr (assoc "path" config)))
+        (conf (cadr (assoc "conf" config))))
     (if (not (string-equal path "default"))
         (setq aidermacs-program path)
       )
-    (if (not (string-equal model "default"))
-        (setq aidermacs-default-model model))
-    (if (not (string-equal weak-model "default"))
-        (setq aidermacs-weak-model weak-model))
+    (if (not (string-equal conf "default"))
+        (setq aidermacs-config-file conf)
+      )
     )
 #+end_src
 
