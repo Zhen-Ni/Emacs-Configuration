@@ -16,7 +16,7 @@ blocks in this file.
 | Field              | Value   | Description                |
 |--------------------+---------+----------------------------|
 | font               | default |                            |
-| font-size          | 16      | font height in units of pt |
+| font-size          | 15      | font height in units of pt |
 | cjk-font           | default |                            |
 | python-interpreter | default | default for auto-detection |
 | longitude          | 121     | calendar-longitude         |
