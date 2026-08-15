@@ -2906,6 +2906,36 @@ Disable inlay hints by default, and use ~C-c i~ to show/hide inlay hints.
 #+end_src
 
 **** My Own Functions
+***** Rust Compile
+
+Press ~<f9>~ to save all buffers and run command ~rust-compile~.
+
+#+begin_src emacs-lisp
+  (defun rust-save-and-compile (&optional arg) (interactive "P")
+         "Save all buffers, and run `rust-compile`."
+         (save-some-buffers '(4))
+         (rust-compile)
+         )
+  (add-hook 'rust-mode-hook
+            (lambda () (local-set-key
+                        (kbd "<f9>")
+                        'rust-save-and-compile)))
+#+end_src
+
+Press ~C-<f9>~ to save all buffers and run command ~rust-compile-release~.
+
+#+begin_src emacs-lisp
+  (defun rust-save-and-compile-release () (interactive)
+         "Save all buffers, and run `rust-compile-release`."
+         (save-some-buffers '(4))
+         (rust-compile-release))
+  (add-hook 'rust-mode-hook
+            (lambda () (local-set-key
+                        (kbd "C-<f9>")
+                        'rust-save-and-compile-release)))
+#+end_src
+
+
 ***** Rust Run
 
 Press ~<f5>~ to save all buffers and run command ~rust-run~. If an prefix
@@ -2995,7 +3025,16 @@ detailed discussion can be found on [[https://tony-zorman.com/posts/fixing-lsp-m
      'rust-mode))
   )
 #+end_src
+**** TODO Run Doctest with Generics on Windows
+When running doctest, ~rust-mode~ will run ~cargo test --doc --package
+/package-name/ -- /function-name/ --show-output~. When ~function-name~
+contains generics, ~<T>~ will be translated into other things on windows
+system, leading to failure of doctest.
+#+begin_src emacs-lisp
+  ;; Cannot find the entry of doctest.
+  ;; No solution provided yet.
 
+#+end_src
 ** Qml Mode
 *** Basic Settings
 
