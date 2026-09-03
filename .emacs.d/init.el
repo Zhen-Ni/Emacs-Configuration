@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 ;;; The settings are in "configuration.org" for better organiztion.
 
 ;; The settings are organized in the org file.

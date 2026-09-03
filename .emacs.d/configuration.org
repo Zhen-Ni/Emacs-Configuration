@@ -1,7 +1,18 @@
-
 #+Title: Emacs Configuration
 
 * Preparation
+** Use Lexical-binding
+
+Since Emacs 31, Emacs will emit a runtime warning when loading `.el` files
+without the `lexical binding` file-local cookie.
+
+The cookie `;; -*- lexical-binding: t; -*-` must sit on the very first
+physical line of the generated `.el` file to take effect.
+
+#+begin_src emacs-lisp
+  ;; -*- lexical-binding: t -*-
+#+end_src
+
 ** Configuration Setup
 
 This is the configuration file for my Emacs.
@@ -83,9 +94,14 @@ Add melpa to package management system.
   ;; to the start of the line. You may delete these
   ;; explanatory comments.
   (require 'package)
-  (setq package-archives '(("gnu"    . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-                           ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
-                           ("melpa"  . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
+  (setq package-archives
+        ;; '(("gnu"    . "https://elpa.gnu.org/packages/")
+        ;; ("melpa"  . "https://melpa.org/packages/"))
+
+        '(("gnu" . "https://mirrors.ustc.edu.cn/elpa/gnu/")
+  	("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")
+  	("melpa-stable" . "https://mirrors.ustc.edu.cn/elpa/melpa-stable/"))
+        )
   (package-initialize)
 #+end_src
 
@@ -1352,7 +1368,7 @@ displayable in the current environment.
 #+begin_src emacs-lisp
   ;; I'd like to use a fancy symbol, such as "..⤸" for folded code. However,
   ;; org-ellipsis font fails to fallback when fringe display is enableb.
-  ;; (e.g., diff-hl-mode). 
+  ;; (e.g., diff-hl-mode).
   ;; (if (char-displayable-p ?⤸)
   ;;     (setq org-ellipsis "..⤸")
   ;;   (setq org-ellipsis "...")
