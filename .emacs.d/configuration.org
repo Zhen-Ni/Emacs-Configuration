@@ -1427,17 +1427,6 @@ current block. This is to achieve consistent experience with
   	    ))
 #+end_src
 
-**** Calendar
-The original keybinding for ~org-agenda~ is ~C-c a~. But it is binded to
-[[Aidermacs]]. Bind it to ~C-c c~ instead.
-
-#+begin_src emacs-lisp
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (define-key org-mode-map (kbd "C-c c") #'org-agenda)
-  	    ))
-#+end_src
-
 *** Troubleshooting
 **** COMMENT Indentation
 
@@ -2952,7 +2941,7 @@ Use Aidermacs for vibe coding. Make sure [[https://aider.chat/docs/install.html]
 
 #+begin_src emacs-lisp
   (use-package aidermacs :ensure t
-    :bind (("C-c a" . aidermacs-transient-menu))
+    :bind (("C-c c" . aidermacs-transient-menu))
     :custom
     (aidermacs-default-chat-mode 'architect))
 #+end_src
