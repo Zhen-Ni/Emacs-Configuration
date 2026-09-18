@@ -2960,6 +2960,47 @@ User settings for aider.
     )
 #+end_src
 
+** Gptel
+
+*** Basic settings
+#+begin_src emacs-lisp
+  (use-package gptel
+  :ensure t
+  :bind (("C-c g" . gptel)
+         ("C-c G" . gptel-menu))
+  :config
+  (setq gptel-backend
+        (gptel-make-openai "siliconflow"
+          :host "api.siliconflow.cn"
+          :endpoint "/v1/chat/completions"
+          :stream t
+          :key (lambda () (getenv "OPENAI_API_KEY"))
+          :models '("zai-org/GLM-5.3"
+  		  "Qwen/Qwen3-8B")))
+  (setq gptel-model 'zai-org/GLM-5.3))
+
+#+end_src
+
+*** Tools
+#+begin_src emacs-lisp
+  (with-eval-after-load 'gptel
+    (defun gptel-tool-now ()
+      "Return current system time."
+      (format-time-string "%Y-%m-%d %H:%M:%S %Z"))
+
+    (setq gptel-tools
+          (list
+           (gptel-make-tool
+            :name "now"
+            :function #'gptel-tool-now
+            :description "Get current date, time and timezone. You MUST call this tool when user asks what time it is."
+            :args nil)))
+
+    (setq gptel-confirm-tool-calls t)
+    (setq gptel-use-tools t)
+    )
+#+end_src
+
 ** COMMENT Emacs Application Framework
 
 Not fuly installed.
