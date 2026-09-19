@@ -678,11 +678,15 @@ Marginalia in the minibuffer. [[https://github.com/minad/marginalia][Marginalia 
 
 *** Flycheck
 
-Enable Flycheck mode by default.
+Ensure installation of ~Flycheck~ mode.
+
+This mode is not suggested to be activated by default using
+~(global-flycheck-mode)~. It is suggested to be activated only for
+~prog-mode~.
 
 #+begin_src emacs-lisp
-  (use-package flycheck :ensure t :no-require t)
-  (global-flycheck-mode)
+  (use-package flycheck :ensure t)
+  ;; (global-flycheck-mode)
 #+end_src
 
 *** Rainbow
@@ -1740,6 +1744,14 @@ Use Dap-mode for debugging. This mode is relient on ~lsp-mode~. See
   ;; Enabling only some features
   (setq dap-auto-configure-features '(sessions locals controls tooltip))
 
+#+end_src
+
+**** Flycheck
+
+Enable ~flycheck~ for all prog modes.
+
+#+begin_src emacs-lisp
+  (add-hook 'prog-mode-hook #'hs-minor-mode)
 #+end_src
 
 *** Keybindings
@@ -2960,7 +2972,7 @@ User settings for aider.
     )
 #+end_src
 
-** COMMENT Ellama
+** Ellama
 
 #+begin_src emacs-lisp
     (use-package ellama
@@ -2989,7 +3001,6 @@ User settings for aider.
   (setopt ellama-session-auto-compact-keep-last-turns 4)
   ;; 禁止短会话强行压缩（消除你看到的kept 0 turn日志）
   (setopt ellama-session-auto-compact-allow-fewer-kept-turns nil)
-
 #+end_src
 
 ** Gptel
