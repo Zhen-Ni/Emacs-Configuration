@@ -2999,7 +2999,7 @@ User settings for aider.
   :ensure t
   :bind (("C-c g" . gptel)
          ("C-c G" . gptel-menu))
-  :config    
+  :config
   (setq gptel-backend
         (gptel-make-openai "siliconflow"
           :host "api.siliconflow.cn"
@@ -3007,12 +3007,27 @@ User settings for aider.
           :stream t
           :key (lambda () (getenv "OPENAI_API_KEY"))
           :models '("zai-org/GLM-5.3"
-  		  "Qwen/Qwen3-8B")))
-  (setq gptel-model 'zai-org/GLM-5.3))
-
+  		  "Qwen/Qwen3-8B"
+  		  "deepseek-ai/DeepSeek-V3.2"
+  		  )))
+  (setq gptel-model 'zai-org/GLM-5.3)
+  )
 #+end_src
 
 *** Tools
+
+~gptel~ has the capability of tool calling.
+
+**** Tools from gptel-agent
+#+begin_src emacs-lisp
+  (use-package gptel-agent
+    :ensure t
+    :config (gptel-agent-update)
+    )
+#+end_src
+
+**** COMMENT User-defined tools
+
 #+begin_src emacs-lisp
   (with-eval-after-load 'gptel
     (defun gptel-tool-now ()
@@ -3026,10 +3041,6 @@ User settings for aider.
             :function #'gptel-tool-now
             :description "Get current date, time and timezone. You MUST call this tool when user asks what time it is."
             :args nil)))
-
-    (setq gptel-confirm-tool-calls t)
-    (setq gptel-use-tools t)
-    )
 #+end_src
 
 ** COMMENT Emacs Application Framework
