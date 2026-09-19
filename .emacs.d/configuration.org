@@ -3026,14 +3026,77 @@ User settings for aider.
 #+end_src
 
 *** Tools
+**** Tools from gptel-agent
 
 ~gptel~ has the capability of tool calling.
 
-**** Tools from gptel-agent
 #+begin_src emacs-lisp
   (use-package gptel-agent
     :ensure t
     :config (gptel-agent-update)
+    )
+#+end_src
+
+***** Troubleshooting
+
+The gptel-agent uses the POSIX ~tree~ for tool ~glob~. However, ~tree~
+refers to ~tree.com~ on Windows and behaves differently, which leads to
+errors. A solution is to rewrite the tool with standard behavior for
+the agent.
+
+#+begin_src emacs-lisp
+  (with-eval-after-load 'gptel-agent
+    (defun gptel-agent--glob (pattern &optional path depth)
+      "Find files matching PATTERN, pure elisp implementation (NO external tree command).
+  PATTERN is a case-insensitive glob-style pattern to match filenames against.
+  PATH is the optional directory to search (defaults to current directory).
+  DEPTH limits recursion depth when provided (non-negative integer).
+  Returns a string listing matching files with full paths, sorted by
+  modification time.  If the output is too large (>20000 chars), it writes
+  the full results to a temporary file and returns a truncated version with
+  instructions to use `Read' for the full contents.
+  Raises an error if PATTERN is empty, PATH is not readable."
+      (when (string-empty-p pattern)
+        (error "Error: pattern must not be empty"))
+      (setq path (or path "."))
+      (unless (and (file-readable-p path) (file-directory-p path))
+        (error "Error: path %s is not readable" path))
+      (let* ((root (expand-file-name path))
+             (max-depth (if (natnump depth) depth nil))
+             entries)
+        (cl-labels
+            ((walk (dir level)
+               ;; guard: dir must be string and readable
+               (when (and (stringp dir)
+  			(file-readable-p dir)
+  			(file-directory-p dir))
+                 (dolist (f (directory-files dir t))
+  		 (let* ((fname (file-name-nondirectory f))
+  			(is-dir (file-directory-p f)))
+                     (unless (member fname '("." ".."))
+                       ;; collect every entry (file OR dir), then test pattern
+                       (when (string-match-p (concat "^" (wildcard-to-regexp pattern) "$") fname)
+                         (push f entries))
+                       ;; recurse into subdirs, skip .git
+                       (when (and is-dir
+  				(not (equal fname ".git"))
+  				(or (not max-depth) (< level max-depth)))
+                         (walk f (1+ level)))))))))
+  	;; tree -L N: root is level 1
+  	(walk root 1))
+        ;; build list with mtime for sorting, safely handle nil attributes
+        (setq entries
+              (mapcar (lambda (f)
+                        (let ((attr (file-attributes f)))
+  			(cons f (if attr (file-attribute-modification-time attr) (current-time)))))
+                      entries))
+        ;; sort by mtime ascending (oldest first)
+        (setq entries (sort entries (lambda (a b) (time-less-p (cdr a) (cdr b)))))
+        (with-temp-buffer
+  	(dolist (e entries)
+            (insert (car e) "\n"))
+  	(gptel-agent--truncate-buffer "glob")
+  	(buffer-string))))
     )
 #+end_src
 
