@@ -2960,15 +2960,46 @@ User settings for aider.
     )
 #+end_src
 
-** Gptel
+** COMMENT Ellama
 
+#+begin_src emacs-lisp
+    (use-package ellama
+      :ensure t
+      :bind ("C-c e" . ellama)
+      :hook (org-ctrl-c-ctrl-c-hook . ellama-chat-send-last-message)
+      :init
+      (require 'llm-openai)
+      (setopt openai-compatible-provider
+              (make-llm-openai-compatible
+               :key (getenv "OPENAI_API_KEY")
+               :url (getenv "OPENAI_API_BASE")
+               :chat-model "zai-org/GLM-5.3"
+  	    ))
+      (setopt ellama-provider openai-compatible-provider)
+      (setopt ellama-auto-scroll t)
+      :config
+      (ellama-setup-agentic-coding)
+      ;; (ellama-context-header-line-global-mode +1)
+      ;; (ellama-session-header-line-global-mode +1)
+      (setq ellama-debug t)
+      )
+    ;; 达到上下文窗口95%才触发压缩（默认80%）
+  (setopt ellama-session-auto-compact-threshold-percent 95)
+  ;; 保留最近4轮完整对话
+  (setopt ellama-session-auto-compact-keep-last-turns 4)
+  ;; 禁止短会话强行压缩（消除你看到的kept 0 turn日志）
+  (setopt ellama-session-auto-compact-allow-fewer-kept-turns nil)
+
+#+end_src
+
+** Gptel
 *** Basic settings
 #+begin_src emacs-lisp
   (use-package gptel
   :ensure t
   :bind (("C-c g" . gptel)
          ("C-c G" . gptel-menu))
-  :config
+  :config    
   (setq gptel-backend
         (gptel-make-openai "siliconflow"
           :host "api.siliconflow.cn"
