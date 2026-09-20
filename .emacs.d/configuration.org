@@ -185,6 +185,41 @@ Use =<f5>= to refresh dashboard buffer.
                                       'dashboard-refresh-buffer)))
 #+end_src
 
+** Internet connection
+
+Use clash proxy
+
+#+begin_src emacs-lisp
+  (defvar clash-proxy-enabled nil)
+
+  (defun clash-proxy-sentinel (proc msg)
+    (when (string-match "open" msg)
+      ;; Use clash proxy
+      (setq url-proxy-services
+            '(("http" . "127.0.0.1:7890")
+              ("https" . "127.0.0.1:7890")
+              ("no_proxy" . "localhost,127.0.0.1"))
+            clash-proxy-enabled t)
+      (message "Clash port 7890 detected, proxy enabled."))
+    (when (string-match "failed" msg)
+      (setq url-proxy-services nil
+            clash-proxy-enabled nil)
+      (message "Clash port 7890 not available, proxy disabled."))
+    (delete-process proc))
+
+  (defun enable-clash-proxy ()
+    "Check Clash port 7890 and toggle url-proxy-services automatically."
+    (interactive)
+    (make-network-process
+     :name "clash-proxy"
+     :host "127.0.0.1"
+     :service 7890
+     :nowait t
+     :sentinel #'clash-proxy-sentinel))
+
+  (enable-clash-proxy)
+#+end_src
+
 ** Misc
 
 Turn off the annoying bell.
