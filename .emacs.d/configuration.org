@@ -95,13 +95,10 @@ Add melpa to package management system.
   ;; explanatory comments.
   (require 'package)
   (setq package-archives
-        ;; '(("gnu"    . "https://elpa.gnu.org/packages/")
-        ;; ("melpa"  . "https://melpa.org/packages/"))
-
         '(("gnu" . "https://mirrors.ustc.edu.cn/elpa/gnu/")
-  	("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")
-  	("melpa-stable" . "https://mirrors.ustc.edu.cn/elpa/melpa-stable/"))
-        )
+          ("nongnu" . "https://mirrors.ustc.edu.cn/elpa/nongnu/")
+          ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")
+          ("melpa-stable" . "https://mirrors.ustc.edu.cn/elpa/melpa-stable/")))
   (package-initialize)
 #+end_src
 
