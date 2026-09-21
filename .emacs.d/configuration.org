@@ -1,19 +1,19 @@
 #+Title: Emacs Configuration
 
 * Preparation
-** Use Lexical-binding
+** Use lexical-binding
 
-Since Emacs 31, Emacs will emit a runtime warning when loading `.el` files
-without the `lexical binding` file-local cookie.
+Since Emacs 31, Emacs will emit a runtime warning when loading ~.el~ files
+without the ~lexical binding~ file-local cookie.
 
-The cookie `;; -*- lexical-binding: t; -*-` must sit on the very first
-physical line of the generated `.el` file to take effect.
+The cookie ~;; -*- lexical-binding: t; -*-~ must sit on the very first
+physical line of the generated ~.el~ file to take effect.
 
 #+begin_src emacs-lisp
   ;; -*- lexical-binding: t -*-
 #+end_src
 
-** Configuration Setup
+** Configuration setup
 
 This is the configuration file for my Emacs.
 
@@ -34,7 +34,7 @@ blocks in this file.
 | latitude           | 31      | calendar-latitude          |
 | backup-dir         | default | backup directory           |
 
-** Macro Definition
+** Macro definition
 
 Get result from Table [[conf-table]].
 
@@ -74,7 +74,7 @@ Run function silently.
 #+end_src
 
 * Preference
-** Personal Info
+** Personal info
 
 Set =user-full-name.=
 
@@ -82,7 +82,7 @@ Set =user-full-name.=
   (setq user-full-name "Zhen NI")
 #+END_SRC
 
-** Package Management
+** Package management
 *** Use Melpa
 
 Add melpa to package management system.
@@ -131,8 +131,8 @@ check, which is given by [[https://stackoverflow.com/questions/78381013/failed-t
   ; (setq package-check-signature package-check-signature-backup)
 #+end_src
 
-** Startup Screen
-*** Disable Builtin Startup Screen
+** Startup screen
+*** Disable builtin startup screen
 
 Turn off the startup screen. Type =M-x display-about-screen= to
 open it manually if you want.
@@ -241,7 +241,7 @@ Stop always popping warning messages.
 
 * Appearance
 ** Color Theme
-*** COMMENT Set by Manually Specified Time
+*** COMMENT Set by manually specified time
 
 Set color theme by time. The theme is set to =tango= from 8:00
 to 18:00, and set to =tango-dark= from 18:00 to 8:00. The code
@@ -285,7 +285,7 @@ is modified from [[https://stackoverflow.com/a/14760833/2731421][this answer on 
   (run-with-timer 0 600 'synchronize-theme)
 #+end_src
 
-*** Set by Sunrise and Sunset Time Automatically
+*** Set by sunrise and sunset time automatically
 
 Use light theme when sun rises and dark theme when
 sun sets.
@@ -352,7 +352,7 @@ sun sets.
               (run-with-timer 0 60 #'synchronize-theme)))
 #+end_src
 
-*** Set Theme Pairs
+*** Set theme pairs
 
 User can set theme pairs interactively.
 
@@ -437,7 +437,7 @@ with size 110, and default cjk font is "微软雅黑".
     )
 #+end_src
 
-*** All the Icons
+*** All-the-icons
 
 Need to run ~all-the-icons-install-fonts~ to install the icons.
 
@@ -465,7 +465,7 @@ available now.
 
 ** Window Layouts
 *** Window Components
-**** Menu, Tools and Scroll Bar
+**** Menu, tools and scroll bar
 
 I'd like to turn off menu, tool and scroll bar by default.
 
@@ -481,7 +481,7 @@ mouse.
   (global-set-key (kbd "<mouse-2>") 'scroll-bar-mode)
 #+end_src
 
-**** COMMENT Show Line Numbers
+**** COMMENT Show line numbers
 
 Show line numbers on the left of the window.
 
@@ -489,7 +489,7 @@ Show line numbers on the left of the window.
   (global-display-line-numbers-mode t)
 #+end_src
 
-*** Window Split
+*** Window split
 
 Window split threshold. If the width of the frame is less than
 140, split horizontally, else split vertically.
@@ -499,7 +499,7 @@ Window split threshold. If the width of the frame is less than
 #+end_src
 
 ** Troubleshooting
-*** Window Size Issue
+*** Window size issue
 
 In X11 window, the default window size seems to be very
 small. This might be a BUG, but easy to fix. The following
@@ -525,9 +525,9 @@ Preserve cursor point when scrolling.
   (setq scroll-preserve-screen-position t)
 #+end_src
 
-** Multilingual Environment
+** Multilingual environment
 
-*** Language Coding System
+*** Language coding system
 
 Set prefered coding system to ~utf-8~. Note that
 ~(set-language-environment "UTF-8")~ is not used because it may ruin
@@ -538,7 +538,7 @@ some environments, such as aidermacs.
   (prefer-coding-system 'utf-8)
 #+end_src
 
-*** Input Method
+*** Input method
 
 Use "TeX" as default input method.
 
@@ -560,9 +560,9 @@ Use icons for dired. Requires ~all-the-icons~ to be properly installed.
    )
 #+end_src
 
-** Default Modes
+** Default modes
 *** Built-in
-**** Column Number Mode
+**** Column number mode
 
 Show column number on the bottom of the editor buffer.
 
@@ -570,7 +570,7 @@ Show column number on the bottom of the editor buffer.
   (column-number-mode 1)
 #+end_src
 
-**** Show Paren Mode
+**** Show paren mode
 
 Show matching parentheses. This becomes default behavior since Emacs
 version 28.
@@ -579,7 +579,7 @@ version 28.
   (show-paren-mode 1)
 #+end_src
 
-**** Auto Revert Mode
+**** Auto revert mode
 
 Automatically revert buffer if its content is changed
 somewhere else.
@@ -590,7 +590,7 @@ somewhere else.
   (setq global-auto-revert-non-file-buffers t)
 #+end_src
 
-**** Which Key Mode
+**** Which key mode
 
 Enable ~which-key-mode~ by default.
 
@@ -598,7 +598,7 @@ Enable ~which-key-mode~ by default.
   (which-key-mode t)
 #+end_src
 
-**** COMMENT Delete Selection Mode
+**** COMMENT Delete selection mode
 
 +Delete the selected region if text entered.+ Disabled.
 
@@ -606,7 +606,7 @@ Enable ~which-key-mode~ by default.
   ;; (delete-selection-mode t)
 #+end_src
 
-*** Recent Files
+*** Recent files
 
 Exclude files in =~/.emacs.d/=.
 
@@ -634,7 +634,7 @@ Always turn yasnippet mode on.
 
 *** Ivy, Swiper and Counsel
 
-**** Basic Settings
+**** Basic settings
 
 Do not enable the whole ivy mode as I just want to use a portion
 of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
@@ -651,7 +651,7 @@ of its funcitons. (to enable the whole ivy-mode, use =(ivy-mode
   (setq enable-recursive-minibuffers t)
 #+end_src
 
-**** Use Icons
+**** Use icons
 
 Use icons for ivy. Requires ~all-the-icons~ to be properly installed.
 
@@ -681,7 +681,7 @@ First make sure it is installed.
   (use-package projectile :ensure t)
 #+end_src
 
-**** Enable Projectile and its Keymap
+**** Enable Projectile and its keymap
 
 #+begin_src emacs-lisp
   (projectile-mode t)
@@ -730,7 +730,7 @@ Rainbow mode by default.
   (add-hook 'prog-mode-hook 'rainbow-mode)
 #+end_src
 
-*** Page Break Lines
+*** Page-break-lines
 
 Display ugly =^L= page breaks as tidy horizontal lines.
 
@@ -748,14 +748,14 @@ Enable this mode in all program modes.
   (add-to-list 'page-break-lines-modes 'prog-mode)
 #+end_src
 
-*** Highlight Indentation
+*** Highlight indentation
 
 #+begin_src emacs-lisp
   (use-package highlight-indentation
     :ensure t :no-require t)
 #+end_src
 
-*** COMMENT Git Gutter
+*** COMMENT Git-gutter
 
 Use ~diff-hl~ instead.
 
@@ -785,7 +785,7 @@ Display file changes if a git repository is found.
 #+end_src
 
 *** Diff-hl
-**** Basic Settings
+**** Basic settings
 
 Use ~diff-hl~ to compare file differences in different versions.
 
@@ -814,7 +814,7 @@ Use ~diff-hl~ to compare file differences in different versions.
   	(unknown . "?") (ignored . "i") (reference . " ")))
 #+end_src
 
-**** Dired Mode
+**** Dired mode
 
 Setup ~diff-hl-dired-mode~.
 
@@ -824,8 +824,8 @@ Setup ~diff-hl-dired-mode~.
   (add-hook 'magit-post-refresh-hook 'diff-hl-dired-update)
 #+end_src
 
-** Functions and Key Bindings
-*** Upcase and Downcase Region
+** Functions and key bindings
+*** Upcase and downcase region
 
 Upcase and downcase region.
 
@@ -885,7 +885,7 @@ cool!
   (global-set-key (kbd "M-g t") 'avy-move-region)  ; teleport
 #+end_src
 
-*** Ace Window
+*** Ace window
 
 Bind =M-o= to use ace-window.
 
@@ -894,7 +894,7 @@ Bind =M-o= to use ace-window.
   (global-set-key (kbd "M-o") 'ace-window)
 #+end_src
 
-*** Multiple Cursors
+*** Multiple cursors
 
 [[https://github.com/magnars/multiple-cursors.el][Multiple cursors]] for Emacs.
 
@@ -906,7 +906,7 @@ Bind =M-o= to use ace-window.
   (global-set-key (kbd "C-S-<mouse-1>") 'mc/toggle-cursor-on-click)
 #+end_src
 
-*** Hide Lines
+*** Hide lines
 
 Hide lines using regexp.
 
@@ -914,8 +914,8 @@ Hide lines using regexp.
   (use-package hide-lines :ensure t)
 #+end_src
 
-*** My Own Functions
-**** Open New Line
+*** My own functions
+**** Open new line
 
 Open a new line below or above the current one by using
 =S-<enter>= and =C-S-<enter>=.
@@ -964,7 +964,7 @@ Open a new line below or above the current one by using
                   'open-and-indent-line-above)
 #+end_src
 
-**** Reversed Yank
+**** Reversed yank
 
 Yank the previous kill. This is equivalent to =M-- M-y=.
 
@@ -981,15 +981,15 @@ Yank the previous kill. This is equivalent to =M-- M-y=.
     (global-set-key "\C-\M-Y" 'yank-pop-reversed)
 #+end_src
 
-** Mode Line Format
-*** Mode Line Format
+** Mode line format
+*** Mode line format
 
 Define the mode-line style.
 
 Please make sure ~all-the-icons~ is properly installed first to enable
 icon display.
 
-**** Syntax Checker Mode Line
+**** Syntax checker mode line
 
 Use flycheck for syntax checking and display the result in the mode
 line.
@@ -1115,7 +1115,7 @@ line.
   		)))
 #+end_src
 
-**** Project Mode Line
+**** Project mode line
 
 Set project mode display function in mode line.
 
@@ -1147,7 +1147,7 @@ Set project mode display function in mode line.
     )
 #+end_src
 
-**** Version Control Mode Line
+**** Version control mode line
 
 Set version control display function in mode line.
 
@@ -1180,7 +1180,7 @@ Currently, using git icon to replace vc-mode display.
     )
 #+end_src
 
-**** Mode Line Content
+**** Mode line content
 
 Set mode line format.
 
@@ -1212,7 +1212,7 @@ Set mode line format.
   )
 #+end_src
 
-*** Hide All Minor Modes
+*** Hide all minor modes
 #+begin_src emacs-lisp
   (use-package minions
     :ensure t
@@ -1224,7 +1224,7 @@ Set mode line format.
     )
 #+end_src
 
-** Backup Setting
+** Backup setting
 
 Set the Backup directory. Different Directories are used for
 Linux and Windows by default. The directory can be modified
@@ -1263,9 +1263,9 @@ around this issue.
     )
 #+end_src
 
-* Major Modes
+* Major modes
 ** Org Mode
-*** Basic Setting
+*** Basic setting
 
 Start org-mode with all headers collapsed. The default
 setting of Emacs minght be different on different
@@ -1305,8 +1305,8 @@ See [[https://orgmode.org/manual/Org-Indent-Mode.html][org mode manual]] for mor
           ))
 #+end_src
 
-*** Apperance Setting
-**** Character Display
+*** Apperance setting
+**** Character display
 
 Use utf-8 characters for display. Use "C-c C-x \" to toggle.
 
@@ -1320,7 +1320,7 @@ Hide *, ~ and / in org text.
   (setq org-hide-emphasis-markers t)
 #+end_src
 
-**** COMMENT Hide Leading Stars
+**** COMMENT Hide leading stars
 
 +Hide the verbose leading stars before headlines.+
 This feature is automatically enabled by =org-indent-mode=.
@@ -1329,7 +1329,7 @@ This feature is automatically enabled by =org-indent-mode=.
   (setq org-hide-leading-stars t)
 #+end_src
 
-**** Org Superstar
+**** Org superstar
 
 Use Org superstar mode.
 
@@ -1338,7 +1338,7 @@ Use Org superstar mode.
 (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 #+end_src
 
-**** Org Ellipsis Style
+**** Org ellipsis style
 
 I'd like something fancy instead of the ellipsis (...) that org
 displays when there's staff under a header. The arrow symbol is
@@ -1364,7 +1364,7 @@ displayable in the current environment.
   (set-face-bold 'org-ellipsis t)
 #+end_src
 
-*** "TODO" List Setting
+*** "TODO" list setting
 
 Org mode keyword settings.
 
@@ -1381,8 +1381,8 @@ Org mode keyword settings.
           ("POSTPONED" . "dark magenta")))
 #+end_src
 
-*** Source Code Block Setting
-**** Source Code Window Setting
+*** Source code block setting
+**** Source code window setting
 
 Use the current window for editing source blocks (Press C-c ' in
 source code block).
@@ -1391,7 +1391,7 @@ source code block).
   (setq org-src-window-setup 'current-window)
 #+end_src
 
-**** Babel Enable Languages
+**** Babel enable languages
 
 Enable Python, C, C++ and D languages.
 
@@ -1419,7 +1419,7 @@ Run these codes without prompting.
   (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
 #+end_src
 
-**** Python Setting for Babel
+**** Python setting for babel
 
 Switch python backend setted in configuration table for babel python
 mode.
@@ -1486,7 +1486,7 @@ whitespaces. And to insert tab in =org-mode=, press =C-q tab=.
   (lambda () (setq indent-tabs-mode nil)))
 #+end_src
 
-**** Page-breaklines Mode Compability
+**** Page-breaklines mode compability
 
 Disable page-breaklines mode because it does not work with
 org-indent-mode.
@@ -1495,7 +1495,7 @@ org-indent-mode.
   (add-hook 'org-mode-hook (lambda () (page-break-lines-mode -1)))
 #+end_src
 
-**** Hiding Leading Stars
+**** Hiding leading stars
 
 The leading stars of the titles in =org-mode= are hided by
 setting =org-hide-leading-starts= to =t=. This feature is
@@ -1539,7 +1539,7 @@ by function =advice-add= (see [[https://emacs.stackexchange.com/a/41250/38157][t
 In Emacs, =prog-mode= is the base mode for programming.
 
 *** Minor mode settings
-**** Company Mode
+**** Company mode
 
 Use Company mode for auto-completion.
 
@@ -1551,7 +1551,7 @@ Please note ~company-mode~ in ~python-shell~ would lead to undefined behavior fo
   (add-hook 'prog-mode-hook #'company-mode)
 #+end_src
 
-**** Hs Minor Mode
+**** Hs minor mode
 ***** Enabler
 
 Enable ~hs-minor-mode~ for all prog modes.
@@ -1559,7 +1559,7 @@ Enable ~hs-minor-mode~ for all prog modes.
 #+begin_src emacs-lisp
   (add-hook 'prog-mode-hook #'hs-minor-mode)
 #+end_src
-***** Overlay Style
+***** Overlay style
 
 Show different fonts for overlay.
 
@@ -1576,7 +1576,7 @@ Show different fonts for overlay.
   (setq hs-set-up-overlay #'hs-display-overlay)
 #+end_src
 
-***** Toggle Hidding Shortcut
+***** Toggle hidding shortcut
 
 Use ~C-`~ for toggle hiding.
 
@@ -1585,7 +1585,7 @@ Use ~C-`~ for toggle hiding.
       (define-key hs-minor-mode-map (kbd "C-`") #'hs-toggle-hiding))
 #+end_src
 
-***** Code Folding Shortcut
+***** Code folding shortcut
 
 *This block will be deprecated after Emacs 31. Use ~hs-cycle~ instead.*
 
@@ -1628,7 +1628,7 @@ Enable Lsp mode.
     )
 #+end_src
 
-***** Highlight Text
+***** Highlight text
 
 Set the font of the highlight text where cursor points to.
 
@@ -1643,7 +1643,7 @@ Set the font of the highlight text where cursor points to.
     )
 #+end_src
 
-***** Auto Guess Root
+***** Auto guess root
 
 Automatically guess the project root using projectile/project. Do not
 use this setting unless you are familiar with ~lsp-mode~ internals and
@@ -1656,7 +1656,7 @@ Refer to [[https://emacs-lsp.github.io/lsp-mode/page/settings/mode/#lsp-auto-gue
   (setq lsp-auto-guess-root t)
 #+end_src
 
-***** Disable Signature Help Documentation
+***** Disable signature help documentation
 
 Signature documentation sometimes makes the minibuffer too big when
 coding. The [[https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/][official website]] gives instructions for turning off such
@@ -1666,7 +1666,7 @@ features.
   (setq lsp-signature-render-documentation nil)
 #+end_src
 
-***** Use Insert Instead of Replace When Completion
+***** Use insert instead of replace when completion
 
 The default behaviour of lsp completion replaces the word inplace, as
 described by [[https://stackoverflow.com/questions/76211988/stop-company-complete-selection-from-eating-following-word-in-rust-code][this question]]. This behavior is controlled by
@@ -1677,8 +1677,8 @@ described by [[https://stackoverflow.com/questions/76211988/stop-company-complet
 (setq lsp-completion-default-behaviour :insert)
 #+end_src
 
-***** Mode Line
-****** Diagnostics Message
+***** Mode line
+****** Diagnostics message
 
 Use ~flycheck~ to show the diagnostic messages instead of ~lsp~'s native
 one.
@@ -1687,7 +1687,7 @@ one.
   (setq lsp-modeline-diagnostics-enable nil)
 #+end_src
 
-****** Code Action Icon
+****** Code action icon
 
 The original icon 💡 cannot be displayed properly on some
 systems. Replace it with other symbol.
@@ -1708,7 +1708,7 @@ systems. Replace it with other symbol.
        ((t)))))
 #+end_src
 
-****** Lsp Progress Prefix
+****** Lsp progress prefix
 
 Set icon for lsp-progress displayed in mode-line, which was originally
 using utf-8 char ~⌛~, and may not be properly displayed on some
@@ -1729,13 +1729,13 @@ platforms.
 
 ***** Headerline
 
-****** Turn off Lsp Headerline by Default
+****** Turn off lsp headerline by default
 
 #+begin_src emacs-lisp
   (setq lsp-headerline-breadcrumb-enable nil)
 #+end_src
 
-****** Lsp Headerline Arror
+****** Lsp headerline arror
 
 Set icons for lsp headerline arrow. These is to avoid unproper display
 of ">" sign on some platforms.
@@ -1802,9 +1802,9 @@ Use hungry delete from c-mode by using prefix "C-c".
                         'c-hungry-delete-forward)))
 #+end_src
 
-** Lisp Mode
-*** Minor Mode Settings
-**** Rainbow Delimiters Mode
+** Lisp mode
+*** Minor mode settings
+**** Rainbow delimiters mode
 
 Use rainbow-delimiters for lisp-like languages.
 
@@ -1817,9 +1817,9 @@ Use rainbow-delimiters for lisp-like languages.
   '(((((((((.)))))))))
 #+end_src
 
-*** Functions and Key Bindings
-**** My Own Funcitons
-***** Run Region or Buffer
+*** Functions and key bindings
+**** My own funcitons
+***** Run region or buffer
 
 Use ~C-c C-c~ to eval region or buffer, depending on whether the
 selected region is active.
@@ -1853,10 +1853,10 @@ Press ~<f5>~ to save all buffers and run the region or buffer.
                         'save-and-eval-region-or-buffer)))
 #+end_src
 
-** Python Mode
-*** Basic Settings
-**** Python Interpreter Setting
-***** Default Setting
+** Python mode
+*** Basic settings
+**** Python interpreter setting
+***** Default setting
 
 Switch python backend given in configuration table.
 
@@ -1876,7 +1876,7 @@ chapter.
   )
 #+end_src
 
-***** User Defined Interpreter
+***** User defined interpreter
 
 Set python interpreter interactively.
 
@@ -1889,14 +1889,14 @@ Set python interpreter interactively.
   			   python-shell-interpreter)))
 #+end_src
 
-**** Echo Input in Inferior Python Mode
+**** Echo input in inferior python mode
 
 The default python shell do not echo the input from python buffer by
 calling ~python-shell-send-string~ and etc., which may cause some
 confusion to the users. Here a function is provided to let the shell
 display the code which is being executed.
 
-***** Python Shell Output String
+***** Python shell output string
 
 The code in this block is inspired by code from ~elpy-shell.el~.
 
@@ -1953,7 +1953,7 @@ The code in this block is inspired by code from ~elpy-shell.el~.
 
 #+end_src
 
-***** Run Python with Shell Echo
+***** Run python with shell echo
 
 Run python with echo in the python shell.
 
@@ -1977,13 +1977,13 @@ Run python with echo in the python shell.
   )
 #+end_src
 
-*** Minor Mode Settings
+*** Minor mode settings
 
 Choose between either elpy or lsp. Since the developement of elpy is
 not active now, lsp-mode is used by default.
 
-**** Hs Minor Mode
-***** Org-style Folding
+**** Hs minor mode
+***** Org-style folding
 
 Use ~S-<tab>~ for Org-style folding.
 
@@ -2049,7 +2049,7 @@ Use ~S-<tab>~ for Org-style folding.
                         'python-hs-toggle-buffer)))
 #+end_src
 
-***** Overlay Style
+***** Overlay style
 
 Use special ellipsis than vanilla "..." for hided text, and show line
 counts.
@@ -2093,8 +2093,8 @@ full power of lsp-mode, by ~pip install python-lsp-server[all]~.
   (add-hook 'python-mode-hook 'lsp)
 #+end_src
 
-***** Grammar Checker Setting
-****** Mypy Cache Directory
+***** Grammar checker setting
+****** Mypy cache directory
 
 Define a directory for ~mypy~ temporarily files. Require ~pylsp-mypy~
 package to install first to enable the lsp mypy checker.
@@ -2111,7 +2111,7 @@ package to install first to enable the lsp mypy checker.
     )
 #+end_src
 
-****** COMMENT Disable Docstyle Check
+****** COMMENT Disable docstyle check
 
 Disable docstyle check. Sometimes it's too annoying.
 
@@ -2120,7 +2120,7 @@ Disable docstyle check. Sometimes it's too annoying.
     ;(setq lsp-pylsp-plugins-pydocstyle-ignore ["D100" "D101" "D102"])
 #+end_src
 
-**** Highlight Indentation
+**** Highlight indentation
 
 Enable highlight indentation for python.
 
@@ -2146,7 +2146,7 @@ Automatically enable python venv if ~.venv~ is found.
   		   (expand-file-name ".venv" venv)))))))
 #+end_src
 
-**** Dap Mode
+**** Dap mode
 
 Using dap mode for python. Lsp is a mandatory for this mode. See
 [[https://emacs-lsp.github.io/dap-mode/page/configuration/#python][official website]] for more details.
@@ -2158,12 +2158,12 @@ Using dap mode for python. Lsp is a mandatory for this mode. See
   (setq dap-python-debugger 'debugpy)
 #+end_src
 
-*** Functions and Key Bindings
+*** Functions and key bindings
 **** ShiftBlocks
 
 Navigation functions taken from ~elpy~.
 
-***** Shift Left-and-right
+***** Shift left-and-right
 #+begin_src emacs-lisp
   (defun elpy-nav-normalize-region ()
     "If the first or last line are not fully selected, select them
@@ -2206,7 +2206,7 @@ Navigation functions taken from ~elpy~.
        (line-beginning-position) (line-end-position) current-prefix-arg)))
 #+end_src
 
-***** Shift Up-and-down
+***** Shift up-and-down
 
 #+begin_src emacs-lisp
   (defun elpy-nav-move-line-or-region-down (&optional beg end)
@@ -2289,8 +2289,8 @@ Navigation functions taken from ~elpy~.
                         'elpy-nav-indent-shift-right)))
 #+end_src
 
-**** Python Run Buffer or Region
-***** Helper Functions
+**** Python run buffer or region
+***** Helper functions
 
 These are the helper functions.
 
@@ -2328,7 +2328,7 @@ These are the helper functions.
     )
 #+end_src
 
-***** Run Buffer or Selected Region
+***** Run buffer or selected region
 
 Run the current buffer, or region if there's an active selected
 region.  When running the current buffer, the ~__main__~ block will not
@@ -2369,7 +2369,7 @@ buffer.
                                       'python-rerun)))
 #+end_src
 
-***** Save all and Run Buffer or Selected Region
+***** Save all and run buffer or selected region
 
 Press ~<f5>~ to save all files, run the whole buffer or the selected
 region.
@@ -2455,7 +2455,7 @@ test the whole project.
 #+end_src
 
 *** Troubleshooting
-**** Capabality with Matplotlib on Windows Machines
+**** Capabality with matplotlib on Windows machines
 
 Matplotlib may not interactively plot figures in emacs environment on
 Window systems. This also happens in babel mode. We have change the
@@ -2466,7 +2466,7 @@ to TtAgg (in ipython) to solve the problem. This can be done by adding
 /matplotlibrc/ file by adding ~backend: TkAgg~, or set the system's
 environment variable ~MPLBACKEND~ to ~Tkagg~.
 
-**** Multilingual Environment
+**** Multilingual environment
 
 Python shell do not work well with windows system when utf-8
 characters are used in the buffer. Alternatively, using
@@ -2484,7 +2484,7 @@ this [[https://github.com/jorgenschaefer/elpy/issues/1729#issuecomment-558204483
   ;;              '("flake8" . (utf-8 . utf-8)))
 #+end_src
 
-**** Python Lsp
+**** Python lsp
 
 Pylsp becomes very slow when dealing with large libraries such as Transformers, which can cause Emacs to freeze. Use Pyright instead. See setup instructions on [[https://emacs-lsp.github.io/lsp-pyright/][this site]].
 
@@ -2507,7 +2507,7 @@ Pylsp becomes very slow when dealing with large libraries such as Transformers, 
   (add-hook 'python-mode-hook #'python-select-lsp)
 #+end_src
 
-**** COMMENT Lsp Issue
+**** COMMENT Lsp issue
 
 =lsp-find-definition= may be very slow or even timed out when
 processing python files on Linux. A similar problem can be
@@ -2520,9 +2520,9 @@ sure about it, and haven't found a solution.
   (setq lsp-enable-file-watchers nil)
 #+end_src
 
-** C++ Mode
-*** Basic Settings
-**** Use C++ Mode
+** C++ mode
+*** Basic settings
+**** Use C++ mode
 
 Use ~C++-mode~ for ~.h~ files.
 
@@ -2555,7 +2555,7 @@ Do not indent namespace in c++ mode.
   (add-hook 'c++-mode-hook 'cancel-c++-namespace-indentation)
 #+end_src
 
-*** Minor Mode Settings
+*** Minor mode settings
 **** Lsp
 ***** Use ~lsp-mode~
 
@@ -2566,7 +2566,7 @@ Use lsp-mode.
   (add-hook 'c-mode-hook 'lsp)
 #+end_src
 
-***** COMMENT Spell Check
+***** COMMENT Spell check
 
 The lsp-mode will use its own lsp-checker for flycheck. Here we
 disable this behaviour so that it uses c/c++-clang as its
@@ -2576,7 +2576,7 @@ default checker.
   (setq lsp-diagnostic-package :none)
 #+end_src
 
-***** Work with TRAMP
+***** Work with tramp
 
 Enable lsp-mode when editing remote files. See [[https://github.com/syl20bnr/spacemacs/issues/13925][Gibhub topic]] and
 [[https://emacs-lsp.github.io/lsp-mode/page/remote/][official website]] for more information.
@@ -2591,15 +2591,15 @@ Enable lsp-mode when editing remote files. See [[https://github.com/syl20bnr/spa
       :server-id 'clangd-remote)))
 #+end_src
 
-** Rust Mode
-*** Basic Settings
+** Rust mode
+*** Basic settings
 **** Use rust-mode
 
 #+begin_src emacs-lisp
   (use-package rust-mode :ensure t :no-require t)
 #+end_src
 
-**** COMMENT Use Rustic Mode
+**** COMMENT Use rustic mode
 
 Rustic mode is based on rust mode and provides additional features.
 
@@ -2616,7 +2616,7 @@ Use space for indentation.
              (lambda () (setq indent-tabs-mode nil)))
 #+end_src
 
-*** Minor Mode Settings
+*** Minor mode settings
 **** LSP
 
 Using lsp needs manually installation of =rust-analyzer=. This can be
@@ -2651,7 +2651,7 @@ information, see [[https://rust-analyzer.github.io/manual.html#emacs][rust-analy
 (add-hook 'rust-mode-hook 'eglot-ensure)
 #+end_src
 
-***** Flycheck Issues
+***** Flycheck issues
 
 Eglot uses flymake mode by default. So we disable flycheck mode here.
 
@@ -2659,9 +2659,9 @@ Eglot uses flymake mode by default. So we disable flycheck mode here.
   (add-hook 'rust-mode-hook (lambda () (flycheck-mode -1)))
 #+end_src
 
-*** Functions and Key Bindings
+*** Functions and key bindings
 **** Lsp
-***** Macro Expandsion
+***** Macro expandsion
 
 Use ~C-c m~ to expand rust macros.
 
@@ -2673,7 +2673,7 @@ Use ~C-c m~ to expand rust macros.
 
 #+end_src
 
-***** Inlay Hints
+***** Inlay hints
 
 Use ~C-c i~ to show/hide inlay hints.
 
@@ -2711,7 +2711,7 @@ Use ~C-c i~ to show/hide inlay hints.
 #+end_src
 
 **** COMMENT Eglot
-***** Inlay Hints
+***** Inlay hints
 
 Disable inlay hints by default, and use ~C-c i~ to show/hide inlay hints.
 
@@ -2723,8 +2723,8 @@ Disable inlay hints by default, and use ~C-c i~ to show/hide inlay hints.
                         'eglot-inlay-hints-mode)))
 #+end_src
 
-**** My Own Functions
-***** Rust Compile
+**** My own functions
+***** Rust compile
 
 Press ~<f9>~ to save all buffers and run command ~rust-compile~.
 
@@ -2753,8 +2753,7 @@ Press ~C-<f9>~ to save all buffers and run command ~rust-compile-release~.
                         'rust-save-and-compile-release)))
 #+end_src
 
-
-***** Rust Run
+***** Rust run
 
 Press ~<f5>~ to save all buffers and run command ~rust-run~. If an prefix
 argument is given, run command ~rust-run-clippy~.
@@ -2785,7 +2784,7 @@ Press ~C-<f5>~ to save all buffers and run command ~rust-run-release~.
                         'rust-save-and-run-release)))
 #+end_src
 
-***** Rust Test
+***** Rust test
 
 Use ~C-c C-t~ for ~rust-test~.
 #+begin_src emacs-lisp
@@ -2794,7 +2793,7 @@ Use ~C-c C-t~ for ~rust-test~.
 #+end_src
 
 *** Troubleshooting
-**** Extract Signature for rust-analyzer
+**** Extract signature for rust-analyzer
 
 When using hover signature in ~lsp-mode~, it extracts the first line
 returned by ~rust-analyzer~ by default as specfied by ~specific
@@ -2843,7 +2842,7 @@ detailed discussion can be found on [[https://tony-zorman.com/posts/fixing-lsp-m
      'rust-mode))
   )
 #+end_src
-**** TODO Run Doctest with Generics on Windows
+**** TODO Run doctest with generics on Windows
 When running doctest, ~rust-mode~ will run ~cargo test --doc --package
 /package-name/ -- /function-name/ --show-output~. When ~function-name~
 contains generics, ~<T>~ will be translated into other things on windows
@@ -2853,8 +2852,8 @@ system, leading to failure of doctest.
   ;; No solution provided yet.
 
 #+end_src
-** Qml Mode
-*** Basic Settings
+** Qml mode
+*** Basic settings
 
 Edit QT QML code.
 
@@ -2864,7 +2863,7 @@ Edit QT QML code.
     :mode "\\.qml\\'")
 #+end_src
 
-*** Minor Mode Settings
+*** Minor mode settings
 **** Indentation
 
 Use space for indentation.
@@ -2895,7 +2894,7 @@ Lsp mode settings for ~qml-mode~.
     :server-id 'qmlls))
 #+end_src
 
-**** Highlight Indentation
+**** Highlight indentation
 
 Enable highlight indentation for qml.
 
@@ -2906,8 +2905,8 @@ Enable highlight indentation for qml.
     	    (highlight-indentation-set-offset 4)))
 #+end_src
 
-*** Functions and Keybindings
-**** Make from Project Root
+*** Functions and keybindings
+**** Make from project root
 
 Press ~[f9]~ for compiling in project root using makefile.
 
@@ -2925,7 +2924,7 @@ Press ~[f9]~ for compiling in project root using makefile.
                                       'make-from-project-root)))
 #+end_src
 
-**** Save and Make from Project Root
+**** Save and make from project root
 
 Press ~[f5]~ for saving and compiling in project root.
 
@@ -2944,7 +2943,7 @@ Press ~[f5]~ for saving and compiling in project root.
                                       'save-and-make-from-project-root)))
 #+end_src
 
-* Not Only an Editor
+* Not only an editor
 ** Magit
 Use magit to interacting with Git.
 
@@ -3149,7 +3148,7 @@ the agent.
             :args nil)))
 #+end_src
 
-** COMMENT Emacs Application Framework
+** COMMENT Emacs application framework
 
 Not fuly installed.
 
