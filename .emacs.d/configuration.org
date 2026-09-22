@@ -475,6 +475,8 @@ I'd like to turn off menu, tool and scroll bar by default.
   (scroll-bar-mode 0)
 #+end_src
 
+***** Scrollbar shortcut
+
 However, scroll bar mode can be toggled by the middle key of the
 mouse.
 #+begin_src emacs-lisp
@@ -513,16 +515,22 @@ function also sets consistent window sizes for all systems.
 * Editor
 ** Scrolling
 
-Uncomment the next code block for smooth scrolling.
-
-#+begin_src emacs-lisp
-  ; (setq mouse-wheel-progressive-speed nil)
-#+end_src
-
 Preserve cursor point when scrolling.
 
 #+begin_src emacs-lisp
   (setq scroll-preserve-screen-position t)
+#+end_src
+
+Use ~ultra-scroll~ for smooth scrolling.
+
+#+begin_src emacs-lisp
+  (use-package ultra-scroll
+    :ensure t
+    :init
+    (setq scroll-conservatively 3) ; or whatever value you prefer, since v0.4
+  					;scroll-margin 0)        ; scroll-margin>0 is now supported, since v0.7
+    :config
+    (ultra-scroll-mode 1))
 #+end_src
 
 ** Multilingual environment
@@ -630,6 +638,20 @@ Always turn yasnippet mode on.
   ;; First make sure it is installed.
   (use-package yasnippet :ensure t)
   (yas-global-mode t)
+#+end_src
+
+*** COMMENT Yascroll
+
+This is disabled because it does not work well with ~ultra-scroll~.
+
+Use ~yascroll-mode~ for all ~text-mode~.
+
+#+begin_src emacs-lisp
+  (use-package yascroll
+    :ensure t
+    :config
+    (add-hook 'text-mode-hook #'yascroll-bar-mode)
+    )
 #+end_src
 
 *** Ivy, Swiper and Counsel
