@@ -3064,16 +3064,33 @@ User settings for aider.
   :bind (("C-c g" . gptel)
          ("C-c G" . gptel-menu))
   :config
-  (setq gptel-backend
-        (gptel-make-openai "siliconflow"
-          :host "api.siliconflow.cn"
+  (setq gptel-siliconflow
+          (gptel-make-openai "siliconflow"
+            :host "api.siliconflow.cn"
+            :endpoint "/v1/chat/completions"
+            :stream t
+            :key (lambda () (getenv "OPENAI_API_KEY"))
+            :models '("zai-org/GLM-5.3"
+                      "Qwen/Qwen3-8B"
+                      "deepseek-ai/DeepSeek-V3.2")))
+
+  (setq gptel-ollama
+        (gptel-make-ollama "ollama"
+          :host "localhost:11434"
+          :stream t
+          :models '("qwen3.5:9b"
+  		  )))
+
+  (setq gptel-ollama-openai
+        (gptel-make-openai "ollama-openai"
+  	:protocol "http"
+  	:host "localhost:11434"
           :endpoint "/v1/chat/completions"
           :stream t
-          :key (lambda () (getenv "OPENAI_API_KEY"))
-          :models '("zai-org/GLM-5.3"
-  		  "Qwen/Qwen3-8B"
-  		  "deepseek-ai/DeepSeek-V3.2"
-  		  )))
+          :key "dummy" ; Provide any value. No check is performed.
+          :models '("qwen3.5:9b")))
+
+  (setq gptel-backend gptel-siliconflow)
   (setq gptel-model 'zai-org/GLM-5.3)
   )
 #+end_src
