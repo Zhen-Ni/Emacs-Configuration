@@ -3070,15 +3070,20 @@ User settings for aider.
             :endpoint "/v1/chat/completions"
             :stream t
             :key (lambda () (getenv "OPENAI_API_KEY"))
-            :models '("zai-org/GLM-5.3"
-                      "Qwen/Qwen/Qwen3.5-4B"
-                      "deepseek-ai/DeepSeek-V3.2")))
+            :models '(
+  		    "zai-org/GLM-5.3"
+  		    (Qwen/Qwen3.5-4B
+  		     :mime-types ("image/jpeg" "image/png" "image/webp" "image/gif"))
+  		    "deepseek-ai/DeepSeek-V3.2"
+  		    )))
 
   (setq gptel-ollama
         (gptel-make-ollama "ollama"
           :host "localhost:11434"
           :stream t
-          :models '("qwen3.5:9b"
+          :models '(
+  		  (qwen3.5:9b
+  		   :mime-types ("image/jpeg" "image/png" "image/webp" "image/gif"))
   		  )))
 
   (setq gptel-ollama-openai
@@ -3088,10 +3093,14 @@ User settings for aider.
           :endpoint "/v1/chat/completions"
           :stream t
           :key "dummy" ; Provide any value. No check is performed.
-          :models '("qwen3.5:9b")))
+          :models '(
+  		  (qwen3.5:9b
+  		   :mime-types ("image/jpeg" "image/png" "image/webp" "image/gif"))
+  		  )))
 
   (setq gptel-backend gptel-siliconflow)
   (setq gptel-model 'zai-org/GLM-5.3)
+
   )
 #+end_src
 
