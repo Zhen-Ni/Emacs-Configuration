@@ -3071,7 +3071,7 @@ User settings for aider.
             :stream t
             :key (lambda () (getenv "OPENAI_API_KEY"))
             :models '("zai-org/GLM-5.3"
-                      "Qwen/Qwen3-8B"
+                      "Qwen/Qwen/Qwen3.5-4B"
                       "deepseek-ai/DeepSeek-V3.2")))
 
   (setq gptel-ollama
