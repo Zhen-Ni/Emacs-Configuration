@@ -858,6 +858,14 @@ Upcase and downcase region.
   (put 'downcase-region 'disabled nil)
 #+end_src
 
+*** Open org-agenda
+
+Use ~C-c a~ to open org-agenda
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-c a") #'org-agenda)
+#+end_src
+
 *** Ivy, Counsel and Swiper
 
 Key bindings for counsel. I just enable some of the key bindings
