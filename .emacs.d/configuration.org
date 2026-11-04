@@ -1900,7 +1900,8 @@ chapter.
   (let ((interpreter (get-conf! "python-interpreter")))
     (if (string= interpreter "default")
         (if (eq 'windows-nt system-type)
-            (setq python-shell-interpreter "ipython")
+            (setq python-shell-interpreter "ipython"
+  		python-shell-interpreter-args "--simple-prompt")
          )
         (setq python-shell-interpreter interpreter))
   )
@@ -1911,7 +1912,7 @@ chapter.
 Set python interpreter interactively.
 
 #+begin_src emacs-lisp
-  (defun python-shell-set-interpreter ()
+  (defun set-python-interpreter ()
     "Set the python interpreter for the current buffer."
     (interactive)
     (setq-local python-shell-interpreter
