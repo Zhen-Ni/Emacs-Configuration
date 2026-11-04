@@ -3005,10 +3005,10 @@ table.
 *** Configuration
 #+CAPTION: Aider Configuration
 #+NAME: aider-conf
-| Field | Value                                     |
-|-------+-------------------------------------------|
-| path  | "C:/msys64/home/zni/.local/bin/aider.exe" |
-| conf  | "~/.aider.conf.yml"                       |
+| Field | Value               |
+|-------+---------------------|
+| path  | default             |
+| conf  | "~/.aider.conf.yml" |
 
 *** Setup
 Use Aidermacs for vibe coding. Make sure [[https://aider.chat/docs/install.html][aider]] is installed first.
