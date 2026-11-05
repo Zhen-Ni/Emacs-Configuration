@@ -1400,15 +1400,19 @@ Org mode keyword settings.
 
 #+begin_src emacs-lisp
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "DOING(i)"
+        '((sequence "TODO(t)"
+  		  "DOING(i)"
+  		  "WAIT(W@/!)"
                     "|"
-                    "DONE(d)" "ABORT(a)" "POSTPONED(p)")))
+                    "DONE(d!)"
+  		  "ABORT(a@)")))
+
   (setq org-todo-keyword-faces
-        '(("TODO" . "red")
-          ("DOING" . "orange")
+        '(("TODO" . "goldenrod")
+          ("DOING" . "indian red")
+          ("WAIT" . "dark magenta")
           ("DONE" . "dark cyan")
-          ("ABORT" . "dim grey")
-          ("POSTPONED" . "dark magenta")))
+          ("ABORT" . "dim grey")))
 #+end_src
 
 *** Source code block setting
