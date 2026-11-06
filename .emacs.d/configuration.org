@@ -3038,7 +3038,7 @@ User settings for aider.
     )
 #+end_src
 
-** Ellama
+** COMMENT Ellama
 
 #+begin_src emacs-lisp
     (use-package ellama
@@ -3057,16 +3057,8 @@ User settings for aider.
       (setopt ellama-auto-scroll t)
       :config
       (ellama-setup-agentic-coding)
-      ;; (ellama-context-header-line-global-mode +1)
-      ;; (ellama-session-header-line-global-mode +1)
-      (setq ellama-debug t)
+      ; (setq ellama-debug t)
       )
-    ;; 达到上下文窗口95%才触发压缩（默认80%）
-  (setopt ellama-session-auto-compact-threshold-percent 95)
-  ;; 保留最近4轮完整对话
-  (setopt ellama-session-auto-compact-keep-last-turns 4)
-  ;; 禁止短会话强行压缩（消除你看到的kept 0 turn日志）
-  (setopt ellama-session-auto-compact-allow-fewer-kept-turns nil)
 #+end_src
 
 ** Gptel
