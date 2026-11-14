@@ -3200,6 +3200,35 @@ the agent.
             :description "Get current date, time and timezone. You MUST call this tool when user asks what time it is."
             :args nil)))
 #+end_src
+*** MCP
+**** MCP setup
+
+See [[https://github.com/lizqwerscott/mcp.el][mcp github page]] for documentation.
+
+#+begin_src emacs-lisp
+  (use-package mcp
+    :ensure t
+    :after gptel
+    :custom
+    (mcp-hub-servers
+     `(
+       ("fetch" . (:command "uvx"
+  			  :args ("mcp-server-fetch")))
+       ("git" . (:command "uvx"
+  			:args ("mcp-server-git")))
+       ("arxiv" . (:command "uvx"
+  			  :args ("arxiv-mcp-server")))
+       ))
+    )
+#+end_src
+
+**** MCP integration
+
+Enable ~gptel-mcp-connect~ and ~gptel-mcp-disconnect~.
+
+#+begin_src emacs-lisp
+  (require 'gptel-integrations)
+#+end_src
 
 ** COMMENT Emacs application framework
 
