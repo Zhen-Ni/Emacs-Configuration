@@ -3077,6 +3077,8 @@ User settings for aider.
             :key (lambda () (getenv "OPENAI_API_KEY"))
             :models '(
   		    "zai-org/GLM-5.3"
+  		    (zai-org/GLM-5.3-Flash
+  		     :mime-types ("image/jpeg" "image/png" "image/webp" "image/gif"))
   		    (Qwen/Qwen3.5-4B
   		     :mime-types ("image/jpeg" "image/png" "image/webp" "image/gif"))
   		    "deepseek-ai/DeepSeek-V3.2"
@@ -3104,8 +3106,7 @@ User settings for aider.
   		  )))
 
   (setq gptel-backend gptel-siliconflow)
-  (setq gptel-model 'zai-org/GLM-5.3)
-
+  (setq gptel-model 'zai-org/GLM-5.3-Flash)
   )
 #+end_src
 
