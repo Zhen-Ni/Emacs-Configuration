@@ -200,10 +200,16 @@ Use clash proxy
               ("https" . "127.0.0.1:7890")
               ("no_proxy" . "localhost,127.0.0.1"))
             clash-proxy-enabled t)
+      (setenv "HTTP_PROXY" "http://127.0.0.1:7890")
+      (setenv "HTTPS_PROXY" "http://127.0.0.1:7890")
+      (setenv "NO_PROXY" "localhost,127.0.0.1")
       (message "Clash port 7890 detected, proxy enabled."))
     (when (string-match "failed" msg)
       (setq url-proxy-services nil
             clash-proxy-enabled nil)
+      (setenv "HTTP_PROXY" nil)
+      (setenv "HTTPS_PROXY" nil)
+      (setenv "NO_PROXY" nil)
       (message "Clash port 7890 not available, proxy disabled."))
     (delete-process proc))
 
@@ -3219,6 +3225,8 @@ See [[https://github.com/lizqwerscott/mcp.el][mcp github page]] for documentatio
   			:args ("mcp-server-git")))
        ("arxiv" . (:command "uvx"
   			  :args ("arxiv-mcp-server")))
+       ("computer" . (:command "uvx"
+  			     :args ("computer-control-mcp")))
        ))
     )
 #+end_src
