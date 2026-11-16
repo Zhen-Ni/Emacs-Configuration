@@ -3239,6 +3239,17 @@ Enable ~gptel-mcp-connect~ and ~gptel-mcp-disconnect~.
   (require 'gptel-integrations)
 #+end_src
 
+** Agent-shell
+
+Connect to AI agents by ACP. Link: [[https://github.com/xenodium/agent-shell][agent-shell github page]].
+
+#+begin_src emacs-lisp
+  (use-package agent-shell
+    :ensure t
+    :no-require t
+    )
+#+end_src
+
 ** COMMENT Emacs application framework
 
 Not fuly installed.
