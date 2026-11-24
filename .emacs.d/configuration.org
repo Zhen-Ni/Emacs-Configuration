@@ -1823,7 +1823,7 @@ Use Dap-mode for debugging. This mode is relient on ~lsp-mode~. See
 Enable ~flycheck~ for all prog modes.
 
 #+begin_src emacs-lisp
-  (add-hook 'prog-mode-hook #'hs-minor-mode)
+  (add-hook 'prog-mode-hook #'flycheck-mode)
 #+end_src
 
 *** Keybindings
