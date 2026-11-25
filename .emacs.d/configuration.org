@@ -3241,6 +3241,7 @@ Enable ~gptel-mcp-connect~ and ~gptel-mcp-disconnect~.
 
 ** Agent-shell
 
+*** Setup agent-shell
 Connect to AI agents by ACP. Link: [[https://github.com/xenodium/agent-shell][agent-shell github page]].
 
 #+begin_src emacs-lisp
@@ -3248,6 +3249,15 @@ Connect to AI agents by ACP. Link: [[https://github.com/xenodium/agent-shell][ag
     :ensure t
     :no-require t
     )
+#+end_src
+
+*** Key bindings
+
+Use ~C-c '~ for multi-line input.
+
+#+begin_src emacs-lisp
+  (add-hook 'agent-shell-mode-hook (lambda () (local-set-key
+  				      (kbd "C-c '") #'agent-shell-prompt-compose)))
 #+end_src
 
 ** COMMENT Emacs application framework
